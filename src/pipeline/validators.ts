@@ -38,11 +38,11 @@ const SENT_CLAIM_RE = /\b(?:I'?ve|I have) sent\b|\blinks? below\b/i;
 const WRITE_TOOLS = ["updateUserClinicPreferences", "updateWorkingMemory", "updateUser"];
 
 const cleanUrl = (u: string) => u.replace(/[.,;:)!?'"]+$/, "");
-const urlsIn = (s: string) => (s.match(URL_RE) ?? []).map(cleanUrl);
+export const urlsIn = (s: string) => (s.match(URL_RE) ?? []).map(cleanUrl);
 const sentences = (s: string) => s.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
 const numbersIn = (s: string) => (s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((n) => Number(n.replace(/,/g, "")));
 
-function moneyIn(s: string): number[] {
+export function moneyIn(s: string): number[] {
   return [...s.matchAll(new RegExp(MONEY_SRC, "gi"))].map((m) => Number((m[1] ?? m[2]).replace(/,/g, "")));
 }
 
@@ -57,7 +57,7 @@ export function allowedValues(log: ToolLog): { urls: string[]; prices: number[] 
   return { urls, prices };
 }
 
-function allowedPriceSet(log: ToolLog, patientText?: string): Set<number> {
+export function allowedPriceSet(log: ToolLog, patientText?: string): Set<number> {
   const tool = [...log.prices()];
   const out = new Set<number>([...tool, ...POLICY_PRICES]);
   // A package price minus a deposit (the remaining balance) is derived from tool values.

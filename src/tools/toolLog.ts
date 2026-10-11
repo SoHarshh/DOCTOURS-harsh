@@ -14,6 +14,9 @@ export class ToolLog {
 
   private allText(): string { return this.results.join("\n"); }
 
+  /** Raw JSON of every tool result this turn, for name and value lookups. */
+  resultsText(): string { return this.allText(); }
+
   urls(): Set<string> {
     return new Set((this.allText().match(/https?:\/\/[^\s"\\]+/g) ?? []).map((u) => u.replace(/[.,;:)]+$/, "")));
   }
