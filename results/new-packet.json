@@ -1,0 +1,72 @@
+[
+  {
+    "response": "Heva has two packages. Silver is $3,000 with a $500 deposit and includes 3 hotel nights. Gold is $4,500 with a $600 deposit and includes 4 hotel nights; on Gold the doctor makes every incision and extracts every graft. Yes, you can book and pay the deposit right from your assessment: open it, pick Heva, choose your package, and hit Book. Heva is an afro hair specialist, so it works for 4C curls.",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "Share Heva packages, confirm assessment booking, confirm afro hair specialty",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": true,
+    "workingMemoryUpdates": {
+      "collectionState": null,
+      "communicationStyle": null,
+      "escalationFlags": null,
+      "keyConcerns": null,
+      "patientName": null,
+      "preferredPaymentMethod": null,
+      "procedureArea": "hairline",
+      "promisesMade": null,
+      "targetProcedureWindow": "within_6_months"
+    }
+  },
+  {
+    "response": "Dr. Hakan Clinic's current package is Sapphire at a base price of $3,200 USD, with a $500 USD deposit. Dr. Hakan Clinic is the only package listed there at the moment.",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "answer clinic price",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": true,
+    "workingMemoryUpdates": null
+  },
+  {
+    "response": "Yes, the free consultation is free. It's a phone call with the Doctours team, not with the clinic or the operating surgeon, and you can book it using the link below.\nhttps://www.doctours.com/consultation",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "answer consultation cost",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": false,
+    "workingMemoryUpdates": null
+  },
+  {
+    "response": "Sure, I'm handing you over to a person on our team now.",
+    "escalate": true,
+    "escalationReason": "Patient asked for a person",
+    "templateId": null,
+    "intent": "escalate_to_human",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": false,
+    "workingMemoryUpdates": null
+  },
+  {
+    "response": "I can't take or charge card details, so I'm handing this to a person on our team.",
+    "escalate": true,
+    "escalationReason": "Patient shared card details",
+    "templateId": null,
+    "intent": "escalate_to_human",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": false,
+    "workingMemoryUpdates": null
+  }
+]

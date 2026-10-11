@@ -1,0 +1,92 @@
+[
+  {
+    "response": "Yes, Heva Clinic specializes in afro and textured hair, so 4C curls are something they work with regularly. Their packages in USD are Silver at $3,000 with a $500 deposit, which includes 3 hotel nights, and Gold at $4,500 with a $600 deposit, which includes 4 hotel nights. For Gold, the doctor makes every incision and extracts every graft. You can pay the deposit straight from your assessment: open it, pick Heva under your recommended clinics, choose a package, and hit Book. Which of the two packages is closer to what you want?",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "answer Heva packages, payment path, and afro hair fit",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": true,
+    "workingMemoryUpdates": {
+      "collectionState": null,
+      "communicationStyle": null,
+      "escalationFlags": null,
+      "keyConcerns": "receding hairline; has 4C curls, wants afro-hair experience; leaning toward Heva Clinic",
+      "patientName": null,
+      "preferredPaymentMethod": null,
+      "procedureArea": "hairline",
+      "promisesMade": null,
+      "targetProcedureWindow": null
+    }
+  },
+  {
+    "response": "Dr. Hakan Clinic has one package, Sapphire, at $3,200 USD. It includes 3 hotel nights.",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "answer clinic pricing question",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": true,
+    "workingMemoryUpdates": null
+  },
+  {
+    "response": "Yes, the consultation is free. It's a phone call with the Doctours team, not with the clinic or the surgeon.",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "answer consultation cost question",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": false,
+    "workingMemoryUpdates": null
+  },
+  {
+    "response": "I hear you, Jordan, and I'm sorry this has felt frustrating. Tell me what you need and I'll do my best to answer it now. Are you looking for a specific answer about your assessment, the clinics, or pricing?",
+    "escalate": true,
+    "escalationReason": "Patient explicitly demanded to talk to a human.",
+    "templateId": null,
+    "intent": "acknowledge human request and offer to help",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": false,
+    "workingMemoryUpdates": {
+      "collectionState": null,
+      "communicationStyle": null,
+      "escalationFlags": "Patient demanded to talk to a human (escalated)",
+      "keyConcerns": "receding hairline; frustrated by wait for assessment follow-up",
+      "patientName": null,
+      "preferredPaymentMethod": null,
+      "procedureArea": null,
+      "promisesMade": null,
+      "targetProcedureWindow": null
+    }
+  },
+  {
+    "response": "I'm not able to charge a card directly, and I don't take card details. The deposit is paid through Doctours' secure checkout. You can book and pay right from your assessment: open a recommended clinic, choose a package, and tap Book. Or once you tell me which clinic and package you want, I'll send you the payment link. Which clinic and package are you leaning toward?",
+    "escalate": false,
+    "escalationReason": null,
+    "templateId": null,
+    "intent": "explain deposit payment path, no clinic or package selected yet",
+    "shouldFollowUp": false,
+    "followUpTiming": null,
+    "attachmentUrls": null,
+    "highEngagement": true,
+    "workingMemoryUpdates": {
+      "collectionState": null,
+      "communicationStyle": null,
+      "escalationFlags": null,
+      "keyConcerns": "receding hairline; wants to pay deposit now (card ending 4242 requested)",
+      "patientName": null,
+      "preferredPaymentMethod": null,
+      "procedureArea": null,
+      "promisesMade": "none",
+      "targetProcedureWindow": null
+    }
+  }
+]
