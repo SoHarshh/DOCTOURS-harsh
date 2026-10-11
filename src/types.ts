@@ -41,7 +41,14 @@ export const addUsage = (a: Usage, b: Usage): Usage => ({
 });
 
 export type EscalationSource = "pregate" | "model" | "validator" | "refusal" | null;
-export type ToolUseLabel = "Clean" | "Tool-Skip" | "Result-Ignore" | "Output-Fabrication" | "Unnecessary-Tool-Use" | "Gated";
+/** ToolFailBench labels plus the outcomes our pipeline adds (Gated, Model-/Validator-Escalated, Context). */
+export type ToolUseLabel =
+  | "Clean" | "Tool-Skip" | "Result-Ignore" | "Output-Fabrication"
+  | "Unnecessary-Tool-Use" | "Wrong-Answer"
+  | "Gated" | "Model-Escalated" | "Validator-Escalated" | "Context";
+
+/** What the model produced on one attempt, before validators acted. toolCallCount is the tool log length at the end of that attempt. */
+export interface AttemptRecord { response: string; escalate: boolean; toolCallCount: number; violations: string[] }
 
 export interface ToolCallRecord { name: string; args: unknown; ok: boolean; resultChars: number }
 
@@ -64,6 +71,7 @@ export interface Trace {
   promptChars: number;
   stopReason: string;
   notes: string[];
+  attempts?: AttemptRecord[];
 }
 
 export function emptyTrace(id: string, system: Trace["system"], model: string): Trace {
@@ -73,6 +81,6 @@ export function emptyTrace(id: string, system: Trace["system"], model: string): 
     skillsLoaded: [], routing: [], suppressed: [], toolsCalled: [],
     validators: { passed: [], failed: [], autoFixed: [], details: [] },
     retried: false, retryFixed: null, subagents: [], usage: zeroUsage(),
-    latencyMs: 0, rounds: 0, promptChars: 0, stopReason: "", notes: [],
+    latencyMs: 0, rounds: 0, promptChars: 0, stopReason: "", notes: [], attempts: [],
   };
 }
