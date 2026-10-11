@@ -1,7 +1,7 @@
 ---
 name: deposit-eligibility
 precedence: 20
-triggers: [paid directly, paid the clinic, already paid, deposit with the clinic, deposit to the clinic, deposit directly, /\b(?:paid|put down|sent|wired|placed)\b[^.?!]{0,30}\b(?:to|with|at)\s+(?:the clinic|heva|hakan|dr\.? hakan|them directly)\b/]
+triggers: [paid directly, paid the clinic, already paid, deposit with the clinic, deposit to the clinic, deposit directly, new deposit, clinic deposit, /\bdirect\b[^.?!]{0,25}\bdeposit\b/, /\b(?:move|moved|transfer|transferred|carry|count|counted|apply|applied|import|roll)\b[^.?!]{0,30}\b(?:into|toward|towards|over to)\s+doctours\b/, /\b(?:paid|put down|sent|wired|placed)\b[^.?!]{0,30}\b(?:to|with|at)\s+(?:the clinic|heva|hakan|dr\.? hakan|them directly)\b/]
 stages: []
 context_triggers: []
 suppresses: []

@@ -152,13 +152,27 @@ describe("routing", () => {
     expect(names("Does it hurt?")).toContain("recovery");
   });
   it("modules carry no text that answers a request the core hands to a person", () => {
-    // packet 921: a date-hold request answered without a handoff; packet 1317: "if one slips through, answer the rest"
+    // packet 921 and 922: date-hold and availability-check requests answered without a handoff;
+    // packet 1317: "if one slips through, answer the rest"
     for (const s of all) {
       expect(s.body, s.name).not.toContain("Clinic date-hold:");
+      expect(s.body, s.name).not.toContain("Clinic-availability check:");
       expect(s.body, s.name).not.toContain("If one slips through, do not grant it");
     }
     expect(byName.get("stage-pre-clinical-sent")?.body).toContain("Do NOT route to human just because the patient asks for a payment link");
-    expect(byName.get("off-channel-requests")?.body).toContain("Clinic-availability check:");
+    expect(byName.get("off-channel-requests")?.body).toContain("Internal lookup:");
+  });
+  it("escalation-shaped requests load the module that says we cannot do them", () => {
+    expect(names("can you see which dates are open at Heva in March?")).toContain("off-channel-requests");
+    expect(names("please arrange an airport pickup for me")).toContain("off-channel-requests");
+    expect(names("which weekdays can the Silver package be booked?")).not.toContain("off-channel-requests");
+  });
+  it("a deposit paid to a clinic directly loads deposit eligibility", () => {
+    for (const t of [
+      "Can the deposit I put down directly with Heva be moved into Doctours?",
+      "I gave Hakan a deposit directly, do I need a new deposit?",
+      "could my clinic deposit count toward Doctours?",
+    ]) expect(names(t), t).toContain("deposit-eligibility");
   });
   it("fertility loads without hair-transplant facts", () => {
     const r = names("do you do IVF?");

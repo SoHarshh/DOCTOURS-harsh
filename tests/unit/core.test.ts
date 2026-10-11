@@ -30,7 +30,7 @@ describe("core prompt", () => {
     for (const re of [
       /talk to a person/i,
       /charge a card/i, /card (?:numbers|digits)/i,
-      /move or refund money (?:they have )?already paid/i,
+      /move, transfer, or refund a deposit or payment/i,
       /contact a clinic/i, /hold or reserve a date/i,
       /second time/i,
       /discount[^.]*cannot verify[^.]*will not drop/i,
@@ -53,7 +53,8 @@ describe("core prompt", () => {
   });
   it("does not contradict the modules it is loaded with", () => {
     // moving money paid directly to a clinic is deposit-eligibility's case, answered, not handed off
-    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/move or refund money they have already paid to Doctours/);
+    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/they say they made to Doctours/);
+    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/deposit paid straight to a clinic[^;]*normal answer/);
     // promo says never announce that you cannot apply a discount
     expect(section("# WHAT YOU CANNOT DO")).not.toMatch(/discount/i);
     // the getPaymentLink fallback lived in packet line 1317, which the module cut drops
@@ -61,6 +62,24 @@ describe("core prompt", () => {
   });
   it("answers a call request with the free consultation instead of a handoff", () => {
     expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/asking for a call \(offer the free consultation call\)/);
+  });
+  it("hands off the new judgment cases and names the look-alike that stays a normal answer", () => {
+    const esc = section("# WHEN A PERSON MUST TAKE OVER");
+    // open dates at a clinic vs a package's bookable weekdays
+    expect(esc).toMatch(/find out which dates are open at a clinic/i);
+    expect(esc).toMatch(/which weekdays a package can be booked on[^;]*normal answer/i);
+    // arranging logistics for them vs how transport works
+    expect(esc).toMatch(/arrange or change their hotel, transfer, or driver for them/i);
+    expect(esc).toMatch(/how transport works from their own hotel[^;]*normal answer/i);
+    // a deposit move request with nothing on file vs asking about later
+    expect(esc).toMatch(/move, transfer, or refund a deposit or payment they say they made to Doctours, even if none shows on file/i);
+    expect(esc).toMatch(/asking whether they could move it later[^;]*normal answer/i);
+  });
+  it("does not copy external test sentences into the prompt", () => {
+    for (const t of ["dates are still free", "Move my deposit to Gold now", "transport from my own hotel?", "a separate callback for me"]) expect(core, t).not.toContain(t);
+  });
+  it("replies in English even when asked for another language", () => {
+    expect(section("# WHAT YOU DO EACH TURN")).toMatch(/Always reply in English, even when the patient writes in or asks for another language/);
   });
   it("does not contain any expected-reply text", () => {
     expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
