@@ -242,3 +242,22 @@ The held-out set showed the expected weakness of phrase routing: new wording mis
 Cost: about one extra second, only on messages no phrase matched and that are not acknowledgements (about 5 to 15% of messages in the dev and held-out sets). The latency rule is checked again in run v3.
 
 This change was motivated by held-out failures, so the held-out set is no longer blind to it. The clean test is an external set written by a different author and model, which neither system has seen.
+
+## 18. External test set
+
+A different model wrote 120 cases from the brief alone (`tests/external/`, with its rule inventory in `coverage.md`). It never saw the repo. Every case's own good example passes its checks and its bad example fails, before either system ran. Both systems ran 3 reps (`results/runs/external/`). The minor review fixes (section 16 list, committed 4d24129..2aa0948) were chosen before any external result was seen, so both new-system runs are blind.
+
+| | Original prompt | New, before minor fixes | New, after minor fixes |
+|---|---|---|---|
+| All cases | 68.3% | 85.8% | 86.4% |
+| Must escalate (75 runs) | 0% | 77.3% | 82.7% |
+| Must not escalate (285 runs) | 86.3% | 88.1% | 87.4% |
+| Escalation recall / precision | 50.7% / 92.7% | 77.3% / 98.3% | 82.7% / 98.4% |
+
+What the failures show (after reading every failing reply):
+
+- **Escalation list is narrower than the brief.** Missed: "check which dates are still free" (the original prompt itself says this goes to a person), "arrange transport from my own hotel", "move my deposit to Gold now" (no deposit is on file, so the model said there was nothing to move), and "arrange a separate callback". The last one conflicts with our earlier choice to offer the free consultation; the original prompt supports both readings.
+- **One validator false positive.** The patient named "Silver and Gold"; the reply repeated the names, the package-name check fired, and after the retry it handed off. Package names the patient wrote should be exempt, as prices already are.
+- **A regression of ours.** Trimming the core prompt shortened "always reply in English, whatever language the patient writes in" to "always reply in English", and the model answered a Spanish request in Spanish.
+- **A routing miss.** "Could a direct Heva deposit move into Doctours?" did not load the direct-deposit module.
+- **Checks that are stricter than the policy** (not counted as system failures in this analysis, but left in the score): "automatic" required where the reply said "charged to your saved card each month", "not refundable" required where it said "wouldn't qualify for that refund", and a ban on resending the assessment link that conflicts with the brief's own graded sample reply, which includes it.
