@@ -20,10 +20,9 @@ describe("handoffReply", () => {
         expect(r.shouldFollowUp).toBe(false);
       });
 
-      it("is one or two short first-person sentences", () => {
+      it("is one short first-person sentence", () => {
         const s = sentences(r.response);
-        expect(s.length).toBeGreaterThanOrEqual(1);
-        expect(s.length).toBeLessThanOrEqual(2);
+        expect(s.length).toBe(1);
         for (const x of s) expect(x.split(/\s+/).length).toBeLessThanOrEqual(20);
         expect(r.response).toMatch(/\bI\b|\bI'm\b/);
       });

@@ -69,6 +69,17 @@ describe("callModel", () => {
     expect(r.reply?.workingMemoryUpdates).toEqual(wm);
   });
 
+  it("drops an off-list working-memory value instead of failing the reply", async () => {
+    // The SDK moves enum lists into descriptions, so the API does not enforce them.
+    const wm = { communicationStyle: "friendly", patientName: "Jordan", collectionState: { lastAskedItem: "email", photoAskCount: "two", areaAskCount: 1 } };
+    const r = await callModel(deps(fakeClient([textResponse(baseReply({ workingMemoryUpdates: wm }))])), input(new ToolLog()));
+    expect(r.parseError).toBeNull();
+    expect(r.reply?.workingMemoryUpdates).toMatchObject({
+      communicationStyle: null, patientName: "Jordan",
+      collectionState: { lastAskedItem: null, photoAskCount: null, areaAskCount: 1 },
+    });
+  });
+
   it("does not mutate the caller's system blocks", async () => {
     const c = fakeClient([textResponse(baseReply())]);
     const inp = input(new ToolLog());

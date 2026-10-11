@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, writeFileSync } from "node:fs";
+import { mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { parseArgs, parseMessages, runAll } from "../../src/cli.js";
@@ -129,6 +129,14 @@ describe("cli process", () => {
     const dir = mkdtempSync(join(tmpdir(), "cli-"));
     oneLineError(run(["--in", join(dir, "nope.json")]), /nope\.json/);
   });
+  it("runs when started through a symlinked path", () => {
+    const dir = mkdtempSync(join(tmpdir(), "cli-"));
+    symlinkSync(ROOT, join(dir, "repo"));
+    const r = spawnSync(tsx, [join(dir, "repo", "src", "cli.ts"), "--system", "baseline", "--trace", join(dir, "t.jsonl")], { input: "[]", encoding: "utf8", cwd: ROOT });
+    expect(r.status).toBe(0);
+    expect(JSON.parse(r.stdout)).toEqual([]);
+  });
+
   it("writes an empty array for empty input, reading --in", () => {
     const dir = mkdtempSync(join(tmpdir(), "cli-"));
     const f = join(dir, "in.json");

@@ -1,7 +1,7 @@
 import "dotenv/config";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync, realpathSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
-import { pathToFileURL } from "node:url";
+import { fileURLToPath } from "node:url";
 import { buildContext, type Context } from "./context/buildContext.js";
 import { createDeps, type ClientLike, type ModelDeps } from "./pipeline/model.js";
 import { handoffReply } from "./pipeline/escalationReply.js";
@@ -110,4 +110,14 @@ async function main() {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) await main();
+/** True when this file is the entry point; compares real paths so a symlinked checkout still runs. */
+function isEntryPoint(): boolean {
+  if (!process.argv[1]) return false;
+  try {
+    return realpathSync(fileURLToPath(import.meta.url)) === realpathSync(resolve(process.argv[1]));
+  } catch {
+    return false;
+  }
+}
+
+if (isEntryPoint()) await main();

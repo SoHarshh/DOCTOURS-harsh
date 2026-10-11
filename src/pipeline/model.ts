@@ -48,19 +48,25 @@ const REPLY_FORMAT = (() => {
   return { type, schema };
 })();
 
-const nulls = (keys: string[]) => Object.fromEntries(keys.map((k) => [k, null]));
+/** Each field's value if its schema accepts it, else null ("no update"). */
+const validFields = (shape: Record<string, z.ZodType>, obj: any) =>
+  Object.fromEntries(Object.entries(shape).map(([k, s]) => [k, s.safeParse(obj[k] ?? null).success ? obj[k] ?? null : null]));
 
-/** Fills omitted working-memory fields with null so the output matches ReplySchema exactly. */
+/**
+ * Fills omitted working-memory fields with null so the output matches ReplySchema exactly. A field with an
+ * off-list value also becomes null: the SDK moves enum lists into descriptions, so the API does not enforce them,
+ * and one bad memory field should not throw away the whole reply.
+ */
 function normalize(raw: any): unknown {
   const wm = raw?.workingMemoryUpdates;
   if (!wm || typeof wm !== "object") return raw;
+  const { collectionState: _cs, ...rest } = WM;
   const cs = wm.collectionState;
   return {
     ...raw,
     workingMemoryUpdates: {
-      ...nulls(Object.keys(WM)),
-      ...wm,
-      collectionState: cs && typeof cs === "object" ? { ...nulls(Object.keys(CS)), ...cs } : null,
+      ...validFields(rest, wm),
+      collectionState: cs && typeof cs === "object" ? validFields(CS, cs) : null,
     },
   };
 }
