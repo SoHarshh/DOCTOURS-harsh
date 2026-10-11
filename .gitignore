@@ -12,3 +12,6 @@ pre-deposit-respond-packet.md
 results/*.json
 results/*.jsonl
 results/*.log
+results/*/
+!results/runs/
+results/*-compare.md
