@@ -208,3 +208,37 @@ Run v2 (`results/runs/v2/`): the new system after the triage fixes in section 12
 **Open judgment call: call requests.** The consultation module keeps the original text "requests for such a call are routed to a person before they reach you; if one slips through, ... keep helping over text". The core prompt says to answer a call request with the free consultation. The model escalated "can you just call me instead?" in 2 of 3 reps. Both readings are defensible from the brief. Offering the consultation keeps the patient helped; escalating matches the company's upstream routing. Left as is and reported.
 
 **Remaining failures** (9 of 321 turns): the call-request ambiguity (2), "who makes the incisions" answered without checking the package's notes (2), first-contact replies missing the upload link (2), and three single-rep misses.
+
+## 15. Blind held-out set
+
+The dev set's numbers are optimistic because fixes were found on it. A fresh agent wrote 25 new cases from the brief alone: it could not see the modules, the core prompt, the pipeline, any results, or the dev set's expectations. Every case uses the brief's patient. Each has a correct and a wrong reply checked against the case's own tests. Both systems ran once, 3 reps, before any change was made because of it (`results/runs/heldout/`).
+
+| | Original prompt | New system |
+|---|---|---|
+| Held-out pass rate | 74.7% (56/75) | 89.3% (67/75) |
+| Must-escalate recall | 83.3% | 100% |
+
+The original prompt failed mostly on escalation (it flagged the handoff, then kept writing). The new system's 8 failures were three kinds, all coverage gaps on new wording:
+
+- "does blue cross cover any of this?" did not load the insurance module (no trigger phrase matched).
+- "need to talk to my wife first" did not load the pause module.
+- "my card limit is like 1k" made the reply's "$1,000" look invented, because "1k" was not read as 1,000.
+
+## 16. Final review and fixes
+
+A fresh reviewer, with no part in the build, read the whole codebase. No critical issues. Four important ones, each fixed with a test that failed first:
+
+- The pre-gate handed off "can I talk to someone at the clinic?" on the first ask; the brief says the first ask gets an answer.
+- An empty-string escalation reason could reach the output where the contract requires null.
+- The head-covering check flagged the correct reply "you don't need to bring a hat".
+- An API rate-limit error after the SDK's retries became a handoff. Now the client retries 6 times with backoff, and the CLI retries a failed message once more before handing it to a person.
+
+Also fixed: "1k" is now read as 1,000 (found on the held-out set, so disclosed). Thirteen minor findings are deferred and listed in the README's next steps where they matter.
+
+## 17. Router fallback
+
+The held-out set showed the expected weakness of phrase routing: new wording misses its module. The plan already named the fix, to be added only once traces showed misses. When no policy module matched and the message is more than an acknowledgement, one small model call picks up to three modules from one-line descriptions. It fails open: on any error the message goes ahead with the stage module only. `ROUTER_FALLBACK=off` turns it off.
+
+Cost: about one extra second, only on messages no phrase matched and that are not acknowledgements (about 5 to 15% of messages in the dev and held-out sets). The latency rule is checked again in run v3.
+
+This change was motivated by held-out failures, so the held-out set is no longer blind to it. The clean test is an external set written by a different author and model, which neither system has seen.
