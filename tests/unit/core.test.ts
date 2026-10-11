@@ -1,0 +1,50 @@
+import { describe, it, expect } from "vitest";
+import { loadPrompt } from "../../src/prompts.js";
+import { TOOL_DEFINITIONS } from "../../src/tools/schemas.js";
+
+const core = loadPrompt("core");
+const section = (heading: string) => {
+  const start = core.indexOf(heading);
+  expect(start, heading).toBeGreaterThanOrEqual(0);
+  const next = core.indexOf("\n# ", start + heading.length);
+  return core.slice(start, next < 0 ? undefined : next);
+};
+
+describe("core prompt", () => {
+  it("is small", () => {
+    expect(core.split("\n").length).toBeLessThan(150);
+    expect(core.split(/\s+/).length).toBeLessThan(1400);
+  });
+  it("has no template placeholders", () => {
+    expect(core).not.toMatch(/\{\{[A-Za-z_.]+\}\}/);
+  });
+  it("covers escalation, grounding, output fields and link placement", () => {
+    for (const h of ["# WHEN A PERSON MUST TAKE OVER", "# GROUNDING", "# OUTPUT FIELDS", "# TOOLS AND LINKS", "last line"]) expect(core).toContain(h);
+  });
+  it("has no conflict-resolution prose: the router settles conflicts in code", () => {
+    expect(core).not.toContain("# CONFLICTS");
+    expect(core).not.toMatch(/\boverrides?\b|takes? priority|wins over|appears first wins|priority order/i);
+  });
+  it("lists exactly the narrow escalation triggers and leaves the handoff sentence to the system", () => {
+    const esc = section("# WHEN A PERSON MUST TAKE OVER");
+    for (const re of [
+      /talk to a person/i,
+      /charge a card/i, /card (?:numbers|digits)/i,
+      /move or refund money (?:they have )?already paid/i,
+      /contact a clinic/i, /hold or reserve a date/i,
+      /second time/i,
+      /discount[^.]*cannot verify[^.]*will not drop/i,
+      /system writes the handoff sentence/i,
+      /escalationReason/,
+    ]) expect(esc, String(re)).toMatch(re);
+    expect(esc).not.toMatch(/no tool and no loaded section|if (?:you are )?unsure|when in doubt/i);
+  });
+  it("describes every tool the model can call", () => {
+    const tools = section("# TOOLS AND LINKS");
+    for (const t of TOOL_DEFINITIONS) expect(tools, t.name).toMatch(new RegExp(`\\b${t.name}\\b`));
+    expect(tools).toMatch(/Tool suffix/);
+  });
+  it("does not contain any expected-reply text", () => {
+    expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
+  });
+});
