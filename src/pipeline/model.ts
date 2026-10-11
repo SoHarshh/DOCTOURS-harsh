@@ -94,10 +94,12 @@ function usageOf(u: any): Usage {
 
 /** One model turn: a manual tool loop capped at maxRounds, ending in a structured Reply. Never throws on bad output, only on a wrong served model or an API error. */
 export async function callModel(deps: ModelDeps, input: ModelCallInput): Promise<ModelCallResult> {
-  // Cache breakpoints: the first block (fixed core prompt) is shared across messages; the last block is shared
-  // across tool rounds within this message. Top-level cache_control (below) also caches the growing tool results.
-  const last = input.system.length - 1;
-  const system = input.system.map((b, i) => (i === 0 || i === last ? { ...b, cache_control: { type: "ephemeral" as const } } : b));
+  // One cache breakpoint per system block (the API allows four in total; the top-level one below is the fourth).
+  // The new system sends three blocks: the fixed core (shared by every message), the chosen policy modules
+  // (shared by every message that routes the same way), and the patient context (shared across tool rounds).
+  // The original prompt sends one block. Top-level cache_control also caches tool results as the rounds grow.
+  if (input.system.length > 3) throw new Error("at most 3 system blocks: the API allows 4 cache breakpoints");
+  const system = input.system.map((b) => ({ ...b, cache_control: { type: "ephemeral" as const } }));
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: input.user }];
   let usage = zeroUsage();
   let rounds = 0;

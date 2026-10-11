@@ -24,9 +24,10 @@ export function renderContextBlock(ctx: Context, extras: string[] = []): string 
 }
 
 /**
- * Two system blocks. The first is the core prompt, identical for every message, so the API cache
- * covers it (callModel marks it). The second holds only the policy modules the router chose,
- * in the router's order, then the context block.
+ * Three system blocks, ordered from most shared to least shared so each can be cached:
+ *   1. the core prompt, identical for every message;
+ *   2. the policy modules the router chose, in the router's order, identical for every message that routes the same way;
+ *   3. the patient and turn context.
  */
 export function assembleSystem(core: string, modules: PolicyModule[], ctx: Context, extras: string[] = []): Anthropic.TextBlockParam[] {
   const policy = modules.length
@@ -34,6 +35,7 @@ export function assembleSystem(core: string, modules: PolicyModule[], ctx: Conte
     : "# LOADED POLICY SECTIONS\n(none for this message)";
   return [
     { type: "text", text: core },
-    { type: "text", text: `${policy}\n\n# CONTEXT\n\n${renderContextBlock(ctx, extras)}` },
+    { type: "text", text: policy },
+    { type: "text", text: `# CONTEXT\n\n${renderContextBlock(ctx, extras)}` },
   ];
 }

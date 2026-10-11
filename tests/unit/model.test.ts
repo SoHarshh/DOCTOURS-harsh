@@ -5,7 +5,7 @@ import { TOOL_DEFINITIONS } from "../../src/tools/schemas.js";
 import { fakeClient, textResponse, toolResponse, baseReply, usage } from "./fakeClient.js";
 
 const deps = (client: any) => ({ client, model: "claude-haiku-5-5", effort: "medium" as const, maxRounds: 4 });
-const input = (log: ToolLog) => ({ system: [{ type: "text" as const, text: "sys" }, { type: "text" as const, text: "ctx" }], user: "hi", tools: TOOL_DEFINITIONS, log });
+const input = (log: ToolLog) => ({ system: [{ type: "text" as const, text: "sys" }, { type: "text" as const, text: "mods" }, { type: "text" as const, text: "ctx" }], user: "hi", tools: TOOL_DEFINITIONS, log });
 
 describe("callModel", () => {
   it("parses a direct structured reply", async () => {
@@ -32,6 +32,7 @@ describe("callModel", () => {
     // top-level automatic caching covers tool results as the conversation grows between rounds.
     expect(p.system[0].cache_control).toEqual({ type: "ephemeral" });
     expect(p.system[p.system.length - 1].cache_control).toEqual({ type: "ephemeral" });
+    for (const b of p.system) expect(b.cache_control).toEqual({ type: "ephemeral" });
     expect(p.cache_control).toEqual({ type: "ephemeral" });
     expect(p.tools.map((t: any) => t.name)).toEqual(TOOL_DEFINITIONS.map((t) => t.name));
     expect(p.messages).toEqual([{ role: "user", content: "hi" }]);

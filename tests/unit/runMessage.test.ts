@@ -107,10 +107,10 @@ describe("runMessage", () => {
     const c = fakeClient([textResponse(baseReply({ response: "We talked about your hairline and your 4C curls." })), textResponse(baseReply({ response: "Anytime." }))]);
     const store = { "66666666-6666-4666-8666-666666666666": "STORED CALL SUMMARY" };
     const a = await runMessage(buildContext(), "remind me what we talked about on the call?", opts(c, { callSummaries: store }));
-    expect(c.calls[0].system[1].text).toContain("STORED CALL SUMMARY");
+    expect(c.calls[0].system[2].text).toContain("STORED CALL SUMMARY");
     expect(a.trace.subagents).toEqual(["callLog"]);
     await runMessage(buildContext(), "ok thanks", opts(c, { callSummaries: store }));
-    expect(c.calls[1].system[1].text).not.toContain("STORED CALL SUMMARY");
+    expect(c.calls[1].system[2].text).not.toContain("STORED CALL SUMMARY");
   });
 
   it("records total latency and prompt size", async () => {

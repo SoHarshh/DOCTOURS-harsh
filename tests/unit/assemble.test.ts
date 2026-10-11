@@ -5,17 +5,25 @@ import { buildContext } from "../../src/context/buildContext.js";
 const mod = (name: string, body: string) => ({ name, body });
 
 describe("assembleSystem", () => {
-  it("returns two blocks: the fixed core first, then modules and context", () => {
+  it("returns three blocks: fixed core, then chosen modules, then patient context", () => {
     const blocks = assembleSystem("CORE", [mod("a", "A body"), mod("b", "B body")], buildContext());
-    expect(blocks.map((b) => b.type)).toEqual(["text", "text"]);
+    expect(blocks.map((b) => b.type)).toEqual(["text", "text", "text"]);
     expect(blocks[0].text).toBe("CORE");
     expect(blocks[1].text.indexOf("A body")).toBeLessThan(blocks[1].text.indexOf("B body"));
     expect(blocks[1].text).toContain("<!-- module: a -->");
+    expect(blocks[1].text).not.toContain("Jordan Hale");
+    expect(blocks[2].text).toContain("Jordan Hale");
   });
   it("the core block is byte-identical across messages so it stays cached", () => {
     const a = assembleSystem("CORE", [mod("a", "A")], buildContext());
     const b = assembleSystem("CORE", [mod("b", "B")], buildContext({ PIPELINE_STATUS: "LEAD" }));
     expect(a[0]).toEqual(b[0]);
+  });
+  it("the modules block depends only on the modules, so it caches across patients", () => {
+    const a = assembleSystem("CORE", [mod("a", "A")], buildContext());
+    const b = assembleSystem("CORE", [mod("a", "A")], buildContext({ PATIENT_NAME: "Someone Else", CHAT_LIST: "different" }));
+    expect(a[1]).toEqual(b[1]);
+    expect(a[2]).not.toEqual(b[2]);
   });
   it("says so when no module loaded", () => {
     expect(assembleSystem("CORE", [], buildContext())[1].text).toContain("(none for this message)");
