@@ -1,7 +1,7 @@
 ---
 name: reversibility
 precedence: 30
-triggers: [change my mind, changed my mind, torn, not sure, what if, final, locked in, commit, commitment, permanent, switch, switching, transfer my deposit, move my deposit, transferable, wrong choice, pick wrong, regret, stuck with, flexible, change later, change it later, change the date, move the date, change my date, change dates, my dates, dates yet]
+triggers: [change my mind, changed my mind, torn, not sure, what if, is it final, is this final, is that final, final decision, set in stone, money back, locked in, commit, commitment, permanent, switch, switching, transfer my deposit, move my deposit, transferable, wrong choice, pick wrong, regret, stuck with, flexible, change later, change it later, change the date, move the date, change my date, change dates, my dates, dates yet]
 stages: []
 context_triggers: []
 suppresses: []

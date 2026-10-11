@@ -51,6 +51,14 @@ describe("core prompt", () => {
   it("quotes a package with its price and deposit, never raw field names", () => {
     expect(section("# GROUNDING")).toMatch(/with its deposit, in plain words without field names/);
   });
+  it("does not contradict the modules it is loaded with", () => {
+    // moving money paid directly to a clinic is deposit-eligibility's case, answered, not handed off
+    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/move or refund money they have already paid to Doctours/);
+    // promo says never announce that you cannot apply a discount
+    expect(section("# WHAT YOU CANNOT DO")).not.toMatch(/discount/i);
+    // the getPaymentLink fallback lived in packet line 1317, which the module cut drops
+    expect(section("# TOOLS AND LINKS")).toMatch(/no ready link[^.]*book from their assessment/);
+  });
   it("does not contain any expected-reply text", () => {
     expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
   });

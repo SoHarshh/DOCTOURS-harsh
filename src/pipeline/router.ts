@@ -98,10 +98,12 @@ export function route(ctx: Context, text: string, all: Skill[]): RouteResult {
     }
   }
 
-  // Cap: most trigger hits first, then lower precedence, then name.
+  // Cap: most trigger hits first, then lower precedence, then the more specific module (fewer
+  // triggers, so a match says more), then name.
   const kept = candidates
     .filter((c) => !dropped.has(c.skill.name))
-    .sort((a, b) => b.hits - a.hits || byPrecedence(a.skill, b.skill))
+    .sort((a, b) => b.hits - a.hits || a.skill.precedence - b.skill.precedence
+      || a.skill.triggers.length - b.skill.triggers.length || a.skill.name.localeCompare(b.skill.name))
     .slice(0, MAX_MODULES)
     .map((c) => c.skill);
 

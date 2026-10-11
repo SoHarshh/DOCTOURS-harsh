@@ -1,7 +1,7 @@
 ---
 name: payment-and-deposit
 precedence: 20
-triggers: [pay, paying, paid, payment, payments, deposit, deposits, checkout, layaway, refund, refunds, refundable, cancel, cancellation, price lock, lock in, locked in, balance, owe, cash, wire, bank transfer, zelle, venmo, card, cards, book now, /\b(?:ready to|how (?:do|can) i|want to|i'?d like to|let'?s|can i) book\b/]
+triggers: [pay, paying, paid, payment, payments, deposit, deposits, checkout, layaway, refund, refunds, refunded, refundable, money back, cancel, cancelled, canceled, cancelling, canceling, cancellation, price lock, lock in, locked in, balance, owe, cash, wire, bank transfer, zelle, venmo, card, cards, book now, /\b(?:ready to|how (?:do|can) i|want to|i'?d like to|let'?s|can i) book\b/]
 stages: []
 context_triggers: []
 suppresses: []

@@ -137,6 +137,12 @@ describe("route cap", () => {
     const r = route(buildContext({ PIPELINE_STATUS: "LEAD" }), "carecredit, pay, flight, photo", all);
     expect(names(r)).toEqual(["carecredit", "payment", "collection", "stage-lead"]);
   });
+  it("on equal hits and precedence, the more specific module (fewer triggers) wins, not the name", () => {
+    const mk = (name: string, triggers: string) => parseSkill(`${name}.md`, `---\nname: ${name}\nprecedence: 20\ntriggers: [${triggers}]\n---\nbody`);
+    const broad = "hello, w1, w2, w3, w4";
+    const r = route(buildContext({ PIPELINE_STATUS: "LEAD" }), "hello", [mk("a-broad", broad), mk("b-broad", broad), mk("c-broad", broad), mk("z-specific", "hello")]);
+    expect(names(r)).toEqual(["a-broad", "b-broad", "z-specific"]);
+  });
   it("the stage module does not count toward the cap", () => {
     const r = route(buildContext({ PIPELINE_STATUS: "LEAD" }), "carecredit, deposit, passport", all);
     expect(names(r)).toEqual(["carecredit", "payment", "travel", "stage-lead"]);

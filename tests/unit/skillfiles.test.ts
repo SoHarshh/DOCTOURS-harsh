@@ -131,6 +131,35 @@ describe("routing", () => {
     expect(names("I'm interested in Heva")).not.toContain("policy-grounding");
     expect(names("how much is the package?")).not.toContain("recovery");
   });
+  it("review fixes: look-alikes stay out, real asks load", () => {
+    expect(names("Does the No Shave FUE package mean I won't be shaved?")).not.toContain("image-delay");
+    expect(names("I just shaved my head")).toContain("image-delay");
+    expect(names("my head is shaved right now")).toContain("image-delay");
+    expect(names("I'm not ready yet")).not.toContain("assessment");
+    expect(names("is it ready yet?")).toContain("assessment");
+    expect(names("can I bring my wife?")).not.toContain("recovery");
+    expect(names("what should I bring?")).toContain("recovery");
+    expect(names("is that your final price?")).not.toContain("reversibility");
+    expect(names("is this final?")).toContain("reversibility");
+    expect(names("what's the deal with Heva?")).not.toContain("promo");
+    expect(names("any deals right now?")).toContain("promo");
+    expect(names("I'm close to deciding")).not.toContain("policy-grounding");
+    expect(names("thinking about going in Apr")).not.toContain("policy-grounding");
+    expect(names("is the hotel close to the clinic?")).toContain("policy-grounding");
+    expect(names("Can I get refunded?")).toContain("payment-and-deposit");
+    expect(names("If I cancelled, do I get my money back?")).toContain("payment-and-deposit");
+    expect(names("Does it hurt?")).toContain("clinic-and-package-facts");
+    expect(names("Does it hurt?")).toContain("recovery");
+  });
+  it("modules carry no text that answers a request the core hands to a person", () => {
+    // packet 921: a date-hold request answered without a handoff; packet 1317: "if one slips through, answer the rest"
+    for (const s of all) {
+      expect(s.body, s.name).not.toContain("Clinic date-hold:");
+      expect(s.body, s.name).not.toContain("If one slips through, do not grant it");
+    }
+    expect(byName.get("stage-pre-clinical-sent")?.body).toContain("Do NOT route to human just because the patient asks for a payment link");
+    expect(byName.get("off-channel-requests")?.body).toContain("Clinic-availability check:");
+  });
   it("fertility loads without hair-transplant facts", () => {
     const r = names("do you do IVF?");
     expect(r).toContain("fertility");

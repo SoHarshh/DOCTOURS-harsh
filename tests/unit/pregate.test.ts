@@ -70,6 +70,57 @@ describe("pregate card", () => {
   });
 });
 
+describe("pregate review fixes", () => {
+  it("a request still fires when an identity or how-it-works question sits in another sentence", () => {
+    for (const t of [
+      "Are you a bot? I want to talk to a real person.", "are you a bot? get me a human",
+      "Would I be able to speak with a real person please?", "am I talking to a human? I need a human",
+    ]) yes(t, "human_request");
+  });
+  it("a bare request for a person fires", () => {
+    for (const t of ["Human please", "Agent", "representative", "a real person pls!!", "Operator."]) yes(t, "human_request");
+  });
+  it("other people in the patient's life are not a request for staff", () => {
+    for (const t of [
+      "Do I need a person to drive me home after surgery?", "Is there an agent fee on top of the clinic price?",
+      "Is there a representative at the airport to meet me?", "Can I transfer my deposit to someone else?",
+      "I need to talk to someone at home before deciding", "I want an agent fee waived",
+      "Do I need to talk to a human to cancel?",
+    ]) no(t);
+  });
+  it("can still ask for someone else on the team", () => {
+    yes("can I talk to someone else?", "human_request");
+    yes("I don't want to talk to a bot anymore", "human_request");
+  });
+  it("asking to hear from a past patient is not a handoff", () => {
+    no("Can I speak to someone who has had the procedure at Heva?");
+  });
+  it("charge requests naming the card brand or using 'put' fire", () => {
+    yes("Charge my Visa for the deposit", "charge_request");
+    yes("Put the deposit on my card please", "charge_request");
+    no("I'll put it on my card when I'm ready");
+  });
+  it("negated or how-it-works charge sentences do not fire", () => {
+    for (const t of [
+      "Please don't charge my card until I pick a date", "Would you charge my card automatically each month for layaway?",
+      "can you charge my card each month for layaway?",
+    ]) no(t);
+  });
+  it("international phone numbers are not card numbers", () => {
+    for (const t of ["call me on +234 803 123 4567", "my number is +55 11 98765 4321", "+86 138 0013 8000"]) no(t);
+  });
+  it("a long digit run that fails the card checksum fires only next to a card word", () => {
+    no("my reference is 2348031234562");
+    yes("my card is 2348031234562", "card_details");
+  });
+  it("card numbers with double spaces or dots fire and are redacted", () => {
+    for (const t of ["4111  1111  1111  1111", "4111.1111.1111.1111", "4111 - 1111 - 1111 - 1111"]) {
+      yes(t, "card_details");
+      expect(pregate(t).redactedText, t).toBe("[redacted]");
+    }
+  });
+});
+
 describe("isQuestion", () => {
   it("detects questions", () => {
     expect(isQuestion("can I pay by card?")).toBe(true);

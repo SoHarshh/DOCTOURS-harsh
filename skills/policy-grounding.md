@@ -1,7 +1,7 @@
 ---
 name: policy-grounding
 precedence: 20
-triggers: [apr, interest, monthly, per month, lock, locked, locks, guarantee, guaranteed, portal, dashboard, booking page, drive, driving, minutes, how far, far from, close to, closer, distance, miles, traffic, transfer, transfers, pickup, pick up, sabiha, ist, video, join link, how does it work, how does this work, how it works]
+triggers: [annual percentage, interest, monthly, per month, lock, locked, locks, guarantee, guaranteed, portal, dashboard, booking page, drive, driving, minutes, how far, far from, /\b(?:close|closer|closest|near|nearest)\b[^.?!]{0,20}\b(?:clinic|airport|hotel|heva|hakan)\b/, distance, miles, traffic, transfer, transfers, pickup, pick up, sabiha, ist, video, join link, how does it work, how does this work, how it works]
 stages: []
 context_triggers: []
 suppresses: []

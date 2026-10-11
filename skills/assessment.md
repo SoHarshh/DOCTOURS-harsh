@@ -1,7 +1,7 @@
 ---
 name: assessment
 precedence: 20
-triggers: [assessment, assessments, graft, grafts, drawing, treatment plan, my plan, revise, revision, revisions, redraw, redrawn, lower the hairline, ready yet, any update, any updates, resend, send it again, norwood, hair loss scale, donor, /\bwhen will (?:it|my|the)\b[^.?!]{0,30}\bready\b/, /\b(?:can'?t|cannot|couldn'?t)\s+open\b/]
+triggers: [assessment, assessments, graft, grafts, drawing, treatment plan, my plan, revise, revision, revisions, redraw, redrawn, lower the hairline, /\b(?:is|are)\s+(?:it|my|the|they)\b[^.?!]{0,20}\bready\b/, any update, any updates, resend, send it again, norwood, hair loss scale, donor, /\bwhen will (?:it|my|the)\b[^.?!]{0,30}\bready\b/, /\b(?:can'?t|cannot|couldn'?t)\s+open\b/]
 stages: []
 context_triggers: []
 suppresses: []

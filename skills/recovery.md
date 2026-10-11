@@ -1,7 +1,7 @@
 ---
 name: recovery
 precedence: 30
-triggers: [hat, hats, cap, caps, beanie, beanies, scarf, hood, hoodie, headband, hijab, durag, du-rag, bonnet, head wrap, head covering, cover my head, wear, wearing, pack, packing, bring, recovery, recover, recovering, after surgery, after the procedure, post-op, post op, aftercare, shedding, shed, wash, washing, scab, scabs, swelling, pain, sleep, sleeping, back to work, /\bhow long (?:does|is|will) (?:the )?(?:surgery|procedure|operation|transplant)\b/]
+triggers: [hat, hats, cap, caps, beanie, beanies, scarf, hood, hoodie, headband, hijab, durag, du-rag, bonnet, head wrap, head covering, cover my head, pack, packing, /\bwhat (?:should|do|can) i (?:bring|pack|wear)\b/, hurt, hurts, painful, recovery, recover, recovering, after surgery, after the procedure, post-op, post op, aftercare, shedding, shed, wash, washing, scab, scabs, swelling, pain, sleep, sleeping, back to work, /\bhow long (?:does|is|will) (?:the )?(?:surgery|procedure|operation|transplant)\b/]
 stages: []
 context_triggers: []
 suppresses: []
