@@ -59,6 +59,9 @@ describe("core prompt", () => {
     // the getPaymentLink fallback lived in packet line 1317, which the module cut drops
     expect(section("# TOOLS AND LINKS")).toMatch(/no ready link[^.]*book from their assessment/);
   });
+  it("answers a call request with the free consultation instead of a handoff", () => {
+    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/asking for a call \(offer the free consultation call\)/);
+  });
   it("does not contain any expected-reply text", () => {
     expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
   });
