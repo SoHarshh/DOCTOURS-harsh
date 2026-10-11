@@ -60,8 +60,11 @@ describe("core prompt", () => {
     // the getPaymentLink fallback lived in packet line 1317, which the module cut drops
     expect(section("# TOOLS AND LINKS")).toMatch(/no ready link[^.]*book from their assessment/);
   });
-  it("answers a call request with the free consultation instead of a handoff", () => {
-    expect(section("# WHEN A PERSON MUST TAKE OVER")).toMatch(/asking for a call \(offer the free consultation call\)/);
+  it("hands off a call other than the free consultation; consultation questions stay a normal answer", () => {
+    const esc = section("# WHEN A PERSON MUST TAKE OVER");
+    expect(esc).toMatch(/asks for a call other than the free consultation \(a separate callback, or a call with you, the surgeon, or the clinic\)/i);
+    expect(esc).toMatch(/questions about the consultation, and call requests it covers, are normal answers/i);
+    expect(esc).not.toMatch(/asking for a call \(offer the free consultation call\)/);
   });
   it("hands off the new judgment cases and names the look-alike that stays a normal answer", () => {
     const esc = section("# WHEN A PERSON MUST TAKE OVER");
