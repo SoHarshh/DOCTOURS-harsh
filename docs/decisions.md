@@ -189,3 +189,22 @@ Triage of the 11 per-case losses:
 ## 13. Advisor tool: considered, not on the main path
 
 The advisor tool lets a fast model consult a stronger one mid-generation. Not adopted on the main reply path: the docs call it a weak fit for single-turn Q&A, each consult adds a non-streaming call to a larger model, which would break the latency rule, and most remaining failures are routing and checking problems, not reasoning. It is a candidate pivot on the retry path only (2.8% of turns, first-retry fix rate 37.5%), paired with an advisor that returns plaintext advice (Opus 4.8 on a Haiku 5.5 executor) so the trace stays readable.
+
+## 14. Run v2
+
+Run v2 (`results/runs/v2/`): the new system after the triage fixes in section 12, against the same baseline replies, all rescored under the corrected test cases.
+
+| | Original prompt | New system |
+|---|---|---|
+| Pass rate | 74.1% | 97.2% |
+| Paired per case | | +23.1 points (SE 3.8); 35 wins, 2 losses, 70 ties |
+| Escalation recall / precision | 58.8% / 90.9% | 100% / 96.2% |
+| Median / p95 latency (turns that reached the model) | 5.3 s / 9.8 s | 3.7 s / 7.1 s |
+| Cost per 1,000 turns | $1.72 | $0.88 |
+| Retries that fixed the reply | n/a | 4 of 4 |
+
+**Caveat.** The v1 to v2 gain came from fixing problems found on this same test set. Each fix is a general rule (a routing phrase, a validator rule, one core prompt line), not a patch for one case, but the v2 number is still optimistic for unseen messages. The v1 number (92.8% after case fixes) is the better estimate of first-contact performance.
+
+**Open judgment call: call requests.** The consultation module keeps the original text "requests for such a call are routed to a person before they reach you; if one slips through, ... keep helping over text". The core prompt says to answer a call request with the free consultation. The model escalated "can you just call me instead?" in 2 of 3 reps. Both readings are defensible from the brief. Offering the consultation keeps the patient helped; escalating matches the company's upstream routing. Left as is and reported.
+
+**Remaining failures** (9 of 321 turns): the call-request ambiguity (2), "who makes the incisions" answered without checking the package's notes (2), first-contact replies missing the upload link (2), and three single-rep misses.
