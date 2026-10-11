@@ -13,7 +13,8 @@
     "eval": "tsx harness/run.ts",
     "compare": "tsx harness/compare.ts",
     "blast": "tsx harness/blast.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "precompute": "tsx scripts/precompute-call-summaries.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
