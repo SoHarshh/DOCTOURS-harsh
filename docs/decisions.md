@@ -86,3 +86,11 @@ Work that happens once, before any patient texts: cutting the prompt into files,
 ## Owed before hand-in
 
 - A workflow diagram comparing the original single-prompt flow with the new flow, marking what is new and how each part works.
+
+## 9. Findings from the first live run (five packet messages)
+
+**Cache gap.** The first run cached only the fixed core prompt. The per-message block (modules plus context, about 13,000 tokens) was re-sent uncached on every tool round, so a message with six tool calls cost about three times the original prompt, which caches its whole 60,000-token prompt as one block. Fix: a second cache breakpoint on the per-message block and automatic caching of the growing tool results. Both systems use the same model-call code, so the comparison stays fair.
+
+**Link conflict.** "Do not resend a link already sent" collided with "tell the patient they can pay from their assessment". The model followed the first rule and left the assessment link out. Resolution, in the core prompt: when you tell the patient to do something on a page (pay, book), include that page's link even if it was sent before. This is a general rule, but it was found because a sample message exposed it, and that is stated here so a reviewer can judge it.
+
+**Baseline on the same five messages.** The original prompt missed the Hakan deposit, left out the consultation link, kept answering after "I demand to talk to a human", and did not escalate the card request.
