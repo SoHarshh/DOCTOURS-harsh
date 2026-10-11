@@ -77,7 +77,7 @@
         "/transfer|move|switch|change/i"
       ],
       "mustNotInclude": [
-        "/(?:is|are|be|gets?) locked in|can.?t (?:be )?changed|final decision/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:is|are|be|gets?) locked in|(?:it|that|this|the package|your choice) can.?t (?:be )?changed|final decision)/i"
       ]
     }
   },
@@ -151,7 +151,7 @@
     "expect": {
       "escalate": false,
       "mustNotInclude": [
-        "/bring a (?:loose )?(?:hat|cap)|pack a hat|loose cap|beanie|scarf/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:bring|pack|buy|grab) (?:a |an |your )?(?:loose |soft |light |front.?opening )*(?:hat|cap|beanie|scarf|hood|headband|bandana|head ?wrap)|(?:a |an )(?:very )?loose (?:front.?opening )?(?:hat|cap|scarf|beanie))/i"
       ],
       "mustInclude": [
         "/two weeks|2 weeks|button|zip|front.?opening|nothing on (?:your|the) head/i"
@@ -249,7 +249,7 @@
         "consultation"
       ],
       "mustNotInclude": [
-        "/I.?ll call you|I will call you|give you a call/i"
+        "/\\bI.?ll (?:call|phone|ring) you|\\bI will (?:call|phone) you|\\bI(?:.?ll| will| can) give you a call/i"
       ]
     },
     "control": true

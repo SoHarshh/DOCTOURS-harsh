@@ -78,8 +78,13 @@ export function errorKind(e: unknown): ErrorKind {
   return "harness";
 }
 
-/** A turn that returned but cannot be scored: the output was cut off or never parsed into a Reply. */
+/**
+ * A turn that returned but cannot be scored: the output was cut off or never parsed into a Reply.
+ * A tool loop that hit the round cap is model behavior, scored for both systems even though the new
+ * system reports it as an unparseable handoff.
+ */
 function infraIssue(trace: Trace): { kind: ErrorKind; message: string } | null {
+  if (trace.stopReason === "max_rounds") return null;
   if (trace.stopReason === "max_tokens") return { kind: "truncated", message: "stop reason max_tokens" };
   const reason = trace.escalation?.reason ?? "";
   if (/unparseable/.test(reason)) return { kind: "unparseable", message: [reason, ...trace.notes].join("; ") };
@@ -95,6 +100,9 @@ async function pool<T>(items: T[], n: number, work: (item: T) => Promise<void>):
 
 export interface RunCasesOpts {
   reps: number; concurrency: number; timeoutMs: number;
+  /** After a timeout, keep the slot until the abandoned call settles, for at most this long (default 10 minutes).
+   * The runners take no abort signal, so this is what keeps abandoned calls within the concurrency limit. */
+  drainMs?: number;
   run: (c: CaseFile, rep: number) => Promise<{ reply: Reply; trace: Trace }>;
   check: (c: CaseFile, reply: Reply, trace: Trace) => CheckResult[];
   classify: (c: CaseFile, reply: Reply, trace: Trace) => ToolUseLabel;
@@ -109,8 +117,9 @@ export async function runCases(cases: CaseFile[], o: RunCasesOpts): Promise<{ ro
   const errors: RunError[] = [];
   let done = 0;
   await pool(jobs, o.concurrency, async ({ c, rep }) => {
+    const work = o.run(c, rep);
     try {
-      const { reply, trace } = await withTimeout(o.run(c, rep), o.timeoutMs);
+      const { reply, trace } = await withTimeout(work, o.timeoutMs);
       const issue = infraIssue(trace);
       if (issue) {
         errors.push({ caseId: c.id, rep, ...issue });
@@ -122,6 +131,7 @@ export async function runCases(cases: CaseFile[], o: RunCasesOpts): Promise<{ ro
       }
     } catch (e) {
       errors.push({ caseId: c.id, rep, kind: errorKind(e), message: e instanceof Error ? e.message : String(e) });
+      if (e instanceof TimeoutError) await withTimeout(work.then(() => {}, () => {}), o.drainMs ?? 600_000).catch(() => {});
     }
     o.onProgress?.(++done, jobs.length);
   });

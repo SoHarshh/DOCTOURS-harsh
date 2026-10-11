@@ -35,6 +35,10 @@ export interface Summary {
   };
   /** Retry rate is over turns that reached the model; fix rate is over retried turns. */
   retry: { retried: number; fixed: number; rate: number | null; fixRate: number | null };
+  /** Turns the pre-gate answered without a model call, and turns that reached the model. */
+  gated: number; modelTurns: number;
+  /** Latency, prompt size and token means are over turns that reached the model, so a pre-gated handoff
+   * (0 ms, no prompt) does not flatter them. Cost is over every turn, because that is the bill. */
   latency: { p50: number; p95: number };
   meanPromptChars: number; meanInput: number; meanCacheRead: number; meanOutput: number; costPer1000: number;
 }
@@ -83,7 +87,6 @@ export function summarize(rows: Row[]): Summary {
   const modelTurns = rows.filter((r) => !gated(r));
   const retried = modelTurns.filter((r) => r.trace.retried);
   const fixed = retried.filter((r) => r.trace.retryFixed === true);
-  const latencies = rows.map((r) => r.trace.latencyMs);
 
   return {
     n: rows.length,
@@ -98,11 +101,13 @@ export function summarize(rows: Row[]): Summary {
       utr: ratio(control.filter((r) => r.toolUseLabel === "Unnecessary-Tool-Use").length, control.length),
     },
     retry: { retried: retried.length, fixed: fixed.length, rate: ratio(retried.length, modelTurns.length), fixRate: ratio(fixed.length, retried.length) },
-    latency: { p50: percentile(latencies, 0.5), p95: percentile(latencies, 0.95) },
-    meanPromptChars: mean(rows.map((r) => r.trace.promptChars)),
-    meanInput: mean(rows.map((r) => r.trace.usage.input)),
-    meanCacheRead: mean(rows.map((r) => r.trace.usage.cacheRead)),
-    meanOutput: mean(rows.map((r) => r.trace.usage.output)),
+    gated: rows.length - modelTurns.length,
+    modelTurns: modelTurns.length,
+    latency: { p50: percentile(modelTurns.map((r) => r.trace.latencyMs), 0.5), p95: percentile(modelTurns.map((r) => r.trace.latencyMs), 0.95) },
+    meanPromptChars: mean(modelTurns.map((r) => r.trace.promptChars)),
+    meanInput: mean(modelTurns.map((r) => r.trace.usage.input)),
+    meanCacheRead: mean(modelTurns.map((r) => r.trace.usage.cacheRead)),
+    meanOutput: mean(modelTurns.map((r) => r.trace.usage.output)),
     costPer1000: mean(rows.map((r) => r.costUsd)) * 1000,
   };
 }
@@ -127,8 +132,18 @@ const pct = (x: number | null) => (x === null ? "n/a" : `${(x * 100).toFixed(1)}
 const num = (x: number) => Math.round(x).toLocaleString("en-US");
 const frac = (x: number | null, k: number, n: number) => (x === null ? "n/a" : `${pct(x)} (${k}/${n})`);
 
-export function renderTable(a: { name: string; s: Summary; errors?: number }, b: { name: string; s: Summary; errors?: number }): string {
-  const row = (label: string, f: (s: Summary) => string, g?: (x: { errors?: number }) => string) =>
+type Side = { name: string; s: Summary; errors?: { kind: ErrorKind }[] };
+
+/** "3 (timeout 2, unparseable 1)", or "0". */
+function errorCell(errors: { kind: ErrorKind }[] = []): string {
+  if (!errors.length) return "0";
+  const byKind = new Map<string, number>();
+  for (const e of errors) byKind.set(e.kind, (byKind.get(e.kind) ?? 0) + 1);
+  return `${errors.length} (${[...byKind].sort((x, y) => y[1] - x[1] || x[0].localeCompare(y[0])).map(([k, n]) => `${k} ${n}`).join(", ")})`;
+}
+
+export function renderTable(a: Side, b: Side): string {
+  const row = (label: string, f: (s: Summary) => string, g?: (x: Side) => string) =>
     `| ${label} | ${g ? g(a) : f(a.s)} | ${g ? g(b) : f(b.s)} |`;
   const count = (s: Summary, label: ToolUseLabel) => s.toolUse.labels[label] ?? 0;
   const lines = [
@@ -143,16 +158,17 @@ export function renderTable(a: { name: string; s: Summary; errors?: number }, b:
     row("Result-Ignore rate", (s) => frac(s.toolUse.rir, count(s, "Result-Ignore"), s.toolUse.required)),
     row("Output-Fabrication rate", (s) => frac(s.toolUse.ofr, count(s, "Output-Fabrication"), s.toolUse.required)),
     row("Unnecessary-Tool-Use rate (control turns)", (s) => (s.toolUse.utr === null ? "n/a" : `${pct(s.toolUse.utr)} (n=${s.toolUse.control})`)),
-    row("Retry rate", (s) => frac(s.retry.rate, s.retry.retried, s.n)),
+    row("Retry rate", (s) => frac(s.retry.rate, s.retry.retried, s.modelTurns)),
     row("First-retry fix rate", (s) => frac(s.retry.fixRate, s.retry.fixed, s.retry.retried)),
-    row("Latency p50 (ms)", (s) => num(s.latency.p50)),
-    row("Latency p95 (ms)", (s) => num(s.latency.p95)),
-    row("Mean prompt size (chars)", (s) => num(s.meanPromptChars)),
-    row("Mean uncached input tokens", (s) => num(s.meanInput)),
-    row("Mean cache-read tokens", (s) => num(s.meanCacheRead)),
-    row("Mean output tokens", (s) => num(s.meanOutput)),
-    row("Cost per 1,000 turns (USD)", (s) => s.costPer1000.toFixed(2)),
-    row("Infra errors excluded", () => "", (x) => String(x.errors ?? 0)),
+    row("Turns answered by the pre-gate", (s) => String(s.gated)),
+    row("Latency p50 (ms, model turns)", (s) => num(s.latency.p50)),
+    row("Latency p95 (ms, model turns)", (s) => num(s.latency.p95)),
+    row("Mean prompt size (chars, model turns)", (s) => num(s.meanPromptChars)),
+    row("Mean uncached input tokens (model turns)", (s) => num(s.meanInput)),
+    row("Mean cache-read tokens (model turns)", (s) => num(s.meanCacheRead)),
+    row("Mean output tokens (model turns)", (s) => num(s.meanOutput)),
+    row("Cost per 1,000 turns (USD, all turns)", (s) => s.costPer1000.toFixed(2)),
+    row("Infra errors excluded", () => "", (x) => errorCell(x.errors)),
   ];
   const p = paired(a.s, b.s);
   const diff = `${p.meanDiff >= 0 ? "+" : ""}${(p.meanDiff * 100).toFixed(1)} points`;
@@ -173,7 +189,7 @@ function main(argv: string[]) {
   const load = (f: string) => JSON.parse(readFileSync(f, "utf8")) as RunFile;
   const A = load(fa), B = load(fb);
   const label = (f: RunFile) => `${f.meta.system} (${f.meta.model})`;
-  const md = renderTable({ name: label(A), s: summarize(A.rows), errors: A.errors.length }, { name: label(B), s: summarize(B.rows), errors: B.errors.length });
+  const md = renderTable({ name: label(A), s: summarize(A.rows), errors: A.errors }, { name: label(B), s: summarize(B.rows), errors: B.errors });
   process.stdout.write(md);
   mkdirSync(RESULTS_DIR, { recursive: true });
   writeFileSync(join(RESULTS_DIR, "compare.md"), md);

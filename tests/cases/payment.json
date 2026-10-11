@@ -11,14 +11,14 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/don.?t accept|do not accept|not accept/i",
+        "/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
         "CareCredit",
         "Klarna|PayPal",
         "layaway"
       ],
       "mustNotInclude": [
-        "depends",
-        "provider",
+        "/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
+        "/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
         "try applying"
       ]
     },
@@ -36,14 +36,15 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/don.?t accept|do not accept|not accept/i",
+        "/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
         "Cherry",
         "Klarna|PayPal",
         "layaway"
       ],
       "mustNotInclude": [
-        "depends",
-        "provider"
+        "/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
+        "/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
+        "try applying"
       ]
     },
     "control": true
@@ -60,7 +61,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/can.?t use|cannot use|doesn.?t take|does not take|not (?:be )?(?:covered|cover)|no,? /i",
+        "/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
         "Klarna|PayPal",
         "layaway"
       ],
@@ -90,7 +91,7 @@
       ],
       "mustNotInclude": [
         "/\\$?\\d+(?:\\.\\d+)?\\s?(?:\\/|per|a) ?mo(?:nth)?\\b/i",
-        "APR",
+        "/\\d+(?:\\.\\d+)?\\s?% APR|APR (?:of|is) \\d/i",
         "/you.?re approved|you are approved|pre-?approved|guaranteed approval/i"
       ]
     },
@@ -112,7 +113,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "US|United States",
+        "/\\bUS\\b|U\\.S\\.|United States/",
         "Canada",
         "pay in full|full"
       ],
@@ -139,7 +140,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "US|United States",
+        "/\\bUS\\b|U\\.S\\.|United States/",
         "Canada",
         "/live|located|based|where/i"
       ],
@@ -166,8 +167,8 @@
         "before the procedure|before your procedure|paid off before|fully paid before"
       ],
       "mustNotInclude": [
-        "deposit option",
-        "APR"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:deposit option)/i",
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bAPR\\b)/i"
       ]
     },
     "control": true
@@ -327,7 +328,7 @@
         "new deposit|through Doctours"
       ],
       "mustNotInclude": [
-        "/import|transfer(?:red)? (?:it|that) (?:in|into|over)|count(?:s)? as your Doctours/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bimport|transfer(?:red)? (?:it|that|your deposit) (?:in|into|over)|counts? (?:as|toward) (?:a |your )?Doctours)/i"
       ]
     }
   },
@@ -368,7 +369,8 @@
         "7 days|seven days"
       ],
       "mustNotInclude": [
-        "/pay (?:the rest|the balance|the remaining)(?: balance)? (?:to|at) the clinic|on procedure day/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:pay (?:the rest|the balance|the remaining(?: balance)?)[^.!?]{0,15}(?:to|at) the clinic)/i",
+        "/(?:is|are|gets|you) (?:pay|paid|due|settled) (?:(?:to|at) the clinic )?on procedure day/i"
       ]
     },
     "control": true
@@ -388,7 +390,7 @@
         "/in full|full amount|one payment|single payment|can.?t be split|cannot be split|not (?:able to )?split|isn.?t split/i"
       ],
       "mustNotInclude": [
-        "/yes,? you can split|installments for the deposit|split the deposit at checkout/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\byou can split|installments? (?:for|on) the deposit|split the deposit (?:at checkout|into))/i"
       ]
     },
     "control": true

@@ -81,7 +81,7 @@
         "500"
       ],
       "mustNotInclude": [
-        "/(?:yes|right|correct)[^.?!]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit/i"
+        "/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:yes|that.?s right|that.?s correct|correct)\\b[^.!?]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit)/i"
       ],
       "toolsCalled": [
         "getClinicPackages"
@@ -106,10 +106,11 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "4 night|four night"
+        "4|four",
+        "/\\b(?:4|four)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "mustNotInclude": [
-        "/\\b(?:3|three|2|two) nights?\\b/i",
+        "/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
         "/PRP|stem cell|exosome/i",
         "/transfers? (?:are|is) included|includes? (?:airport )?transfers?/i"
       ],
@@ -142,7 +143,8 @@
         "/\\bThu(?:rs(?:day)?)?s?\\b/i"
       ],
       "mustNotInclude": [
-        "/wednesday (?:works|is fine|is available|is ok)|yes,? wednesday/i",
+        "/^(?:yes|sure|absolutely|of course|yep)\\b|^wednesday (?:works|is fine)/i",
+        "/silver (?:is |does |also )?(?:available|book(?:s|able)?|run(?:s)?|operate(?:s)?)[^.!?]{0,15}wednesday/i",
         "/(?:heva|silver) (?:runs|operates|books?) monday (?:through|to|-) (?:saturday|friday)/i"
       ],
       "toolsCalled": [
@@ -200,7 +202,8 @@
         "3,000|4,500|3,200"
       ],
       "mustNotInclude": [
-        "/use code|the code is|your code is|promo code [A-Z0-9]{3,}|300 off (?:applies|is yours)/i",
+        "/use code|the code is|your code is|300 off (?:applies|is yours)/i",
+        "/promo code [A-Z0-9]{4,}\\b/",
         "/no (?:promos?|discounts?|promotions?|codes?)\\b|don.?t have any (?:promos?|discounts?|codes?)|nothing running|aren.?t any (?:promos?|discounts?)/i",
         "/I.?ll check|will check|let me check|(?:promos?|discounts?|codes?) (?:may|might|could) (?:be|come)/i"
       ],

@@ -180,6 +180,10 @@
       "clinic-contact",
       "escalate-positive"
     ],
+    "contextOverrides": {
+      "CHAT_LIST": "[Sep 20, 10:02 AM] Alex: Amazing, love to hear that! My name is Alex and I'll be helping you throughout your hair transplant journey, from today all the way through your results 12 to 18 months from now. To start, which area are you looking to address first: hairline, crown, full top, beard, or eyebrow?\n[Sep 20, 10:06 AM] Jordan Hale: Hairline. My edges have been receding for a few years.\n[Sep 20, 10:07 AM] Alex: That's one of the most common things we help with. What's your name?\n[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload\n[Sep 21, 11:40 AM] Jordan Hale: done\n[Sep 21, 11:41 AM] Alex: Got them — all five angles are in. The medical team will send your assessment as soon as it's ready.\n[Sep 24, 2:05 PM] Jordan Hale: Any update?\n[Sep 25, 9:30 AM] Alex: Your assessment is ready. It has your graft estimate and the clinics we matched you with. You can open it using the link below.\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333\n[Sep 26, 8:12 AM] Jordan Hale: Got it\n[Sep 26, 8:13 AM] Alex: Did any clinic catch your eye, or do you have questions about the plan?\n[Sep 26, 8:18 AM] Jordan Hale: can I message Heva directly? what's their number?\n[Sep 26, 8:20 AM] Alex: Yes, you can reach out to Heva yourself. What do you need from them? I may be able to answer it here.",
+      "RECENT_CONVERSATION_SUMMARY": "[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload\n[Sep 21, 11:40 AM] Jordan Hale: done\n[Sep 21, 11:41 AM] Alex: Got them — all five angles are in. The medical team will send your assessment as soon as it's ready.\n[Sep 24, 2:05 PM] Jordan Hale: Any update?\n[Sep 25, 9:30 AM] Alex: Your assessment is ready. It has your graft estimate and the clinics we matched you with. You can open it using the link below.\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333\n[Sep 26, 8:12 AM] Jordan Hale: Got it\n[Sep 26, 8:13 AM] Alex: Did any clinic catch your eye, or do you have questions about the plan?\n[Sep 26, 8:18 AM] Jordan Hale: can I message Heva directly? what's their number?\n[Sep 26, 8:20 AM] Alex: Yes, you can reach out to Heva yourself. What do you need from them? I may be able to answer it here."
+    },
     "expect": {
       "escalate": true,
       "mustNotInclude": [
@@ -235,11 +239,13 @@
     "tags": [
       "escalation",
       "hard-negative",
+      "tool-required",
       "escalate-negative"
     ],
     "expect": {
       "escalate": false
-    }
+    },
+    "toolRequired": true
   },
   {
     "id": "neg-own-hair",

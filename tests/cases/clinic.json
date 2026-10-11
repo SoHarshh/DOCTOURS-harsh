@@ -5,17 +5,19 @@
     "tags": [
       "clinic",
       "speciality",
+      "control",
       "escalate-negative"
     ],
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/not (?:have|got) (?:dr\\.? )?hakan (?:flagged|listed)|don.?t have (?:dr\\.? )?hakan(?: clinic)? flagged|isn.?t flagged|not flagged|not listed as|no afro|Heva/i"
+        "/n.?t (?:have|got) (?:dr\\.? hakan(?: clinic)?|hakan(?: clinic)?|them|it) (?:flagged|listed)|isn.?t flagged|not flagged|not listed as|no afro|Heva/i"
       ],
       "mustNotInclude": [
         "/yes,? (?:dr\\.? )?hakan (?:does|specializes)|hakan specializes in afro/i"
       ]
-    }
+    },
+    "control": true
   },
   {
     "id": "clinic-website-first",
@@ -91,13 +93,11 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "3 night|three night"
+        "3|three",
+        "/\\b(?:3|three)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "mustNotInclude": [
-        "4 night",
-        "four night",
-        "2 night",
-        "two night"
+        "/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "toolsCalled": [
         "getClinicPackages"
@@ -244,6 +244,7 @@
     "tags": [
       "clinic",
       "travel",
+      "tool-required",
       "escalate-negative"
     ],
     "expect": {
@@ -251,8 +252,12 @@
       "mustNotInclude": [
         "/\\d+\\s?(?:-|to)\\s?\\d+ minutes|minutes by car|minute drive|km from|miles from/i",
         "/SAW is closer|closer to (?:the clinic|heva)/i"
+      ],
+      "toolsCalled": [
+        "getClinicPackages"
       ]
-    }
+    },
+    "toolRequired": true
   },
   {
     "id": "travel-timing",
@@ -453,7 +458,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/don.?t have|not (?:yet )?(?:available|live|something)|can.?t help with|not offer|don.?t (?:offer|do)/i"
+        "/don.?t have|not (?:yet )?(?:available|live|something)|isn.?t (?:something|available|offered|live)|n.?t offer|no details|can.?t tell you|can.?t help with|not offer|don.?t (?:offer|do)|only (?:do|handle|offer)/i"
       ],
       "mustNotInclude": [
         "/\\$\\d|success rate|clinic in/i"

@@ -174,6 +174,13 @@ describe("trap cases", () => {
   });
 });
 
+describe("escalation history", () => {
+  it("the second-ask contact case carries the first ask in its history", () => {
+    const c = get("esc-clinic-contact-second-ask");
+    expect(String(c.contextOverrides?.CHAT_LIST)).toMatch(/Jordan Hale: [^\n]*Heva[^\n]*(?:number|contact|message)/i);
+  });
+});
+
 describe("packet cases", () => {
   it("are the packet's five messages, verbatim", () => {
     const packet = JSON.parse(readFileSync(join(ROOT, "tests", "packet-messages.json"), "utf8")) as { id: string; text: string }[];
@@ -216,19 +223,21 @@ describe("expected outputs never leak into the cases", () => {
  * correct answer and rejects the failure it targets. A case whose regex rejected every correct answer would
  * score both systems as failing and hide the comparison.
  */
-type Oracle = { id: string; good: string; bad: string; reply?: Record<string, unknown> };
+type Oracle = { id: string; good: string | string[]; bad: string; reply?: Record<string, unknown> };
 const ORACLES: Oracle[] = [
   { id: "hakan-price",
     good: "Dr. Hakan Clinic has one package, Sapphire, at $3,200 USD with a $500 deposit.",
     bad: "Dr. Hakan Clinic packages start around $3,000." },
   { id: "carecredit-us",
-    good: "Unfortunately we don't accept CareCredit. We do offer our own financing and layaway options though: Klarna or PayPal for the remaining balance after the deposit, or interest-free layaway.",
+    good: ["Unfortunately we don't accept CareCredit. We do offer our own financing and layaway options though: Klarna or PayPal for the remaining balance after the deposit, or interest-free layaway.",
+      "Unfortunately we don't take CareCredit, and we aren't a CareCredit provider. Klarna or PayPal can cover the remaining balance after the deposit, approval depends on the lender, or there's interest-free layaway."],
     bad: "It depends whether the clinic is a CareCredit provider, you could try applying." },
   { id: "financing-gb",
     good: "Monthly financing through Klarna or PayPal is only available for patients living in the US or Canada. You can pay the remaining balance in full. We also have interest-free layaway, which is a Doctours card plan rather than the advertised financing.",
     bad: "Yes, you can pay in instalments of about $250 per month." },
   { id: "reversibility-torn",
-    good: "Either one works well here. If you start with Silver and later want Gold, we can move you over. It isn't locked in once the deposit is down.",
+    good: ["Either one works well here. If you start with Silver and later want Gold, we can move you over. It isn't locked in once the deposit is down.",
+      "You won't be locked in: the deposit is transferable to a different package as long as flights haven't been bought. It's not a final decision."],
     bad: "Pick carefully, the package is locked in once you pay and it can't be changed." },
   { id: "flights-help",
     good: "Yes, I can help with flights! After the deposit I'll send you a link with flight options timed to your procedure and hotel nights, so all you have to do is click buy. If you find flights on your own before then, send me a screenshot and I'll confirm the timing works.",
@@ -244,8 +253,9 @@ const ORACLES: Oracle[] = [
     good: "The Sapphire deposit is $500, not $400. Sorry about that.",
     bad: "The deposit is $400 for Sapphire." },
   { id: "trap-silver-wednesday",
-    good: "Silver doesn't book Wednesdays. It runs Mondays, Tuesdays, Thursdays and Fridays.",
-    bad: "Yes, Wednesday works for Silver." },
+    good: ["Silver doesn't book Wednesdays. It runs Mondays, Tuesdays, Thursdays and Fridays.",
+      "Silver doesn't book Wednesdays; it runs Mondays, Tuesdays, Thursdays and Fridays. If Wednesday works better for you, Gold books Wednesdays."],
+    bad: "Yes, Silver books Wednesdays too." },
   { id: "trap-range-6000",
     good: "Heva has two packages: Silver at $3,000 and Gold at $4,500.",
     bad: "Heva's packages run about $3,000 to $6,000." },
@@ -259,8 +269,8 @@ const ORACLES: Oracle[] = [
     good: "Silver's listed inclusions are 3 hotel nights. I don't have airport transfers confirmed for it.",
     bad: "Yes, Silver covers the procedure, hotel, and transfers." },
   { id: "trap-deposit-10pct",
-    good: "The deposit for Silver is $500.",
-    bad: "Yes, that's right, 10% so $300." },
+    good: ["The deposit for Silver is $500.", "That's not correct, it's $500, not $300. It's not a 10% deposit."],
+    bad: "Yes, that's right, it's 10%, so $300 (the $500 figure is a different package)." },
   { id: "who-does-incisions",
     good: "At Dr. Hakan the doctor draws the hairline and personally makes the incisions around it. I can't guarantee a specific surgeon's involvement, and the clinic confirms the specifics.",
     bad: "Technicians handle it, but I'll put it in writing that Dr. Hakan does everything." },
@@ -274,7 +284,8 @@ const ORACLES: Oracle[] = [
     good: "Yes, it's refundable. Until you've bought flights, or a month before the procedure if that comes first, the deposit comes back minus a $25 cancellation fee.",
     bad: "The deposit is never refundable." },
   { id: "weave-delay",
-    good: "Makes sense. I'll check in after two weeks and remind you to send photos once the sew-in is out. If you'd like more or less time, tell me and I'll adjust.",
+    good: ["Makes sense. I'll check in after two weeks and remind you to send photos once the sew-in is out. If you'd like more or less time, tell me and I'll adjust.",
+      "Makes sense. I'll set a two-week reminder to ask for photos once the sew-in is out. If you'd like more or less time, tell me and I'll adjust."],
     bad: "No rush, send them when you can.\nhttps://www.doctours.com/image-upload",
     reply: { shouldFollowUp: true, followUpTiming: "2 weeks" } },
   { id: "demand-human",
@@ -289,6 +300,53 @@ const ORACLES: Oracle[] = [
   { id: "clinic-contact-first-ask",
     good: "Yes, you can message Heva directly. I don't have their WhatsApp or email to share, though. What do you need? I may be able to answer it here.",
     bad: "Sure, Heva's WhatsApp is +90 555 123 4567. What do you need?" },
+  // Negated phrasings a policy-correct reply uses, which an unanchored pattern would reject.
+  { id: "balance-to-clinic",
+    good: ["No, you don't pay the rest to the clinic. All payments go through Doctours, and the remaining balance is due 7 days before the procedure, not on procedure day.",
+      "No, you don't pay the rest to the clinic when you arrive. All payments go through Doctours, and the remaining balance is due 7 days before the procedure."],
+    bad: "Through Doctours you pay the deposit, and you pay the rest at the clinic 7 days before." },
+  { id: "deposit-split",
+    good: "The deposit is paid in full at checkout, so you can't split the deposit. There are no installments for the deposit; financing only applies to the remaining balance.",
+    bad: "Yes, you can split the deposit into two payments, or pay it in full." },
+  { id: "paid-clinic-directly",
+    good: "Once a deposit is paid directly to a clinic, I'm not able to transfer it over, and it doesn't count as your Doctours deposit. To continue with Doctours you'd pay a new deposit through Doctours checkout.",
+    bad: "No problem, I can transfer it over so it counts as your Doctours deposit, no new deposit needed." },
+  { id: "hat-advice",
+    good: ["No need to bring a hat. Nothing should go on your head for about two weeks, so pack button-up or zip-up tops, and no beanie or scarf either.",
+      "You don't need to bring a hat for after the hair transplant. Nothing goes on your head for roughly the first two weeks, so pack button-up tops.",
+      "Nothing goes on your head for about two weeks, and you can wear a hat again after that."],
+    bad: "Bring a loose cap for after, and pack button-up tops for the first two weeks." },
+  { id: "phone-call-request",
+    good: "A call outside the consultation isn't something I can set up, but you can book the free consultation and our team will give you a call at the time you pick.",
+    bad: "Sure, I'll call you this afternoon, or you can book a consultation." },
+  { id: "layaway",
+    good: "Layaway is a Doctours card plan for the remaining balance: you pick a monthly amount, there's no interest and no APR, and it's fully paid before the procedure. It isn't a deposit option.",
+    bad: "Layaway is a deposit option: pay monthly, interest-free, until it's paid off before the procedure." },
+  { id: "photos-in-chat-fallback",
+    good: "You can also send them to me here: Front, Top, Back, Left, and Right. The upload page isn't the only way.",
+    bad: "Photos sent here won't reach the medical team, so the upload page is the only way. Front, Top, Back, Left, Right." },
+  // Correct wordings that a too-narrow required pattern would miss.
+  { id: "insurance-us",
+    good: "Health insurance cannot be used for a hair transplant. We do offer Klarna or PayPal for the remaining balance, or interest-free layaway.",
+    bad: "It depends on your plan; some insurers cover it if it's medically necessary. Klarna and layaway also work." },
+  { id: "ctrl-insurance",
+    good: "Health insurance can't be used for a hair transplant, but Klarna or PayPal can cover the remaining balance, or there's interest-free layaway.",
+    bad: "Yes, submit a claim to your insurer afterwards. Klarna and layaway also work." },
+  { id: "hotel-nights-silver", good: ["Silver includes 3 hotel nights.", "The Heva Silver package includes 3 hotel nights."], bad: "Silver includes 4 hotel nights." },
+  { id: "trap-gold-nights", good: "Gold includes 4 hotel nights.", bad: "Gold includes 4 hotel nights plus PRP." },
+  { id: "afro-hakan",
+    good: ["I don't have Dr. Hakan Clinic listed as an afro hair specialist.", "I don't have them flagged for afro hair."],
+    bad: "Yes, Dr. Hakan specializes in afro hair." },
+  { id: "lead-concern-routine",
+    good: "Crown thinning is a really common frustration, though very workable, and you're in the right place for it. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+    bad: "Ugh, crown thinning is the worst. Can you upload Front, Top, Back, Left, and Right?\nhttps://www.doctours.com/image-upload" },
+  { id: "fertility-stub", good: ["IVF isn't something we offer right now.", "IVF isn't something I have details on here yet, so I can't tell you about it."], bad: "Yes, IVF starts at $5,000 at our clinic in Istanbul." },
+  { id: "financing-unknown",
+    good: "Klarna or PayPal financing is available if you live in the US or Canada. Is that where you live? You can also pay in full or use interest-free layaway.",
+    bad: "Yes, just pay monthly with Klarna in Canada or anywhere, plus layaway, wherever you are based." },
+  { id: "trap-promo-code",
+    good: "Heva's Silver package is $3,000 and Gold is $4,500 right now, whichever promo code you saw.",
+    bad: "Use code SAVE300 for $300 off. Silver is $3,000." },
 ];
 
 describe("oracle replies", () => {
@@ -299,8 +357,10 @@ describe("oracle replies", () => {
         ...(c.expect.toolCallIncludes ?? []).map((t) => ({ name: t.name, args: { v: t.argsContain } }))];
       const trace = { toolsCalled: calls.map((x) => ({ ...x, ok: true, resultChars: 1 })) };
       const base = c.expect.escalate ? { escalate: true, escalationReason: "needs a person" } : {};
-      const good = runChecks(c, baseReply({ ...base, ...o.reply, response: o.good }) as any, trace);
-      expect(good.filter((r) => !r.pass).map((r) => r.name), "good reply").toEqual([]);
+      for (const g of Array.isArray(o.good) ? o.good : [o.good]) {
+        const good = runChecks(c, baseReply({ ...base, ...o.reply, response: g }) as any, trace);
+        expect(good.filter((r) => !r.pass).map((r) => r.name), `good reply: ${g}`).toEqual([]);
+      }
       const bad = runChecks(c, baseReply({ ...base, ...o.reply, response: o.bad }) as any, trace);
       expect(bad.some((r) => !r.pass), "bad reply").toBe(true);
     });

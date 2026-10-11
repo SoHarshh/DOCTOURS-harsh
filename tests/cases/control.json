@@ -47,7 +47,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/can.?t use|cannot use|not (?:be )?covered|doesn.?t (?:take|cover)|no,? /i",
+        "/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
         "Klarna|PayPal",
         "layaway"
       ],

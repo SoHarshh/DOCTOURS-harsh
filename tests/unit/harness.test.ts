@@ -131,6 +131,19 @@ describe("summarize", () => {
     expect(s.retry.fixRate).toBeCloseTo(0.5, 9);
     expect(summarize([row("c", 0, true)]).retry.fixRate).toBeNull();
   });
+  it("takes latency, prompt size and token means over turns that reached the model, and cost over every turn", () => {
+    const s = summarize([
+      row("a", 0, true, { latency: 100, input: 1000, cost: 0.002 }),
+      row("b", 0, true, { latency: 300, input: 3000, cost: 0.004 }),
+      row("g", 0, true, { latency: 0, input: 0, cost: 0, gated: true, label: "Gated" }),
+    ]);
+    expect(s.gated).toBe(1);
+    expect(s.modelTurns).toBe(2);
+    expect(s.latency).toEqual({ p50: 100, p95: 300 });
+    expect(s.meanInput).toBe(2000);
+    expect(s.meanPromptChars).toBe(5000);
+    expect(s.costPer1000).toBeCloseTo(2, 9);
+  });
   it("computes latency percentiles, token means and cost per 1,000 turns", () => {
     const s = summarize([
       row("a", 0, true, { latency: 100, input: 1000, cost: 0.002 }),
@@ -164,7 +177,8 @@ describe("paired", () => {
 describe("renderTable", () => {
   const a = summarize([row("x", 0, true), row("y", 0, false, { tags: ["pricing", "escalate-negative"] })]);
   const b = summarize([row("x", 0, true), row("y", 0, true, { tags: ["pricing", "escalate-negative"] })]);
-  const md = renderTable({ name: "baseline", s: a, errors: 2 }, { name: "new", s: b, errors: 0 });
+  const errs = [{ kind: "timeout" as const }, { kind: "timeout" as const }, { kind: "unparseable" as const }];
+  const md = renderTable({ name: "baseline", s: a, errors: errs }, { name: "new", s: b, errors: [] });
 
   it("has one column per system", () => {
     expect(md).toContain("| Metric | baseline | new |");
@@ -178,7 +192,12 @@ describe("renderTable", () => {
     for (const label of ["Escalation precision", "Tool-Skip", "Result-Ignore", "Output-Fabrication", "Unnecessary-Tool-Use",
       "Retry rate", "First-retry fix rate", "Latency p50", "Latency p95", "Mean prompt size", "Mean uncached input",
       "Mean cache-read", "Mean output", "Cost per 1,000 turns", "Infra errors excluded"]) expect(md, label).toContain(label);
-    expect(md).toMatch(/\| Infra errors excluded \| 2 \| 0 \|/);
+    expect(md).toMatch(/\| Infra errors excluded \| 3 \(timeout 2, unparseable 1\) \| 0 \|/);
+    expect(md).toMatch(/\| Turns answered by the pre-gate \| 0 \| 0 \|/);
+  });
+  it("shows the retry rate over turns that reached the model", () => {
+    const s = summarize([row("r", 0, true, { retried: true, retryFixed: true }), row("n", 0, true), row("g", 0, true, { gated: true, label: "Gated" })]);
+    expect(renderTable({ name: "a", s }, { name: "b", s })).toMatch(/\| Retry rate \| 50\.0% \(1\/2\) \|/);
   });
   it("states the paired per-case result", () => {
     expect(md).toContain("new vs baseline on 2 shared cases: 1 wins, 0 losses, 1 ties");
@@ -232,7 +251,7 @@ describe("runCases", () => {
   const mk = (id: string, tags = ["escalate-negative"]): CaseFile => ({ id, text: id, tags, expect: { escalate: false } });
   const ok = (id: string) => ({ reply: baseReply({ response: id }) as any, trace: emptyTrace(id, "new", "claude-haiku-5-5") });
   const base = {
-    reps: 1, concurrency: 2, timeoutMs: 200,
+    reps: 1, concurrency: 2, timeoutMs: 200, drainMs: 20,
     check: (_c: CaseFile, reply: any) => [{ name: "notEmpty", pass: reply.response !== "bad", detail: "" }],
     classify: () => "Clean" as ToolUseLabel,
     cost: () => 0.5,
@@ -266,6 +285,28 @@ describe("runCases", () => {
     const kinds = Object.fromEntries(res.errors.map((e) => [e.caseId, e.kind]));
     expect(kinds).toEqual({ api: "api", slow: "timeout", mismatch: "model-mismatch", bug: "harness", trunc: "truncated", "unparse-new": "unparseable", "unparse-base": "unparseable" });
     for (const e of res.errors) { expect(e.rep).toBe(0); expect(e.message.length).toBeGreaterThan(0); }
+  });
+  it("scores a tool loop that hit the round cap the same way for both systems", async () => {
+    const run = async (c: CaseFile) => {
+      const r = ok(c.id);
+      r.trace.stopReason = "max_rounds";
+      r.trace.escalation = { source: "validator", reason: c.id === "new" ? "validator:unparseable" : "max_tool_rounds", category: "validator" };
+      return r;
+    };
+    const res = await runCases([mk("new"), mk("baseline")], { ...base, run });
+    expect(res.errors).toEqual([]);
+    expect(res.rows.map((r) => r.caseId)).toEqual(["baseline", "new"]);
+  });
+  it("holds a slot until a timed-out turn settles, so abandoned calls never exceed the concurrency limit", async () => {
+    let inFlight = 0, peak = 0;
+    const run = (c: CaseFile) => new Promise<ReturnType<typeof ok>>((resolve) => {
+      inFlight++; peak = Math.max(peak, inFlight);
+      setTimeout(() => { inFlight--; resolve(ok(c.id)); }, 40);
+    });
+    const res = await runCases(["a", "b", "c", "d", "e", "f"].map((i) => mk(i)), { ...base, concurrency: 2, timeoutMs: 5, drainMs: 1000, run });
+    expect(res.rows).toEqual([]);
+    expect(res.errors.map((e) => e.kind)).toEqual(Array(6).fill("timeout"));
+    expect(peak).toBe(2);
   });
   it("keeps a row with a null label when the classifier throws", async () => {
     const res = await runCases([mk("a")], { ...base, run: async (c) => ok(c.id), classify: () => { throw new Error("boom"); } });

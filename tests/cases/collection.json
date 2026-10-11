@@ -237,7 +237,7 @@
       ],
       "urlLastLine": true,
       "mustNotInclude": [
-        "/^sorry|ugh|oof|yikes/i",
+        "/^sorry|\\b(?:ugh|oof|yikes)\\b/i",
         "/hairline, crown, or both/i"
       ]
     }
@@ -298,8 +298,8 @@
           "softPackageInterestIds": null
         },
         "consultationTime": null,
-        "email": null,
-        "name": null,
+        "email": "jordan.hale@example.invalid",
+        "name": "Jordan Hale",
         "phone": "+15555550123",
         "pipelineStatus": "LEAD",
         "tentativeProcedureDates": null
@@ -310,7 +310,7 @@
       "shouldFollowUp": true,
       "followUpTimingIncludes": "2 week|two week|14 day",
       "mustInclude": [
-        "two weeks|2 weeks",
+        "two week|2 week|two-week|2-week",
         "sew-in|sew in",
         "/more or less time|adjust|sooner or later|different (?:time|date)|move (?:that|the) (?:reminder|check)/i"
       ],
@@ -376,8 +376,8 @@
           "softPackageInterestIds": null
         },
         "consultationTime": null,
-        "email": null,
-        "name": null,
+        "email": "jordan.hale@example.invalid",
+        "name": "Jordan Hale",
         "phone": "+15555550123",
         "pipelineStatus": "LEAD",
         "tentativeProcedureDates": null
@@ -447,8 +447,8 @@
           "softPackageInterestIds": null
         },
         "consultationTime": null,
-        "email": null,
-        "name": null,
+        "email": "jordan.hale@example.invalid",
+        "name": "Jordan Hale",
         "phone": "+15555550123",
         "pipelineStatus": "LEAD",
         "tentativeProcedureDates": null
@@ -462,7 +462,7 @@
       ],
       "mustNotInclude": [
         "image-upload",
-        "/can.?t accept|won.?t reach|only way/i"
+        "/(?:can.?t|cannot|won.?t be able to) (?:accept|use|review) (?:photos|pictures|images|them) (?:sent |texted )?(?:here|in (?:the )?chat|over text)|won.?t (?:reach|get to|go to) the (?:medical )?team|(?:is|portal is) the only way/i"
       ]
     }
   },
@@ -493,6 +493,26 @@
         "count": 0,
         "recommendationStatus": "none",
         "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": "jordan.hale@example.invalid",
+        "name": "Jordan Hale",
+        "phone": "+15555550123",
+        "pipelineStatus": "PREP_PRE_CLINICAL",
+        "tentativeProcedureDates": {
+          "strength": "medium",
+          "text": "within about 6 months"
+        }
       }
     },
     "expect": {
