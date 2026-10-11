@@ -9,3 +9,8 @@ dist/
 CLAUDE.md
 pre-deposit-respond-packet.md
 .superpowers/
+
+# working eval outputs; measured runs are archived under results/runs/
+results/*.json
+results/*.jsonl
+results/*.log
