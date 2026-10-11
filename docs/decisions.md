@@ -100,3 +100,5 @@ Work that happens once, before any patient texts: cutting the prompt into files,
 **Cache layout.** The prompt is now three blocks, each cached: the core (same for every message), the chosen modules (same for every message that routes the same way, across patients), and the patient context (reused across tool rounds of one message).
 
 **False positive fixed.** The assessment link contains an ID with long digit runs, and the card-number check read it as a card, which escalated a correct reply. Card checks now ignore links and IDs.
+
+**Assessment link moved from prompt to code.** With the link rule in the prompt, the model included the assessment link in one run and left it out in the next. That is the pattern the research predicts for a small model. Code now enforces it: when a reply tells the patient to pay, book, or open something in their assessment and has no assessment link, code calls the same tool the model would and appends the link as the last line. No retry and no model call. These code-made tool calls are tagged so the tool-use labels ignore them.
