@@ -45,6 +45,14 @@ describe("classifyModules", () => {
     expect(c.calls[0].max_tokens).toBeLessThanOrEqual(400);
     expect(c.calls[0].tools).toBeUndefined();
   });
+  it("caches the module list, which is identical on every call", async () => {
+    const c = fakeClient([answer(["health-insurance"])]);
+    await classifyModules(deps(c), "x", MODULES);
+    const sys = c.calls[0].system;
+    expect(Array.isArray(sys)).toBe(true);
+    expect(sys[sys.length - 1].cache_control).toEqual({ type: "ephemeral" });
+    expect(JSON.stringify(sys)).toContain("time-bound-pause");
+  });
   it("caps the answer at three modules", async () => {
     const c = fakeClient([answer(["health-insurance", "time-bound-pause", "health-insurance", "time-bound-pause"])]);
     expect((await classifyModules(deps(c), "x", MODULES)).names.length).toBeLessThanOrEqual(3);

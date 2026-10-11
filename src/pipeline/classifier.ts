@@ -45,10 +45,15 @@ export async function classifyModules(deps: ModelDeps, text: string, modules: Sk
       model: deps.model,
       max_tokens: 300,
       output_config: { effort: "low", format: FORMAT },
-      system:
-        "You route a patient's SMS to the policy sections a coordinator needs to answer it. " +
-        "Pick at most three section names from the list, only ones the message clearly needs. Pick none if none apply.\n\n" +
-        candidates.map(describeModule).join("\n"),
+      // Identical on every call, so it is cached; only the patient message varies.
+      system: [{
+        type: "text",
+        text:
+          "You route a patient's SMS to the policy sections a coordinator needs to answer it. " +
+          "Pick at most three section names from the list, only ones the message clearly needs. Pick none if none apply.\n\n" +
+          candidates.map(describeModule).join("\n"),
+        cache_control: { type: "ephemeral" },
+      }],
       messages: [{ role: "user", content: `Patient message: "${text}"` }],
     });
     const raw = (res.content as any[]).filter((b) => b.type === "text").map((b) => b.text).join("");
