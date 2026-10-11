@@ -261,3 +261,30 @@ What the failures show (after reading every failing reply):
 - **A regression of ours.** Trimming the core prompt shortened "always reply in English, whatever language the patient writes in" to "always reply in English", and the model answered a Spanish request in Spanish.
 - **A routing miss.** "Could a direct Heva deposit move into Doctours?" did not load the direct-deposit module.
 - **Checks that are stricter than the policy** (not counted as system failures in this analysis, but left in the score): "automatic" required where the reply said "charged to your saved card each month", "not refundable" required where it said "wouldn't qualify for that refund", and a ban on resending the assessment link that conflicts with the brief's own graded sample reply, which includes it.
+
+## 19. Generalization round
+
+Asked to make the system better on messages nobody has seen, without fitting it to the test sets. Rules for this round: every fix is a general rule stated in policy terms; each new escalation trigger comes with its look-alike that must not escalate; no test-set sentence appears in any prompt, module or description (a test enforces this); two new blind sets were written by fresh agents before the fixes were finished, and are scored once, on the frozen system.
+
+Changes, each with tests:
+
+- **Escalation coverage** (from the external set's misses): checking which dates are open, arranging hotel, transfer or driver, moving or refunding a payment the patient says they made to Doctours even if none shows, and a call other than the free consultation (own commit, user-approved reading). Each paired with the answerable look-alike in the core prompt. Two original-prompt examples that answered these without a handoff (lines 922 and 1406–1407) were dropped from modules.
+- **English only**, even when asked for another language (a regression from trimming the core prompt).
+- **Package names the patient wrote** no longer trip the "named a package without looking it up" check (the one false escalation on the external set).
+- **Soft vs hard checks.** After one failed retry, a reply that only trips a heuristic is sent; only invented links or prices, card digits, false handoff claims and banned promises go to a person.
+- **Module descriptions.** Each policy module has one sentence of patient intent, so the fallback classifier routes unseen wording by meaning. Its prompt is cached.
+- **Uncovered rules placed:** after a failed payment method suggest only the next option; never invent clinic nicknames; an earlier hold notice is already handled.
+- **Edge inputs** (a separate session, 30 tests): found and fixed a regex that froze on long "kkkk…" runs and card numbers split across lines that slipped past the pre-gate.
+
+**Routing A/B** (`results/runs/ab-routing/`). Union mode runs the classifier on every message and merges its picks with phrase matches. Pre-registered rule: adopt only if it raises the combined pass rate on dev, held-out and external and keeps median and p95 latency below the original prompt's.
+
+| | Fallback | Union | Original prompt, same load |
+|---|---|---|---|
+| Dev | 98.1% | 97.2% | 78.5% |
+| Held-out | 100% | 100% | |
+| External | 90.0% | 90.0% | |
+| Median latency, dev / external | 3.5 s / 4.2 s | 4.7 s / 5.3 s | 5.2 s (dev) |
+
+Union did not help and broke the latency rule on the external set. Fallback stays the default; union remains available with `ROUTER_MODE=union`.
+
+Remaining ambiguities: "can you just call me instead?" now escalates (3 of 3) under the callback rule, while the dev set expected an answer; "move my direct Heva deposit into Doctours now" gets the direct-deposit answer (new deposit needed) in 2 of 3, while the external set expected a handoff. Both readings are defensible from the brief.
