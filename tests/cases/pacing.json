@@ -133,8 +133,8 @@
         "free"
       ],
       "mustNotInclude": [
-        "gratis",
-        "consulta"
+        "/\\bgratis\\b/i",
+        "/\\bconsulta\\b/i"
       ]
     },
     "control": true
@@ -266,9 +266,9 @@
     "expect": {
       "escalate": false,
       "mustNotInclude": [
-        "whatsapp",
-        "@heva",
-        "+90"
+        "/wa\\.me|\\+\\d{6,}|@heva/i",
+        "+90",
+        "/[\\w.+-]+@[\\w-]+\\.[a-z]{2,}/i"
       ],
       "mustInclude": [
         "?",

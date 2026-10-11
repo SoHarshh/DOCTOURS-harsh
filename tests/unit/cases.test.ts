@@ -283,6 +283,12 @@ const ORACLES: Oracle[] = [
   { id: "promo-ask",
     good: "Heva's Silver package is $3,000 and Gold is $4,500 right now.",
     bad: "We don't have any promos running right now." },
+  { id: "spanish",
+    good: "Yes, the consultation is free. It's a phone call with our team.",
+    bad: "Yes, it's free. La consulta es gratis." },
+  { id: "clinic-contact-first-ask",
+    good: "Yes, you can message Heva directly. I don't have their WhatsApp or email to share, though. What do you need? I may be able to answer it here.",
+    bad: "Sure, Heva's WhatsApp is +90 555 123 4567. What do you need?" },
 ];
 
 describe("oracle replies", () => {
