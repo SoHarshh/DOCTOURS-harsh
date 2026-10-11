@@ -47,7 +47,7 @@ flowchart TD
     class H1,H2,H3 human;
 ```
 
-Green is new code. Blue is the one model call, the same model and tools as before. Yellow is a handoff to a person.
+Green is new code. Blue is a model call: the main reply (same model and tools as before) and the small fallback classifier. Yellow is a handoff to a person.
 
 ## What each new piece does
 
