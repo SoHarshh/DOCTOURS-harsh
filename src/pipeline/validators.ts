@@ -31,6 +31,7 @@ const STALL_RE = /\b(?:I'?ll (?:get back to you|check on|look into|find out)|let
 const TURNAROUND_RE = /\b(?:a few hours|couple of hours|later today|by tomorrow|within a day|24 hours|24-48 hours|48 hours|a few days|couple of days|typically takes|usually takes|should be ready|will be ready (?:in|by|within))\b/i;
 const HEADCOVER_RE = /\b(?:bring|wear|pack|buy|get|grab|use)\b[^.?!]{0,30}\b(?:hat|cap|beanie|scarf|hood|headband|hijab|head ?wrap|bandana)\b/i;
 const HEADCOVER_TIMING_RE = /\b(?:after|until|again|weeks?)\b/i;
+const HEADCOVER_NEGATED_RE = /\b(?:don'?t|do not|no need to|won'?t need|never|not|avoid|skip)\b[^.?!]{0,25}\b(?:bring|wear|wearing|pack|buy|get|grab|use)\b/i;
 
 const HANDOFF_CLAIM_RE = /\b(?:I'?m|I am) (?:getting|bringing in|looping in|connecting you|passing|handing)\b|\b(?:someone|somebody|a (?:person|human|team member|coordinator|specialist|colleague)|(?:our|the) team)(?: from (?:our|the) team)? will (?:reach out|be in touch|contact you|get back|follow up|call you|help you|take over|pick (?:this|it) up)|\b(?:I'?ve|I have) (?:passed|handed|forwarded|escalated)\b/i;
 const SAVED_CLAIM_RE = /\b(?:I'?ve|I have) (?:saved|updated|noted|recorded|logged|added|locked in)\b/i;
@@ -43,7 +44,11 @@ const cleanUrl = (u: string) => u.replace(/[.,;:)!?'"]+$/, "");
 export const withoutLinksAndIds = (s: string) => s.replace(URL_RE, " ").replace(UUID_RE, " ");
 export const urlsIn = (s: string) => (s.match(URL_RE) ?? []).map(cleanUrl);
 const sentences = (s: string) => s.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
-const numbersIn = (s: string) => (s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((n) => Number(n.replace(/,/g, "")));
+const numbersIn = (s: string) => [
+  ...(s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((n) => Number(n.replace(/,/g, ""))),
+  // "1k", "2.5k": patients write thousands this way
+  ...[...s.matchAll(/(\d+(?:\.\d+)?)\s?k\b/gi)].map((m) => Math.round(Number(m[1]) * 1000)),
+];
 
 export function moneyIn(s: string): number[] {
   return [...s.matchAll(new RegExp(MONEY_SRC, "gi"))].map((m) => Number((m[1] ?? m[2]).replace(/,/g, "")));
@@ -110,7 +115,7 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
 
   // Escalation fields, checked in both directions.
   if (reply.escalate && !reply.escalationReason) add("escalationShape", "escalate is true but escalationReason is empty");
-  if (!reply.escalate && reply.escalationReason) add("escalationShape", "escalationReason is set but escalate is false");
+  if (!reply.escalate && reply.escalationReason !== null) add("escalationShape", "escalationReason must be null when escalate is false");
 
   // Structured fields.
   if (reply.templateId !== null) add("fieldSanity", "templateId must be null");
@@ -139,7 +144,7 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
   if (STALL_RE.test(text)) add("bannedPhrases", "promises a later check or follow-up nobody can trigger");
   for (const s of sentences(text)) {
     if (/assessment/i.test(s) && TURNAROUND_RE.test(s)) add("bannedPhrases", `assessment turnaround promise: ${s}`);
-    if (HEADCOVER_RE.test(s) && !HEADCOVER_TIMING_RE.test(s)) add("bannedPhrases", `head-covering advice: ${s}`);
+    if (HEADCOVER_RE.test(s) && !HEADCOVER_TIMING_RE.test(s) && !HEADCOVER_NEGATED_RE.test(s)) add("bannedPhrases", `head-covering advice: ${s}`);
   }
 
   if (HANDOFF_CLAIM_RE.test(text)) add("claimsVsReceipts", "claims a hand-off to a person but escalate is false");
@@ -183,7 +188,7 @@ export function autoFix(reply: Reply): { reply: Reply; fixed: string[] } {
       fixed.push("urlLastLine");
     }
     if (text !== reply.response) out = { ...out, response: text };
-    if (out.escalationReason) { out = { ...out, escalationReason: null }; fixed.push("escalationShape"); }
+    if (out.escalationReason !== null) { out = { ...out, escalationReason: null }; fixed.push("escalationShape"); }
   } else if (!out.escalationReason) {
     out = { ...out, escalationReason: "model escalated without a reason" };
     fixed.push("escalationShape");

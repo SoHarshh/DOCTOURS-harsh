@@ -81,6 +81,14 @@ describe("priceProvenance with a wrong price in the chat history", () => {
   });
 });
 
+describe("patient numbers written as 1k", () => {
+  it("treats 1k in the patient's message as 1,000", () => {
+    const r = reply({ response: "The Silver deposit is $500, so a $1,000 limit covers it." });
+    expect(names(r, heva(), "my card limit is like 1k")).not.toContain("priceProvenance");
+    expect(names(r, heva(), "my card limit is like 2.5k")).toContain("priceProvenance");
+  });
+});
+
 describe("noCardDigits", () => {
   it("flags echoed card digits", () => {
     expect(names(reply({ response: "I can't charge the card ending in 4242." }))).toContain("noCardDigits");
@@ -108,6 +116,13 @@ describe("escalationShape", () => {
   });
 });
 
+describe("final review: empty escalation reason", () => {
+  it("an empty-string reason with escalate false is flagged and fixed to null", () => {
+    expect(names(reply({ escalate: false, escalationReason: "" }))).toContain("escalationShape");
+    expect(autoFix(reply({ escalate: false, escalationReason: "" })).reply.escalationReason).toBeNull();
+  });
+});
+
 describe("fieldSanity", () => {
   it("checks templateId, attachments and empty replies", () => {
     expect(names(reply({ templateId: "t" }))).toContain("fieldSanity");
@@ -129,6 +144,16 @@ describe("bannedPhrases", () => {
   });
   it("bans stalling and head-covering advice", () => {
     expect(names(reply({ response: "Let me look into that and get back to you." }))).toContain("bannedPhrases");
+    expect(names(reply({ response: "Bring a loose cap for afterwards." }))).toContain("bannedPhrases");
+  });
+});
+
+describe("final review: negated head-covering advice", () => {
+  it("does not flag telling the patient not to bring a hat", () => {
+    expect(names(reply({ response: "No, you don't need to bring a hat. Nothing goes on your head for the first two weeks." }))).not.toContain("bannedPhrases");
+    expect(names(reply({ response: "Avoid wearing a cap at first." }))).not.toContain("bannedPhrases");
+  });
+  it("still flags advice to bring one", () => {
     expect(names(reply({ response: "Bring a loose cap for afterwards." }))).toContain("bannedPhrases");
   });
 });
