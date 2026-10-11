@@ -11,6 +11,7 @@ import { assembleSystem } from "./assemble.js";
 import { callModel, type ModelDeps } from "./model.js";
 import { validate, autoFix, retryMessage, VALIDATOR_NAMES } from "./validators.js";
 import { handoffReply } from "./escalationReply.js";
+import { ensureActionLink } from "./actionLinks.js";
 import { callSummaryExtra, loadCallSummaries, type SummaryStore } from "../subagents/callLog.js";
 
 export interface RunOpts {
@@ -118,7 +119,9 @@ export async function runMessage(ctx: Context, text: string, opts: RunOpts): Pro
         trace.escalation = { source: "model", reason, category: "model" };
         return finish(handoffReply("model", reason));
       }
-      return finish(fixed.reply);
+      const linked = ensureActionLink(fixed.reply, log, opts.toolOverrides);
+      if (linked.added) { trace.validators.autoFixed.push("assessmentLink"); trace.toolsCalled = log.calls; }
+      return finish(linked.reply);
     }
 
     if (attempt === 0) {

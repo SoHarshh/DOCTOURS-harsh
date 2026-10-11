@@ -113,6 +113,13 @@ describe("runMessage", () => {
     expect(c.calls[1].system[2].text).not.toContain("STORED CALL SUMMARY");
   });
 
+  it("adds the assessment link in code when the reply tells the patient to act on it", async () => {
+    const c = fakeClient([textResponse(baseReply({ response: "Yes, you can pay the deposit right from your assessment." }))]);
+    const { reply, trace } = await runMessage(buildContext(), "can I pay from the assessment?", opts(c));
+    expect(reply.response.endsWith("\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333")).toBe(true);
+    expect(trace.validators.autoFixed).toContain("assessmentLink");
+    expect(c.calls.length).toBe(1);
+  });
   it("records total latency and prompt size", async () => {
     const c = fakeClient([textResponse(baseReply({ response: "Anytime." }))]);
     const { trace } = await runMessage(buildContext(), "ok thanks", opts(c));

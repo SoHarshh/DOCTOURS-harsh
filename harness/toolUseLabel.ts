@@ -49,7 +49,9 @@ function neededValues(c: CaseFile): string[] {
   return (c.expect.mustInclude ?? []).filter((m) => !/^\/.+\/[a-z]*$/.test(m) && /\d|https?:\/\//.test(m));
 }
 
-export function classifyToolUse(c: CaseFile, reply: Reply, trace: Trace): ToolUseLabel {
+export function classifyToolUse(c: CaseFile, reply: Reply, fullTrace: Trace): ToolUseLabel {
+  // Only the model's own calls count; calls code made itself (args.source === "code") are not tool-use decisions.
+  const trace = { ...fullTrace, toolsCalled: fullTrace.toolsCalled.filter((t) => (t.args as { source?: string } | null)?.source !== "code") };
   const source = trace.escalation?.source ?? null;
   if (source === "pregate") return "Gated";
   if (source === "validator") return "Validator-Escalated";

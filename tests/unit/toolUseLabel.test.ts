@@ -56,6 +56,9 @@ describe("classifyToolUse", () => {
     expect(classifyToolUse(control, reply({ response: "One. Two. Three." }), trace([]))).toBe("Wrong-Answer");
     expect(classifyToolUse(control, reply({ response: "Anytime!" }), trace([]))).toBe("Clean");
   });
+  it("ignores tool calls code made itself, such as the appended assessment link", () => {
+    expect(classifyToolUse(control, reply({ response: "Anytime!" }), trace([["getLatestAssessment", { source: "code" }]]))).toBe("Clean");
+  });
   it("Context when a case neither requires a tool nor is a control", () => {
     expect(classifyToolUse(context, reply({ response: "About 2,800." }), trace([]))).toBe("Context");
   });
