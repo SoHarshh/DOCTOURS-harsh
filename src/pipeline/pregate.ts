@@ -46,7 +46,7 @@ const CARD_RUN_SRC = "(?<![\\w+-])\\d(?:[ .\\-]{0,3}\\d){12,18}(?![\\w-])";
 const CARD_RUN_G = new RegExp(CARD_RUN_SRC, "g");
 const CARD_WORD = /\b(?:card|visa|mastercard|amex|discover|credit|debit|cvv|cvc|exp|expiry|expires)\b/i;
 const CARD_ENDING = /\b(?:card|visa|mastercard|amex|discover)\b[^.?!]{0,30}\b(?:ending|ends|last (?:four|4)|last digits?)\b[^.?!]{0,12}\b\d{4}\b/i;
-const ENDING_DIGITS_G = /(\b(?:ending|ends|last (?:four|4)|last digits?)\b[^.?!\d]{0,12}?)\b\d{4}\b/gi;
+const ENDING_DIGITS_G = /(\b(?:card|visa|mastercard|amex|discover|credit|debit)\b[^.?!]{0,30}?\b(?:ending|ends|last (?:four|4)|last digits?)\b[^.?!\d]{0,12}?)\b\d{4}\b/gi;
 
 const CARD = "(?:my|the|this)\\s+(?:credit\\s+|debit\\s+)?(?:card|visa|mastercard|amex)\\b";
 const CHARGE_OBJECT = "(?:it|that|me|the deposit|the payment|the balance|the full amount)";

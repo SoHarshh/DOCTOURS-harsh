@@ -144,3 +144,10 @@ describe("pregate final review fixes", () => {
     expect(pregate("I want to speak to a real person").escalate).toBe(true);
   });
 });
+
+describe("review minors: redaction", () => {
+  it("does not redact a year or a phone ending that is not next to a card word", () => {
+    expect(redactCardDigits("my lease ends in 2027 so maybe after that")).toBe("my lease ends in 2027 so maybe after that");
+    expect(redactCardDigits("card ending in 4242")).toBe("card ending in [redacted]");
+  });
+});
