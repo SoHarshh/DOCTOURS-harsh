@@ -76,7 +76,9 @@ describe("core prompt", () => {
     expect(esc).toMatch(/how transport works from their own hotel[^;]*normal answer/i);
     // a deposit move request with nothing on file vs asking about later
     expect(esc).toMatch(/move, transfer, or refund a deposit or payment they say they made to Doctours, even if none shows on file/i);
-    expect(esc).toMatch(/asking whether they could move it later[^;]*normal answer/i);
+    // an instruction to refund or move it is a handoff; a what-if about the refund or transfer terms is not
+    expect(esc).toMatch(/- tells us to move, transfer, or refund a deposit/i);
+    expect(esc).toMatch(/asking whether a deposit could be refunded or moved later \(a what-if about the terms\)[^;]*normal answer/i);
   });
   it("does not copy external test sentences into the prompt", () => {
     for (const t of ["dates are still free", "Move my deposit to Gold now", "transport from my own hotel?", "a separate callback for me"]) expect(core, t).not.toContain(t);
