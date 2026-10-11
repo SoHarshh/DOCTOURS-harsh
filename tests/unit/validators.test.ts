@@ -74,6 +74,11 @@ describe("noCardDigits", () => {
     expect(names(reply({ response: "I can't charge the card ending in 4242." }))).toContain("noCardDigits");
     expect(names(reply({ response: "Got 4242 4242 4242 4242." }))).toContain("noCardDigits");
   });
+  it("does not mistake an ID inside a URL for card digits", () => {
+    const log = withTools(["getLatestAssessment", {}]);
+    expect(names(reply({ response: "Pay from your assessment.\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333" }), log)).not.toContain("noCardDigits");
+    expect(names(reply({ response: "Your plan id is c3d4e5f6-3333-4333-8333-333333333333." }))).not.toContain("noCardDigits");
+  });
   it("does not flag a phone number or a graft count", () => {
     expect(names(reply({ response: "Your estimate is 2,800 grafts." }))).not.toContain("noCardDigits");
   });
@@ -145,8 +150,14 @@ describe("toolRequired", () => {
 describe("autoFix", () => {
   it("strips markdown and moves URLs to the end", () => {
     const { reply: r, fixed } = autoFix(reply({ response: "**Yes.** Book at https://www.doctours.com/consultation today.\n- thanks" }));
-    expect(r.response).toBe("Yes. Book at using the link below today.\nthanks\nhttps://www.doctours.com/consultation");
+    expect(r.response).toBe("Yes. Book using the link below today.\nthanks\nhttps://www.doctours.com/consultation");
     expect(fixed).toEqual(expect.arrayContaining(["plainText", "urlLastLine"]));
+  });
+  it("drops the word that pointed at the moved URL", () => {
+    expect(autoFix(reply({ response: "You can book it at https://www.doctours.com/consultation." })).reply.response)
+      .toBe("You can book it using the link below.\nhttps://www.doctours.com/consultation");
+    expect(autoFix(reply({ response: "Pay here: https://www.doctours.com/consultation" })).reply.response)
+      .toBe("Pay using the link below.\nhttps://www.doctours.com/consultation");
   });
   it("nulls a stray reason, fills a missing one, nulls templateId", () => {
     expect(autoFix(reply({ escalate: false, escalationReason: "x" })).reply.escalationReason).toBeNull();

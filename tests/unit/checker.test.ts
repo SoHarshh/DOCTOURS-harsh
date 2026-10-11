@@ -45,6 +45,10 @@ describe("null and wrong replies fail", () => {
   it("missing expected tool fails", () => {
     expect(failed(runChecks(hakan, reply({ response: "Sapphire is $3,200, deposit $500." }), trace([])))).toContain("tool:getClinicPackages");
   });
+  it("an ID inside a URL is not card digits", () => {
+    const c: CaseFile = { id: "c", text: "x", tags: [], expect: { escalate: false } };
+    expect(failed(runChecks(c, reply({ response: "Here.\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333" }), trace()))).not.toContain("noCardDigits");
+  });
   it("markdown and card digits fail", () => {
     const c: CaseFile = { id: "c", text: "x", tags: [], expect: { escalate: false } };
     expect(failed(runChecks(c, reply({ response: "**Yes** card ending in 4242" }), trace()))).toEqual(expect.arrayContaining(["plainText", "noCardDigits"]));

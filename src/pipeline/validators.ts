@@ -37,7 +37,10 @@ const SAVED_CLAIM_RE = /\b(?:I'?ve|I have) (?:saved|updated|noted|recorded|logge
 const SENT_CLAIM_RE = /\b(?:I'?ve|I have) sent\b|\blinks? below\b/i;
 const WRITE_TOOLS = ["updateUserClinicPreferences", "updateWorkingMemory", "updateUser"];
 
+const UUID_RE = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
 const cleanUrl = (u: string) => u.replace(/[.,;:)!?'"]+$/, "");
+/** Text with URLs and IDs removed, so digits inside a link or an ID are not mistaken for a card number. */
+export const withoutLinksAndIds = (s: string) => s.replace(URL_RE, " ").replace(UUID_RE, " ");
 export const urlsIn = (s: string) => (s.match(URL_RE) ?? []).map(cleanUrl);
 const sentences = (s: string) => s.trim().split(/(?<=[.!?])\s+/).filter(Boolean);
 const numbersIn = (s: string) => (s.match(/\d[\d,]*(?:\.\d+)?/g) ?? []).map((n) => Number(n.replace(/,/g, "")));
@@ -108,7 +111,7 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
   const okPrices = allowedPriceSet(log, patientText);
   for (const n of moneyIn(text)) if (!okPrices.has(n)) add("priceProvenance", `price not returned by a tool this turn: ${n}`);
 
-  if (CARD_RE.test(text)) add("noCardDigits", "card digits echoed back");
+  if (CARD_RE.test(withoutLinksAndIds(text))) add("noCardDigits", "card digits echoed back");
 
   if (STALL_RE.test(text)) add("bannedPhrases", "promises a later check or follow-up nobody can trigger");
   for (const s of sentences(text)) {
@@ -148,9 +151,11 @@ export function autoFix(reply: Reply): { reply: Reply; fixed: string[] } {
       for (const u of urls) {
         const esc = u.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         body = body.replace(new RegExp(`^\\s*${esc}[.,;:)!?]*\\s*$`, "m"), "");
-        body = body.replace(new RegExp(`${esc}[.,;:)!?]*`), "using the link below");
+        // Drop the word that pointed at the URL ("at", "here:"), keep any sentence punctuation after it.
+        body = body.replace(new RegExp(`(?:\\s+\\b(?:at|via|on|from|here)\\b\\s*:?|\\s*:)?\\s*${esc}`), " using the link below");
       }
-      body = body.split("\n").map((l) => l.trim()).filter(Boolean).join("\n");
+      body = body.split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean)
+        .map((l) => (/using the link below$/.test(l) ? `${l}.` : l)).join("\n");
       text = `${body}\n${[...new Set(urls)].join("\n")}`;
       fixed.push("urlLastLine");
     }

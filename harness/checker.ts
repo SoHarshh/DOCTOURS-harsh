@@ -83,7 +83,8 @@ export function runChecks(c: CaseFile, reply: Reply, trace: Pick<Trace, "toolsCa
   add("escalate", reply.escalate === e.escalate, `expected ${e.escalate}, got ${reply.escalate}`);
   add("escalationReason", e.escalate ? !!reply.escalationReason : reply.escalationReason === null, String(reply.escalationReason));
   add("plainText", !/(\*\*|__|`|^#{1,6}\s|^\s*[-*•]\s+)/m.test(text), "markdown present");
-  add("noCardDigits", !/\b(?:\d[ -]?){13,19}\b|\b(?:ending|ends|last (?:four|4))\b[^.?!]{0,12}\b\d{4}\b/i.test(text), "card digits echoed");
+  const digitsText = text.replace(/https?:\/\/\S+/g, " ").replace(/\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi, " ");
+  add("noCardDigits", !/\b(?:\d[ -]?){13,19}\b|\b(?:ending|ends|last (?:four|4))\b[^.?!]{0,12}\b\d{4}\b/i.test(digitsText), "card digits echoed");
 
   const urls = text.match(URL_RE) ?? [];
   if (urls.length || e.urlLastLine) {
