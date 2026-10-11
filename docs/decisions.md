@@ -53,3 +53,19 @@ The starting point is the best-evidenced setup, not a strawman. Later changes ar
 - Commits under the author's own name. No tool attribution anywhere in the repo.
 - Push after every step so the history shows the work.
 - README written plainly.
+
+## 7. Before and after, item by item
+
+| Area | What was there | What replaces it | Why it should be better | Evidence |
+|---|---|---|---|---|
+| Rule loading | One 800-line prompt, every rule on every turn | Short core prompt plus only the modules this message needs, chosen by code | Small models follow far fewer of their rules as rule count rises | IFScale 2025; Levy et al. 2024; Chroma Context Rot 2025 |
+| Rule text | Policies mixed in one block | Same policy wording, cut into one file per policy | Keeps their policy intact so gains come from structure; each file has its own tests | Packet's own sections; Claude Code and Cursor scoped rule files |
+| Choosing rules | Implicit, the model reads all of it | Code router on stage and keywords, list logged in the trace | Model-picked rule loading under-triggers; code choice is repeatable and traceable | Anthropic Skills docs; Vercel skills test; Arora et al. 2024 |
+| Conflicts | Prose like "this overrides X" inside the prompt | Code decides which module applies before the prompt is built | Haiku-class models resolve prompt-level conflicts 28% of the time; code engines raise compliance 48% to 93% | IHEval; PCAS |
+| Human handoff | None | Code triggers for clear cases, model may request for judgment cases, code writes the sentence and blocks false handoff claims | False "I handed you off" claims are a large failure class; confidence-based escalation is unreliable | Intercom, Zendesk, τ²-bench; arXiv 2606.09863; Xiong et al. 2024 |
+| Output checks | Rules in the prompt only, nothing checks the reply | Code checks links, prices, format, card digits, handoff shape; one retry naming allowed values | External, specific feedback fixes errors; self-review does not | VeriHarness; Guardrails AI; Huang et al. 2024 |
+| Debugging | Reread the whole prompt | Trace per reply: modules, tools, failed checks, escalation source | No standard exists for this; logging what code decided is the practical route | OTel GenAI conventions; Langfuse |
+| Side tasks | None | Call-log summary as one small separate call | Sub-agent loops hurt sequential tasks; inline worker calls are what vendors use | Google 2026 agent scaling study; Intercom Fin |
+| New care line | Paste into the same prompt | New folder of modules with its own tests | Per-product content with a shared core is the standard pattern | Intercom multi-brand; DoorDash |
+| Cost | Full prompt every turn | Smaller prompt, fixed part cached, pre-gated handoffs skip the model | Cheaper and faster; quality is the main reason though | Anthropic prompt caching docs |
+| Evaluation | None | Test set from their rules, three reps, ToolFailBench failure labels, against the original prompt with caching | Small single runs are too noisy to trust | Miller 2024; ToolFailBench |
