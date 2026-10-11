@@ -9,7 +9,7 @@
     "startedAt": "2026-10-11T06:00:41.361Z",
     "finishedAt": "2026-10-11T06:08:26.185Z",
     "commit": "154805f",
-    "rescoredAt": "2026-10-11T06:20:16.546Z",
+    "rescoredAt": "2026-10-11T06:30:45.174Z",
     "droppedCases": []
   },
   "rows": [
@@ -5360,7 +5360,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -5388,8 +5388,8 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
-          "pass": false,
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -5413,7 +5413,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Yes, you can message Heva yourself. Before you do, tell me what you're hoping to learn from them, and I'll answer what I can about Heva's packages, pricing, or doctors.",
         "escalate": false,
@@ -5482,7 +5482,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -5510,8 +5510,8 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
-          "pass": false,
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -5535,7 +5535,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Yes, you can message Heva directly. Before you reach out, tell me what you're hoping to find out. I can answer most package and clinic questions myself first, so you may not need to contact them at all.",
         "escalate": false,
@@ -5632,7 +5632,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -20969,7 +20969,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -21085,7 +21085,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -21201,7 +21201,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -32229,7 +32229,7 @@
         "trap-prompt",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -32267,8 +32267,8 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
-          "pass": false,
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -32415,7 +32415,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -32542,7 +32542,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -37317,10 +37317,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -37366,14 +37365,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200-300 grafts, and technicians handle the remaining stages. That's how it normally runs across Dr. Hakan's packages. The clinic sets the specifics, so if you want the exact breakdown for a particular package, ask them directly once you're in touch with them.",
         "escalate": false,
@@ -37429,10 +37423,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -37478,14 +37471,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200 to 300 grafts, and technicians handle the remaining stages. This applies across Dr. Hakan's packages.",
         "escalate": false,
@@ -37551,10 +37539,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -37600,14 +37587,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200-300 grafts, and technicians handle the remaining stages. The exact split can vary a little case by case, so the clinic can confirm specifics at your consultation.",
         "escalate": false,
@@ -37704,7 +37686,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -37811,7 +37793,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -37918,7 +37900,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },

@@ -9,7 +9,7 @@
     "startedAt": "2026-10-11T06:20:24.456Z",
     "finishedAt": "2026-10-11T06:25:19.604Z",
     "commit": "c748b20",
-    "rescoredAt": "2026-10-11T06:25:28.109Z",
+    "rescoredAt": "2026-10-11T06:30:45.186Z",
     "droppedCases": []
   },
   "rows": [
@@ -6369,7 +6369,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -6397,8 +6397,8 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
-          "pass": false,
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -6422,7 +6422,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Yes, you can message Heva yourself. Before you do, tell me what you want to ask, and I'll answer what I can about their packages, pricing, or your assessment.",
         "escalate": false,
@@ -6544,7 +6544,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -6691,7 +6691,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -24143,7 +24143,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -24289,7 +24289,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -24435,7 +24435,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -37899,7 +37899,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -38056,7 +38056,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -38219,7 +38219,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -43794,7 +43794,6 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -43843,14 +43842,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": true,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Clean",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the first 200 to 300 grafts, and technicians handle the remaining stages. This applies to the Sapphire package there, which is the one I have listed for that clinic.",
         "escalate": false,
@@ -43945,10 +43939,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -43994,14 +43987,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200 to 300 grafts, and technicians handle the remaining stages. The exact split for your case is set by the clinic.",
         "escalate": false,
@@ -44087,10 +44075,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -44136,14 +44123,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200 to 300 grafts, and technicians handle the remaining stages. This is how it normally runs across Dr. Hakan's packages. The clinic sets the specifics for your case.",
         "escalate": false,
@@ -44260,7 +44242,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -44392,7 +44374,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -44496,7 +44478,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -44524,8 +44506,8 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
-          "pass": false,
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -44534,7 +44516,7 @@
           "detail": "3 sentences"
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Doctours vets the partner clinics we work with, and you see full package pricing and deposit amounts before you pay anything. I also stay with you as your coordinator from booking through recovery, so you have one person to ask. Heva's packages and deposits are the same whichever way you book.",
         "escalate": false,

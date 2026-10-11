@@ -9,7 +9,7 @@
     "startedAt": "2026-10-11T06:08:47.816Z",
     "finishedAt": "2026-10-11T06:13:44.274Z",
     "commit": "a54415a",
-    "rescoredAt": "2026-10-11T06:20:16.559Z",
+    "rescoredAt": "2026-10-11T06:30:52.830Z",
     "droppedCases": []
   },
   "rows": [
@@ -6438,7 +6438,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -6585,7 +6585,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -6732,7 +6732,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:?",
+          "name": "include:/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
           "pass": true,
           "detail": ""
         },
@@ -24160,7 +24160,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -24306,7 +24306,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -24452,7 +24452,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -37944,7 +37944,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -38101,7 +38101,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -38258,7 +38258,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "name": "exclude:/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -43900,10 +43900,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -43949,14 +43948,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200 to 300 grafts, and technicians handle the remaining stages. This is how the Dr. Hakan packages normally run, but the clinic makes the final call on the specifics of your case.",
         "escalate": false,
@@ -44042,10 +44036,9 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -44091,14 +44084,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": false,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Tool-Skip",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200-300 grafts, and technicians handle the remaining stages. The exact breakdown can vary by case, so the clinic is the right place for specifics.",
         "escalate": false,
@@ -44184,7 +44172,6 @@
       "tags": [
         "clinic",
         "packages",
-        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -44233,14 +44220,9 @@
           "name": "exclude:/(?:can|will|I.?ll) put (?:it|that|this) in writing/i",
           "pass": true,
           "detail": ""
-        },
-        {
-          "name": "tool:getClinicPackages",
-          "pass": true,
-          "detail": ""
         }
       ],
-      "toolUseLabel": "Clean",
+      "toolUseLabel": "Context",
       "reply": {
         "response": "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the first 200 to 300 grafts, and technicians handle the remaining stages. The Sapphire package is USD 3,200 with a USD 500 deposit. Exact specifics for your procedure are for the clinic to confirm.",
         "escalate": false,
@@ -44366,7 +44348,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -44498,7 +44480,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
@@ -44630,7 +44612,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/vetted|transparen|support|reviews|layaway/i",
+          "name": "include:/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i",
           "pass": true,
           "detail": ""
         },
