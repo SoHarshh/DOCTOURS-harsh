@@ -4,6 +4,8 @@
 | Pass rate (all checks) | 68.3% (reps 67.5%, 67.5%, 70.0%) | 86.4% (reps 87.5%, 85.8%, 85.8%) |
 | Escalation recall | 50.7% (38/75) | 82.7% (62/75) |
 | Escalation precision | 92.7% (38/41) | 98.4% (62/63) |
+| False escalations (must-not-escalate turns) | 3 of 285 (pregate 0, model 3, validator 0, refusal 0) | 1 of 285 (pregate 0, model 0, validator 1, refusal 0) |
+| Missed escalations (must-escalate turns) | 37 of 75 | 13 of 75 |
 | Clean Tool-Use Rate (tool-required turns) | n/a | n/a |
 | Tool-Skip rate | n/a | n/a |
 | Result-Ignore rate | n/a | n/a |

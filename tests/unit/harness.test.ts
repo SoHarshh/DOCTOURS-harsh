@@ -6,7 +6,7 @@ import { parseArgs, loadCases, pickWarmup, runCases, withTimeout, TimeoutError }
 import { blastRadius } from "../../harness/blast.js";
 import type { CaseFile } from "../../harness/checker.js";
 import { CASES_DIR } from "../../src/paths.js";
-import { emptyTrace, type ToolUseLabel } from "../../src/types.js";
+import { emptyTrace, type EscalationSource, type ToolUseLabel } from "../../src/types.js";
 import { baseReply } from "./fakeClient.js";
 
 afterEach(() => { vi.restoreAllMocks(); });
@@ -42,7 +42,7 @@ describe("percentile", () => {
   });
 });
 
-type RowOpts = { tags?: string[]; esc?: boolean; label?: ToolUseLabel | null; input?: number; latency?: number; retried?: boolean; retryFixed?: boolean | null; gated?: boolean; cost?: number };
+type RowOpts = { tags?: string[]; esc?: boolean; src?: EscalationSource; label?: ToolUseLabel | null; input?: number; latency?: number; retried?: boolean; retryFixed?: boolean | null; gated?: boolean; cost?: number };
 function row(caseId: string, rep: number, pass: boolean, o: RowOpts = {}): Row {
   const trace = emptyTrace(caseId, "new", "claude-haiku-5-5");
   trace.usage = usage(o.input ?? 1000, 100, 2000, 0);
@@ -51,12 +51,26 @@ function row(caseId: string, rep: number, pass: boolean, o: RowOpts = {}): Row {
   trace.retried = o.retried ?? false;
   trace.retryFixed = o.retryFixed ?? null;
   if (o.gated) trace.escalation = { source: "pregate", reason: "r", category: "human_request" };
+  if (o.src) trace.escalation = { source: o.src, reason: "r", category: null };
   return {
     caseId, rep, tags: o.tags ?? ["escalate-negative"], pass, checks: [],
     toolUseLabel: o.label === undefined ? "Context" : o.label,
     reply: baseReply({ escalate: o.esc ?? false }) as any, trace, costUsd: o.cost ?? 0.001,
   };
 }
+
+/** Five false escalations (one per source, model twice, one with no source), one correct non-escalation,
+ * one missed escalation and one caught by a refusal. */
+const escalationRows: Row[] = [
+  row("f1", 0, false, { esc: true, src: "model" }),
+  row("f2", 0, false, { esc: true, src: "model" }),
+  row("f3", 0, false, { esc: true, src: "validator" }),
+  row("f4", 0, false, { esc: true, gated: true, label: "Gated" }),
+  row("f5", 0, false, { esc: true }),
+  row("ok", 0, true),
+  row("m1", 0, false, { tags: ["escalate-positive"], esc: false }),
+  row("h1", 0, true, { tags: ["escalate-positive"], esc: true, src: "refusal" }),
+];
 
 describe("summarize", () => {
   const rows: Row[] = [
@@ -85,6 +99,11 @@ describe("summarize", () => {
     expect(s.escalation).toMatchObject({ tp: 3, fn: 1, fp: 1, tn: 1 });
     expect(s.escalation.recall).toBeCloseTo(3 / 4, 9);
     expect(s.escalation.precision).toBeCloseTo(3 / 4, 9);
+  });
+  it("counts false escalations by the layer that escalated, and missed escalations", () => {
+    const s = summarize(escalationRows);
+    expect(s.escalation.falseBySource).toEqual({ pregate: 1, model: 2, validator: 1, refusal: 0, unknown: 1 });
+    expect(s.escalation).toMatchObject({ fp: 5, fn: 1 });
   });
   it("reports null precision and recall when nothing escalated or nothing should", () => {
     const s = summarize([row("x", 0, true)]);
@@ -194,6 +213,18 @@ describe("renderTable", () => {
       "Mean cache-read", "Mean output", "Cost per 1,000 turns", "Infra errors excluded"]) expect(md, label).toContain(label);
     expect(md).toMatch(/\| Infra errors excluded \| 3 \(timeout 2, unparseable 1\) \| 0 \|/);
     expect(md).toMatch(/\| Turns answered by the pre-gate \| 0 \| 0 \|/);
+  });
+  it("breaks false escalations down by source and counts missed escalations", () => {
+    const s = summarize(escalationRows);
+    const t = renderTable({ name: "a", s }, { name: "b", s });
+    expect(t).toMatch(/\| False escalations \(must-not-escalate turns\) \| 5 of 6 \(pregate 1, model 2, validator 1, refusal 0, unknown 1\) \|/);
+    expect(t).toMatch(/\| Missed escalations \(must-escalate turns\) \| 1 of 2 \|/);
+  });
+  it("leaves out the unknown source when every false escalation has one, and shows n/a with no must-escalate turns", () => {
+    const s = summarize([row("f1", 0, false, { esc: true, src: "model" }), row("ok", 0, true)]);
+    const t = renderTable({ name: "a", s }, { name: "b", s });
+    expect(t).toMatch(/\| False escalations \(must-not-escalate turns\) \| 1 of 2 \(pregate 0, model 1, validator 0, refusal 0\) \|/);
+    expect(t).toMatch(/\| Missed escalations \(must-escalate turns\) \| n\/a \|/);
   });
   it("shows the retry rate over turns that reached the model", () => {
     const s = summarize([row("r", 0, true, { retried: true, retryFixed: true }), row("n", 0, true), row("g", 0, true, { gated: true, label: "Gated" })]);

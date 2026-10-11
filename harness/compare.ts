@@ -27,7 +27,11 @@ export interface Summary {
   passRateByRep: number[];
   byTag: Record<string, { n: number; passRate: number }>;
   perCase: Record<string, { n: number; passes: number }>;
-  escalation: { precision: number | null; recall: number | null; tp: number; fp: number; fn: number; tn: number };
+  /** falseBySource splits fp by the layer that escalated; "unknown" is an escalation the trace gave no source for. */
+  escalation: {
+    precision: number | null; recall: number | null; tp: number; fp: number; fn: number; tn: number;
+    falseBySource: Record<FalseSource, number>;
+  };
   /** ToolFailBench rates. Tool-required and control denominators exclude pre-gated turns, where no model ran. */
   toolUse: {
     required: number; control: number; labels: Record<string, number>;
@@ -42,6 +46,9 @@ export interface Summary {
   latency: { p50: number; p95: number };
   meanPromptChars: number; meanInput: number; meanCacheRead: number; meanOutput: number; costPer1000: number;
 }
+
+const SOURCES = ["pregate", "model", "validator", "refusal"] as const;
+type FalseSource = (typeof SOURCES)[number] | "unknown";
 
 export interface Paired { n: number; wins: number; losses: number; ties: number; meanDiff: number; se: number | null }
 
@@ -72,10 +79,17 @@ export function summarize(rows: Row[]): Summary {
   }
 
   let tp = 0, fp = 0, fn = 0, tn = 0;
+  const falseBySource: Record<FalseSource, number> = { pregate: 0, model: 0, validator: 0, refusal: 0, unknown: 0 };
   for (const r of rows) {
     const should = r.tags.includes("escalate-positive");
     const did = !!r.reply?.escalate;
-    if (should && did) tp++; else if (should) fn++; else if (did) fp++; else tn++;
+    if (should && did) tp++;
+    else if (should) fn++;
+    else if (did) {
+      fp++;
+      const src = r.trace.escalation?.source;
+      falseBySource[src && (SOURCES as readonly string[]).includes(src) ? (src as FalseSource) : "unknown"]++;
+    } else tn++;
   }
 
   const required = rows.filter((r) => r.tags.includes("tool-required") && !gated(r));
@@ -94,7 +108,7 @@ export function summarize(rows: Row[]): Summary {
     passRateByRep: [...new Set(rows.map((r) => r.rep))].sort((a, b) => a - b).map((rep) => passOf(rows.filter((r) => r.rep === rep))),
     byTag,
     perCase,
-    escalation: { precision: ratio(tp, tp + fp), recall: ratio(tp, tp + fn), tp, fp, fn, tn },
+    escalation: { precision: ratio(tp, tp + fp), recall: ratio(tp, tp + fn), tp, fp, fn, tn, falseBySource },
     toolUse: {
       required: required.length, control: control.length, labels,
       ctur: share("Clean"), tsr: share("Tool-Skip"), rir: share("Result-Ignore"), ofr: share("Output-Fabrication"),
@@ -134,6 +148,13 @@ const frac = (x: number | null, k: number, n: number) => (x === null ? "n/a" : `
 
 type Side = { name: string; s: Summary; errors?: { kind: ErrorKind }[] };
 
+/** "5 of 285 (pregate 1, model 2, validator 1, refusal 0)", with ", unknown n" only when some escalation had no source. */
+function falseEscalationCell(e: Summary["escalation"]): string {
+  const parts = SOURCES.map((k) => `${k} ${e.falseBySource[k]}`);
+  if (e.falseBySource.unknown) parts.push(`unknown ${e.falseBySource.unknown}`);
+  return `${e.fp} of ${e.fp + e.tn} (${parts.join(", ")})`;
+}
+
 /** "3 (timeout 2, unparseable 1)", or "0". */
 function errorCell(errors: { kind: ErrorKind }[] = []): string {
   if (!errors.length) return "0";
@@ -153,6 +174,8 @@ export function renderTable(a: Side, b: Side): string {
     row("Pass rate (all checks)", (s) => `${pct(s.passRate)} (reps ${s.passRateByRep.map(pct).join(", ")})`),
     row("Escalation recall", (s) => frac(s.escalation.recall, s.escalation.tp, s.escalation.tp + s.escalation.fn)),
     row("Escalation precision", (s) => frac(s.escalation.precision, s.escalation.tp, s.escalation.tp + s.escalation.fp)),
+    row("False escalations (must-not-escalate turns)", (s) => falseEscalationCell(s.escalation)),
+    row("Missed escalations (must-escalate turns)", (s) => (s.escalation.tp + s.escalation.fn ? `${s.escalation.fn} of ${s.escalation.tp + s.escalation.fn}` : "n/a")),
     row("Clean Tool-Use Rate (tool-required turns)", (s) => frac(s.toolUse.ctur, count(s, "Clean"), s.toolUse.required)),
     row("Tool-Skip rate", (s) => frac(s.toolUse.tsr, count(s, "Tool-Skip"), s.toolUse.required)),
     row("Result-Ignore rate", (s) => frac(s.toolUse.rir, count(s, "Result-Ignore"), s.toolUse.required)),
