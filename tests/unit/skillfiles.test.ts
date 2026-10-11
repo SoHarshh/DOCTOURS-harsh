@@ -237,6 +237,25 @@ describe("routing", () => {
   it("a question about how many nights to plan loads travel's stay-length rule", () => {
     for (const t of ["how many nights should I plan for?", "how many days do I need to be there?"]) expect(names(t), t).toContain("travel");
   });
+  it("pausing to talk it over or take weeks loads the pause module, even next to a question", () => {
+    for (const t of [
+      "is the hotel included in Silver? I need a couple of weeks to discuss it with my wife first",
+      "let me talk it over with my partner",
+      "I want to run it by my family before I decide",
+      "give me a few days",
+      "I need to check with my husband before committing",
+    ]) expect(names(t), t).toContain("time-bound-pause");
+  });
+  it("plain questions about weeks, days or decisions do not load the pause module", () => {
+    for (const t of [
+      "how many weeks until I can work out again?",
+      "how many days is the hotel stay?",
+      "what should I know before I book?",
+      "do I need to wait a few weeks before washing my hair?",
+      "can my husband come with me?",
+      "does recovery take a few weeks?",
+    ]) expect(names(t), t).not.toContain("time-bound-pause");
+  });
   it("a deposit paid to a clinic directly loads deposit eligibility", () => {
     for (const t of [
       "Can the deposit I put down directly with Heva be moved into Doctours?",
