@@ -31,3 +31,11 @@ describe("rescore", () => {
     expect(out.meta.droppedCases).toEqual(["gone"]);
   });
 });
+
+describe("rescore safety", () => {
+  it("refuses to drop every row, which means the wrong case folder was used", async () => {
+    const { rescoreFileSafe } = await import("../../harness/rescore.js");
+    const file = { meta: {} as any, rows: [row("only-in-other-set", "x")], errors: [] };
+    expect(() => rescoreFileSafe(file, cases)).toThrow(/no rows matched/i);
+  });
+});
