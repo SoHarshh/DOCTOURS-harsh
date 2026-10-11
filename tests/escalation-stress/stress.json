@@ -1,0 +1,362 @@
+[
+  {
+    "id": "stress-p01-human-indirect",
+    "text": "is anyone actually reading these? I want a real person to answer me",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-1"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n01-photos-real-person",
+    "text": "is anyone actually reading my photos? I want to know a real person checked them",
+    "tags": ["stress", "escalate-negative", "hard-negative", "human-mention", "pair-1"],
+    "expect": { "escalate": false, "mustInclude": ["team"] }
+  },
+  {
+    "id": "stress-p02-human-polite",
+    "text": "Would it be possible to speak with one of your team members directly? I'd appreciate it.",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-2"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n02-self-book-polite",
+    "text": "Would it be possible to book Heva myself from the assessment? I'd appreciate it.",
+    "tags": ["stress", "escalate-negative", "hard-negative", "self-serve", "pair-2"],
+    "expect": { "escalate": false, "mustInclude": ["assessment"] }
+  },
+  {
+    "id": "stress-p03-human-misspelled",
+    "text": "can i tlak to a reel persn plz",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-3"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n03-wife-misspelled",
+    "text": "can i tlak to my wife frist plz, then ill decide",
+    "tags": ["stress", "escalate-negative", "hard-negative", "own-people", "pair-3"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-p04-human-spanish",
+    "text": "Quiero hablar con una persona de su equipo, no con un bot.",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-4"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n04-photos-spanish",
+    "text": "¿Una persona de su equipo revisó mis fotos, o fue un bot?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "human-mention", "pair-4"],
+    "expect": { "escalate": false, "mustInclude": ["/\\b(the|your)\\b/i"] }
+  },
+  {
+    "id": "stress-p05-human-frustrated",
+    "text": "this is taking forever. just get me your supervisor.",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-5"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n05-frustrated-next-step",
+    "text": "this is taking forever. just tell me the next step.",
+    "tags": ["stress", "escalate-negative", "hard-negative", "frustration", "pair-5"],
+    "expect": { "escalate": false, "mustInclude": ["assessment|deposit"] }
+  },
+  {
+    "id": "stress-p06-card-amex-charge",
+    "text": "put the Gold deposit on my Amex now",
+    "tags": ["stress", "escalate-positive", "card-charge", "pair-6"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n06-card-amex-question",
+    "text": "can I put the Gold deposit on my Amex?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "card", "pair-6"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-p07-card-number-run",
+    "text": "can you run the $500 Silver deposit on my card? number's 6011 0009 9013 9424",
+    "tags": ["stress", "escalate-positive", "card-charge", "pair-7"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n07-paypal-deposit",
+    "text": "can I run the $500 Silver deposit through PayPal instead of a card?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "card", "pair-7"],
+    "expect": { "escalate": false, "mustInclude": ["paypal"] }
+  },
+  {
+    "id": "stress-p08-card-spanish",
+    "text": "Mi tarjeta es 4000 0566 5566 5556, cobren el depósito de Gold por favor.",
+    "tags": ["stress", "escalate-positive", "card-charge", "pair-8"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n08-card-spanish-question",
+    "text": "¿Puedo pagar el depósito de Gold con mi tarjeta?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "card", "pair-8"],
+    "expect": { "escalate": false, "mustInclude": ["/\\b(the|your)\\b/i"] }
+  },
+  {
+    "id": "stress-p09-move-paid-deposit",
+    "text": "I paid the Heva Silver deposit on Monday, go ahead and move it to Dr. Hakan.",
+    "tags": ["stress", "escalate-positive", "money-move", "pair-9"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n09-move-deposit-question",
+    "text": "If I pay the Heva Silver deposit, can I move it to Dr. Hakan later?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "refund-transfer", "pair-9"],
+    "expect": { "escalate": false, "mustInclude": ["flight"] }
+  },
+  {
+    "id": "stress-p10-refund-paid",
+    "text": "please refund the $500 I put down for Sapphire, I've changed my mind",
+    "tags": ["stress", "escalate-positive", "money-move", "pair-10"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n10-refund-question",
+    "text": "if I change my mind after putting $500 down for Sapphire, can I get it back?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "refund-transfer", "pair-10"],
+    "expect": { "escalate": false, "mustInclude": ["25"] }
+  },
+  {
+    "id": "stress-p11-reach-out-doctor",
+    "text": "reach out to Dr. Hakan for me and ask what density he'd put in my hairline",
+    "tags": ["stress", "escalate-positive", "clinic-contact", "pair-11"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n11-reach-out-myself",
+    "text": "can I reach out to Dr. Hakan myself to ask what density he'd put in my hairline?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "clinic", "pair-11"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-p12-call-clinic",
+    "text": "can you call the Heva clinic and tell them I'm coming in March?",
+    "tags": ["stress", "escalate-positive", "clinic-contact", "pair-12"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n12-call-clinic-question",
+    "text": "do I need to call the Heva clinic to tell them I'm coming in March?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "clinic", "pair-12"],
+    "expect": { "escalate": false, "mustInclude": ["deposit|checkout"] }
+  },
+  {
+    "id": "stress-p13-just-book-date",
+    "text": "just book me a Tuesday in November at Heva Silver, I'll pay the deposit later",
+    "tags": ["stress", "escalate-positive", "date-hold", "pair-13"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n13-book-tuesday-question",
+    "text": "can I book a Tuesday in November at Heva Silver when I pay the deposit?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates", "pair-13"],
+    "expect": { "escalate": false, "mustInclude": ["/\\btue(s|sday)?s?\\b/i"] }
+  },
+  {
+    "id": "stress-p14-hold-week",
+    "text": "hold the week of Jan 11 at Dr. Hakan for me, I'll pay once my bonus lands",
+    "tags": ["stress", "escalate-positive", "date-hold", "pair-14"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n14-deposit-hold-question",
+    "text": "will paying the deposit hold the week of Jan 11 at Dr. Hakan for me?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates", "pair-14"],
+    "expect": { "escalate": false, "mustInclude": ["confirm"] }
+  },
+  {
+    "id": "stress-p15-live-availability",
+    "text": "is the first week of January still open at Dr. Hakan? can you look",
+    "tags": ["stress", "escalate-positive", "availability-check", "pair-15"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n15-busy-season",
+    "text": "is January usually a busy time at Dr. Hakan?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates", "pair-15"],
+    "expect": { "escalate": false, "mustInclude": ["busy|winter|popular"] }
+  },
+  {
+    "id": "stress-p16-arrange-pickup",
+    "text": "set up my airport pickup from IST for when I land",
+    "tags": ["stress", "escalate-positive", "logistics", "pair-16"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n16-pickup-question",
+    "text": "how does the airport pickup from IST work when I land?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "transport", "pair-16"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-p17-call-hotel",
+    "text": "call the hotel and ask them for an early check-in for me",
+    "tags": ["stress", "escalate-positive", "hotel-contact", "pair-17"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n17-call-hotel-myself",
+    "text": "can I call the hotel and ask them for an early check-in myself?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "hotel", "pair-17"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-p18-contact-second-ask",
+    "text": "Second time asking: what's Heva's email? I want to ask about aftercare.",
+    "tags": ["stress", "escalate-positive", "contact-repeat", "pair-18"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n18-contact-first-ask",
+    "text": "What's Heva's email? I want to ask about aftercare.",
+    "tags": ["stress", "escalate-negative", "hard-negative", "clinic", "pair-18"],
+    "expect": { "escalate": false, "mustNotInclude": ["/[\\w.+-]+@[\\w-]+\\.[a-z]{2,}/i"] }
+  },
+  {
+    "id": "stress-p19-human-german",
+    "text": "Kann ich bitte mit einem echten Mitarbeiter sprechen?",
+    "tags": ["stress", "escalate-positive", "human-request", "pair-19"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n19-consult-call-german",
+    "text": "Ist die Beratung ein Telefonanruf mit einem echten Mitarbeiter?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "calls", "pair-19"],
+    "expect": { "escalate": false, "mustInclude": ["phone|call"] }
+  },
+  {
+    "id": "stress-p20-card-on-file",
+    "text": "4532.0151.1283.0366 exp 04/27 cvv 902, that's my visa, keep it on file for when I'm ready",
+    "tags": ["stress", "escalate-positive", "card-share"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "stress-n20-real-surgeon",
+    "text": "is the surgeon at Heva a real doctor or a technician?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "human-mention"],
+    "expect": { "escalate": false, "mustInclude": ["sibel|surgeon"] }
+  },
+  {
+    "id": "stress-n21-graft-decider",
+    "text": "will a person or an algorithm decide my final graft count?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "human-mention"],
+    "expect": { "escalate": false, "mustInclude": ["surgeon"] }
+  },
+  {
+    "id": "stress-n22-talk-before-pay",
+    "text": "do I have to talk to anyone before I pay, or can I just book it myself?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "human-mention"],
+    "expect": { "escalate": false, "mustInclude": ["assessment"] }
+  },
+  {
+    "id": "stress-n23-you-people-price",
+    "text": "you people keep sending me links and I'm annoyed. just tell me the Sapphire price in plain words",
+    "tags": ["stress", "escalate-negative", "hard-negative", "frustration"],
+    "expect": { "escalate": false, "mustInclude": ["3200"] }
+  },
+  {
+    "id": "stress-n24-card-to-hold",
+    "text": "do I need to give you my card number to hold my spot?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "card"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-n25-card-declined",
+    "text": "my card got declined at checkout, what other ways can I pay the deposit?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "card"],
+    "expect": { "escalate": false, "mustInclude": ["klarna|paypal"] }
+  },
+  {
+    "id": "stress-n26-cancel-fee",
+    "text": "what's the cancellation fee if I back out after paying the deposit?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "refund-transfer"],
+    "expect": { "escalate": false, "mustInclude": ["25"] }
+  },
+  {
+    "id": "stress-n27-tax-refund-reminder",
+    "text": "remind me in two weeks, I'm still waiting on my tax refund",
+    "tags": ["stress", "escalate-negative", "hard-negative", "refund-transfer"],
+    "expect": { "escalate": false, "shouldFollowUp": true, "followUpTimingIncludes": "2|two" }
+  },
+  {
+    "id": "stress-n28-price-lock",
+    "text": "does the price stay locked if I pay the deposit now but don't travel until next summer?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "refund-transfer"],
+    "expect": { "escalate": false, "mustInclude": ["12"] }
+  },
+  {
+    "id": "stress-n29-clinic-website",
+    "text": "does Dr. Hakan's clinic have a website I can look at?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "clinic"],
+    "expect": { "escalate": false, "mustInclude": ["/doctours\\.com\\/clinic\\/dr-hakan/"], "urlLastLine": true }
+  },
+  {
+    "id": "stress-n30-redraw-team",
+    "text": "the hairline on my plan is too high, get the team to redraw it lower",
+    "tags": ["stress", "escalate-negative", "hard-negative", "revision"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-n31-sapphire-days",
+    "text": "which days does Sapphire run? I can only get Mondays or Fridays off work",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates"],
+    "expect": { "escalate": false, "mustInclude": ["/\\bmon(day)?s?\\b/i"] }
+  },
+  {
+    "id": "stress-n32-march-busy",
+    "text": "is March a busy month at Heva? just trying to plan ahead",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-n33-confirm-timing",
+    "text": "how soon after the deposit does the clinic confirm my date?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "dates"],
+    "expect": { "escalate": false, "mustInclude": ["24"] }
+  },
+  {
+    "id": "stress-n34-own-hotel-transport",
+    "text": "if I stay at my own hotel instead of the Silver package hotel, is transport to Heva still covered?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "transport"],
+    "expect": { "escalate": false, "mustInclude": ["/(five|5)[ -]?mile/i"] }
+  },
+  {
+    "id": "stress-n35-consult-phone",
+    "text": "is the consultation a phone call? I'm not great on video",
+    "tags": ["stress", "escalate-negative", "hard-negative", "calls"],
+    "expect": { "escalate": false, "mustInclude": ["phone"] }
+  },
+  {
+    "id": "stress-n36-book-consult-again",
+    "text": "can I book another free consultation call to go over my assessment?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "calls"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-n37-confusing-difference",
+    "text": "ugh I've been going back and forth for weeks and it's so confusing. what's the actual difference between Silver and Gold?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "frustration"],
+    "expect": { "escalate": false, "mustInclude": ["4500|4 night|four night|incision"] }
+  },
+  {
+    "id": "stress-n38-fed-up-grafts",
+    "text": "I'm honestly fed up with hair loss. how many grafts am I looking at?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "frustration"],
+    "expect": { "escalate": false, "mustInclude": ["2500|3200|2800"] }
+  },
+  {
+    "id": "stress-n39-girlfriend-reviews",
+    "text": "my girlfriend wants to talk to someone who's been through it. do you have reviews from other patients?",
+    "tags": ["stress", "escalate-negative", "hard-negative", "own-people"],
+    "expect": { "escalate": false }
+  },
+  {
+    "id": "stress-n40-photos-to-barber",
+    "text": "can you send me my photos back? I want to show my barber",
+    "tags": ["stress", "escalate-negative", "hard-negative", "photos"],
+    "expect": { "escalate": false }
+  }
+]
