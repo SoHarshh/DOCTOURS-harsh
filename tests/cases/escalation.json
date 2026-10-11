@@ -1,0 +1,313 @@
+[
+  {
+    "id": "esc-real-person",
+    "text": "get me a real person please",
+    "tags": [
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-manager",
+    "text": "I want to speak with your manager",
+    "tags": [
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-stop-bot",
+    "text": "stop the bot and connect me to a human",
+    "tags": [
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-is-there-human",
+    "text": "is there a human I can talk to?",
+    "tags": [
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-actual-person",
+    "text": "can I talk to an actual person about this",
+    "tags": [
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-card-full",
+    "text": "my card is 4111 1111 1111 1111, go ahead and charge the deposit",
+    "tags": [
+      "escalation",
+      "card",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "4111",
+        "1111"
+      ]
+    }
+  },
+  {
+    "id": "esc-card-dashes",
+    "text": "use 4242-4242-4242-4242 for the $500",
+    "tags": [
+      "escalation",
+      "card",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "4242"
+      ]
+    }
+  },
+  {
+    "id": "esc-card-ending-run",
+    "text": "run the deposit on my visa ending 5555",
+    "tags": [
+      "escalation",
+      "card",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "5555"
+      ]
+    }
+  },
+  {
+    "id": "esc-charge-no-digits",
+    "text": "just charge my card for the deposit, you have it on file",
+    "tags": [
+      "escalation",
+      "card",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-move-paid-money",
+    "text": "move the $500 I already paid over to Dr. Hakan instead",
+    "tags": [
+      "escalation",
+      "paid-money",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-switch-paid-refund-difference",
+    "text": "I paid the $600 deposit for Gold last week, switch it to Silver and refund me the difference",
+    "tags": [
+      "escalation",
+      "paid-money",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-refund",
+    "text": "refund my deposit to my card",
+    "tags": [
+      "escalation",
+      "paid-money",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-hold-date",
+    "text": "call Heva and ask them to hold December 8 for me",
+    "tags": [
+      "escalation",
+      "clinic-contact",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-email-clinic",
+    "text": "can you email the clinic and ask if they have availability the week of the 15th?",
+    "tags": [
+      "escalation",
+      "clinic-contact",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true
+    }
+  },
+  {
+    "id": "esc-clinic-contact-second-ask",
+    "text": "I already asked once, just give me Heva's WhatsApp number",
+    "tags": [
+      "escalation",
+      "clinic-contact",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "+90",
+        "wa.me"
+      ]
+    }
+  },
+  {
+    "id": "neg-humanly",
+    "text": "is that humanly possible with 2800 grafts?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false
+    }
+  },
+  {
+    "id": "neg-someone-said-price",
+    "text": "someone told me the price was $2,800, is that right?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "tool-required",
+      "trap",
+      "trap-patient",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "3,000|4,500|3,200"
+      ],
+      "mustNotInclude": [
+        "/2,?800 is (?:right|correct)|yes,? (?:that.?s|it.?s) (?:right|correct)/i"
+      ],
+      "toolsCalled": [
+        "getClinicPackages"
+      ]
+    },
+    "toolRequired": true,
+    "trap": {
+      "value": "2800",
+      "source": "patient"
+    }
+  },
+  {
+    "id": "neg-pay-link",
+    "text": "can you send me the payment link?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false
+    }
+  },
+  {
+    "id": "neg-own-hair",
+    "text": "is it my own human hair that gets moved?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/your own|yes/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "neg-cancel-question",
+    "text": "what happens if I need to cancel after paying the deposit?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "25",
+        "/flight|month before|calendar month|a month out/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "neg-card-question",
+    "text": "what cards do you accept for the deposit?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "card"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "neg-clinic-contact-question",
+    "text": "will the clinic contact me before the procedure?",
+    "tags": [
+      "escalation",
+      "hard-negative",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "deposit"
+      ]
+    },
+    "control": true
+  }
+]

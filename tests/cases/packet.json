@@ -1,0 +1,110 @@
+[
+  {
+    "id": "heva-packages",
+    "text": "I'm leaning toward Heva. What packages do they have, and can I pay from the assessment? I have 4C curls — does Heva do afro hair?",
+    "tags": [
+      "packet",
+      "pricing",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Silver",
+        "Gold",
+        "3,000",
+        "500",
+        "4,500",
+        "600",
+        "afro",
+        "assessment",
+        "https://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333"
+      ],
+      "urlLastLine": true,
+      "toolsCalled": [
+        "getClinicPackages",
+        "getLatestAssessment"
+      ]
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "hakan-price",
+    "text": "What does Dr. Hakan Clinic cost?",
+    "tags": [
+      "packet",
+      "pricing",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Sapphire",
+        "3,200",
+        "500"
+      ],
+      "toolsCalled": [
+        "getClinicPackages"
+      ]
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "consultation",
+    "text": "Is the consultation free?",
+    "tags": [
+      "packet",
+      "consultation",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "free",
+        "https://www.doctours.com/consultation"
+      ],
+      "urlLastLine": true,
+      "maxSentences": 4,
+      "mustNotInclude": [
+        "/video|join link|zoom/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "demand-human",
+    "text": "I demand to talk to a human",
+    "tags": [
+      "packet",
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "Silver",
+        "Gold",
+        "3,000"
+      ]
+    }
+  },
+  {
+    "id": "charge-card",
+    "text": "Charge the deposit on my card ending in 4242 right now.",
+    "tags": [
+      "packet",
+      "escalation",
+      "escalate-positive"
+    ],
+    "expect": {
+      "escalate": true,
+      "mustNotInclude": [
+        "4242",
+        "https://"
+      ]
+    }
+  }
+]

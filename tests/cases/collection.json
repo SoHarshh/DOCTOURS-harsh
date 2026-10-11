@@ -1,0 +1,508 @@
+[
+  {
+    "id": "lead-first-contact",
+    "text": "hi, I'm interested in getting a hair transplant",
+    "tags": [
+      "collection",
+      "lead",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area unknown; name unknown; photos missing. Asks so far -- area 0, name 0, photos 0 (budget 1 each).",
+      "CHAT_LIST": "",
+      "RECENT_CONVERSATION_SUMMARY": "",
+      "RECENT_CALLS": "",
+      "PATIENT_NAME": null,
+      "PROCEDURE_AREA": null,
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0,
+      "WORKING_MEMORY": "{}"
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Alex",
+        "12 to 18|12-18",
+        "hairline",
+        "crown"
+      ],
+      "mustNotInclude": [
+        "image-upload",
+        "/what.?s your name/i"
+      ]
+    }
+  },
+  {
+    "id": "lead-concern-distressed",
+    "text": "my edges got pulled out from braids and I'm so embarrassed!! I just want them back",
+    "tags": [
+      "collection",
+      "lead",
+      "concern",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area unknown; name unknown; photos missing. Asks so far -- area 0, name 0, photos 0 (budget 1 each).",
+      "CHAT_LIST": "",
+      "RECENT_CONVERSATION_SUMMARY": "",
+      "RECENT_CALLS": "",
+      "PATIENT_NAME": null,
+      "PROCEDURE_AREA": null,
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0,
+      "WORKING_MEMORY": "{}"
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "https://www.doctours.com/image-upload",
+        "Front",
+        "done|finished|completed"
+      ],
+      "urlLastLine": true,
+      "mustNotInclude": [
+        "/thanks for sharing|thank you for sharing/i",
+        "/hairline, crown, or both/i"
+      ]
+    }
+  },
+  {
+    "id": "lead-concern-routine",
+    "text": "my crown is thinning a bit",
+    "tags": [
+      "collection",
+      "lead",
+      "concern",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area unknown; name unknown; photos missing. Asks so far -- area 0, name 0, photos 0 (budget 1 each).",
+      "CHAT_LIST": "",
+      "RECENT_CONVERSATION_SUMMARY": "",
+      "RECENT_CALLS": "",
+      "PATIENT_NAME": null,
+      "PROCEDURE_AREA": null,
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0,
+      "WORKING_MEMORY": "{}"
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "https://www.doctours.com/image-upload"
+      ],
+      "urlLastLine": true,
+      "mustNotInclude": [
+        "/^sorry|ugh|oof|yikes/i",
+        "/hairline, crown, or both/i"
+      ]
+    }
+  },
+  {
+    "id": "weave-delay",
+    "text": "I have a sew-in right now so I can't take photos for a while",
+    "tags": [
+      "collection",
+      "image-delay",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area hairline; name on file; photos missing. Asks so far -- area 1, name 1, photos 1 (budget 1 each). Last collection ask: 1 patient turn(s) ago.",
+      "CHAT_LIST": "[Sep 20, 10:02 AM] Alex: Amazing, love to hear that! My name is Alex and I'll be helping you throughout your hair transplant journey, from today all the way through your results 12 to 18 months from now. To start, which area are you looking to address first: hairline, crown, full top, beard, or eyebrow?\n[Sep 20, 10:06 AM] Jordan Hale: Hairline. My edges have been receding for a few years.\n[Sep 20, 10:07 AM] Alex: That's one of the most common things we help with. What's your name?\n[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "RECENT_CONVERSATION_SUMMARY": "[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": true,
+      "followUpTimingIncludes": "2 week|two week|14 day",
+      "mustInclude": [
+        "two weeks|2 weeks",
+        "sew-in|sew in",
+        "/more or less time|adjust|sooner or later|different (?:time|date)|move (?:that|the) (?:reminder|check)/i"
+      ],
+      "mustNotInclude": [
+        "image-upload",
+        "Front, Top"
+      ]
+    }
+  },
+  {
+    "id": "back-photo-pushback",
+    "text": "why do you need a photo of the back of my head? the back is fine",
+    "tags": [
+      "collection",
+      "images",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area hairline; name on file; photos missing. Asks so far -- area 1, name 1, photos 1 (budget 1 each). Last collection ask: 1 patient turn(s) ago.",
+      "CHAT_LIST": "[Sep 20, 10:02 AM] Alex: Amazing, love to hear that! My name is Alex and I'll be helping you throughout your hair transplant journey, from today all the way through your results 12 to 18 months from now. To start, which area are you looking to address first: hairline, crown, full top, beard, or eyebrow?\n[Sep 20, 10:06 AM] Jordan Hale: Hairline. My edges have been receding for a few years.\n[Sep 20, 10:07 AM] Alex: That's one of the most common things we help with. What's your name?\n[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "RECENT_CONVERSATION_SUMMARY": "[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "donor"
+      ],
+      "maxSentences": 5
+    }
+  },
+  {
+    "id": "photos-in-chat-fallback",
+    "text": "the upload page won't let me select photos, can I just send them here?",
+    "tags": [
+      "collection",
+      "images",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "LEAD",
+      "COLLECTION_STATUS": "area hairline; name on file; photos missing. Asks so far -- area 1, name 1, photos 1 (budget 1 each). Last collection ask: 1 patient turn(s) ago.",
+      "CHAT_LIST": "[Sep 20, 10:02 AM] Alex: Amazing, love to hear that! My name is Alex and I'll be helping you throughout your hair transplant journey, from today all the way through your results 12 to 18 months from now. To start, which area are you looking to address first: hairline, crown, full top, beard, or eyebrow?\n[Sep 20, 10:06 AM] Jordan Hale: Hairline. My edges have been receding for a few years.\n[Sep 20, 10:07 AM] Alex: That's one of the most common things we help with. What's your name?\n[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "RECENT_CONVERSATION_SUMMARY": "[Sep 20, 10:08 AM] Jordan Hale: Jordan Hale\n[Sep 21, 9:15 AM] Alex: A receding hairline is one of the most common things we help with, and you're in the right place for it. Once I have your photos the team builds your assessment, which shows what your new hairline could look like plus a graft estimate. Can you upload Front, Top, Back, Left, and Right? When you're finished, just send done and I'll check it.\nhttps://www.doctours.com/image-upload",
+      "HAS_PATIENT_IMAGES": false,
+      "PATIENT_IMAGE_COUNT": 0,
+      "SAVED_CLINIC_COUNT": 0
+    },
+    "toolOverrides": {
+      "getPatientImages": {
+        "allAnglesUploaded": false,
+        "angles": {},
+        "hasImages": false,
+        "imageCount": 0,
+        "missingAngles": [
+          "front",
+          "top",
+          "left",
+          "right",
+          "back"
+        ],
+        "uploadedAngles": []
+      },
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 0
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      },
+      "getPatientContext": {
+        "clinicSelectionPreferences": {
+          "budgetMax": null,
+          "excludedDestinations": null,
+          "preferredDestinations": null,
+          "selectedClinicId": null,
+          "selectedPackageId": null,
+          "softClinicInterestIds": null,
+          "softPackageInterestIds": null
+        },
+        "consultationTime": null,
+        "email": null,
+        "name": null,
+        "phone": "+15555550123",
+        "pipelineStatus": "LEAD",
+        "tentativeProcedureDates": null
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/send them (?:to me )?here|here/i",
+        "Front"
+      ],
+      "mustNotInclude": [
+        "image-upload",
+        "/can.?t accept|won.?t reach|only way/i"
+      ]
+    }
+  },
+  {
+    "id": "assessment-turnaround",
+    "text": "when will my assessment be ready?",
+    "tags": [
+      "collection",
+      "assessment",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PIPELINE_STATUS": "PREP_PRE_CLINICAL",
+      "SAVED_CLINIC_COUNT": 0,
+      "CHAT_LIST": "[Sep 21, 11:41 AM] Alex: Got them — all five angles are in. The medical team will send your assessment as soon as it's ready.",
+      "RECENT_CONVERSATION_SUMMARY": "[Sep 21, 11:41 AM] Alex: Got them — all five angles are in. The medical team will send your assessment as soon as it's ready."
+    },
+    "toolOverrides": {
+      "getLatestAssessment": {
+        "assessmentUrl": null,
+        "graftRange": null,
+        "hasAssessment": false,
+        "hasHairlineDrawing": false,
+        "shareStatus": "not_ready",
+        "version": 1
+      },
+      "getSavedClinics": {
+        "count": 0,
+        "recommendationStatus": "none",
+        "savedClinics": []
+      }
+    },
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "/24 hours|48 hours|few hours|couple of hours|by tomorrow|a few days|within a day|typically|usually|should be ready|I.?ll check/i"
+      ],
+      "mustInclude": [
+        "/working on|as soon as|once it.?s ready|when it.?s ready/i"
+      ]
+    }
+  }
+]

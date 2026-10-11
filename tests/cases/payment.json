@@ -1,0 +1,396 @@
+[
+  {
+    "id": "carecredit-us",
+    "text": "do you take carecredit?",
+    "tags": [
+      "payment",
+      "carecredit",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/don.?t accept|do not accept|not accept/i",
+        "CareCredit",
+        "Klarna|PayPal",
+        "layaway"
+      ],
+      "mustNotInclude": [
+        "depends",
+        "provider",
+        "try applying"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "cherry-us",
+    "text": "can I use Cherry to finance this?",
+    "tags": [
+      "payment",
+      "carecredit",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/don.?t accept|do not accept|not accept/i",
+        "Cherry",
+        "Klarna|PayPal",
+        "layaway"
+      ],
+      "mustNotInclude": [
+        "depends",
+        "provider"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "insurance-us",
+    "text": "will my health insurance cover this?",
+    "tags": [
+      "payment",
+      "insurance",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/can.?t use|cannot use|doesn.?t take|does not take|not (?:be )?(?:covered|cover)|no,? /i",
+        "Klarna|PayPal",
+        "layaway"
+      ],
+      "mustNotInclude": [
+        "depends on your plan",
+        "medically necessary",
+        "submit a claim",
+        "superbill",
+        "reimburse"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "financing-us",
+    "text": "can I do monthly payments?",
+    "tags": [
+      "payment",
+      "financing",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Klarna|PayPal"
+      ],
+      "mustNotInclude": [
+        "/\\$?\\d+(?:\\.\\d+)?\\s?(?:\\/|per|a) ?mo(?:nth)?\\b/i",
+        "APR",
+        "/you.?re approved|you are approved|pre-?approved|guaranteed approval/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "financing-gb",
+    "text": "can I pay in instalments?",
+    "tags": [
+      "payment",
+      "financing",
+      "control",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PATIENT_COUNTRY_CODE": "GB",
+      "KLARNA_PAYPAL_FINANCING_ELIGIBLE": false
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "US|United States",
+        "Canada",
+        "pay in full|full"
+      ],
+      "mustNotInclude": [
+        "/^yes/i",
+        "/\\$?\\d+(?:\\.\\d+)?\\s?(?:\\/|per|a) ?mo(?:nth)?\\b/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "financing-unknown",
+    "text": "do you offer financing?",
+    "tags": [
+      "payment",
+      "financing",
+      "control",
+      "escalate-negative"
+    ],
+    "contextOverrides": {
+      "PATIENT_COUNTRY_CODE": null,
+      "KLARNA_PAYPAL_FINANCING_ELIGIBLE": "unknown"
+    },
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "US|United States",
+        "Canada",
+        "/live|located|based|where/i"
+      ],
+      "mustNotInclude": [
+        "/\\$?\\d+(?:\\.\\d+)?\\s?(?:\\/|per|a) ?mo(?:nth)?\\b/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "layaway",
+    "text": "how does your layaway work?",
+    "tags": [
+      "payment",
+      "layaway",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "monthly|month",
+        "/interest.?free|no interest|without interest/i",
+        "before the procedure|before your procedure|paid off before|fully paid before"
+      ],
+      "mustNotInclude": [
+        "deposit option",
+        "APR"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "deposit-refund-terms",
+    "text": "is the deposit refundable?",
+    "tags": [
+      "payment",
+      "deposit",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "25",
+        "refund",
+        "/flight|month before|calendar month|a month out/i"
+      ],
+      "mustNotInclude": [
+        "non-refundable under any",
+        "never refundable"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "pay-link-gold",
+    "text": "I'm ready, send me the payment link for the Heva Gold package",
+    "tags": [
+      "payment",
+      "links",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "https://www.doctours.com/payment/44444444-4444-4444-8444-444444444442"
+      ],
+      "urlLastLine": true,
+      "toolsCalled": [
+        "getClinicPackages",
+        "getPaymentLink"
+      ],
+      "toolCallIncludes": [
+        {
+          "name": "getPaymentLink",
+          "argsContain": "44444444-4444-4444-8444-444444444442"
+        }
+      ]
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "checkout-link-heva",
+    "text": "I want to go with Heva but haven't picked a package yet, can you send me a link so I can look at them?",
+    "tags": [
+      "payment",
+      "links",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "https://www.doctours.com/clinic/heva/checkout|https://www.doctours.com/clinic/heva|https://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333"
+      ],
+      "urlLastLine": true
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "promo-ask",
+    "text": "do you have any discount codes going right now?",
+    "tags": [
+      "payment",
+      "promo",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "3,000|4,500|3,200"
+      ],
+      "mustNotInclude": [
+        "/no (?:promos?|discounts?|promotions?|codes?)\\b|don.?t have any (?:promos?|discounts?|codes?)|nothing running|aren.?t any (?:promos?|discounts?)/i",
+        "/I.?ll check|will check|let me check|(?:promos?|discounts?|codes?) (?:may|might|could) (?:be|come)/i"
+      ],
+      "toolsCalled": [
+        "getClinicPackages"
+      ]
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "claimed-discount",
+    "text": "I saw a $200 off coupon on instagram, can you apply it to my package?",
+    "tags": [
+      "payment",
+      "promo",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "/we.?ll honou?r|(?:i.?ve|i have|it.?s|been|is) applied|confirm(?:ed)? the \\$?200|200 off your/i",
+        "/no (?:promos?|discounts?|promotions?|codes?)\\b|don.?t have any (?:promos?|discounts?|codes?)|nothing running|aren.?t any (?:promos?|discounts?)/i",
+        "/I.?ll check|will check|let me check|(?:promos?|discounts?|codes?) (?:may|might|could) (?:be|come)/i"
+      ]
+    }
+  },
+  {
+    "id": "direct-clinic-quote",
+    "text": "Heva quoted me $2,600 directly, is that the real price?",
+    "tags": [
+      "payment",
+      "pricing",
+      "tool-required",
+      "trap",
+      "trap-patient",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "3,000|4,500"
+      ],
+      "mustNotInclude": [
+        "/can.?t verify|cannot verify|unable to verify/i",
+        "/we.?ll match|can match/i",
+        "/2,?600 is (?:right|correct|the real)|yes,? (?:that|2,?600)/i"
+      ],
+      "toolsCalled": [
+        "getClinicPackages"
+      ]
+    },
+    "toolRequired": true,
+    "trap": {
+      "value": "2600",
+      "source": "patient"
+    }
+  },
+  {
+    "id": "paid-clinic-directly",
+    "text": "I already paid a deposit directly to Heva last week, can you take over my booking from here?",
+    "tags": [
+      "payment",
+      "deposit-eligibility",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "new deposit|through Doctours"
+      ],
+      "mustNotInclude": [
+        "/import|transfer(?:red)? (?:it|that) (?:in|into|over)|count(?:s)? as your Doctours/i"
+      ]
+    }
+  },
+  {
+    "id": "debit-card-question",
+    "text": "can I pay the deposit with my debit card?",
+    "tags": [
+      "payment",
+      "card",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "card|yes"
+      ],
+      "mustNotInclude": [
+        "person will",
+        "getting a person"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "balance-to-clinic",
+    "text": "do I pay the rest to the clinic when I get there?",
+    "tags": [
+      "payment",
+      "balance",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Doctours",
+        "7 days|seven days"
+      ],
+      "mustNotInclude": [
+        "/pay (?:the rest|the balance|the remaining)(?: balance)? (?:to|at) the clinic|on procedure day/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "deposit-split",
+    "text": "can I split the deposit into two payments?",
+    "tags": [
+      "payment",
+      "deposit",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/in full|full amount|one payment|single payment|can.?t be split|cannot be split|not (?:able to )?split|isn.?t split/i"
+      ],
+      "mustNotInclude": [
+        "/yes,? you can split|installments for the deposit|split the deposit at checkout/i"
+      ]
+    },
+    "control": true
+  }
+]

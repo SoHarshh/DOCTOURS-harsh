@@ -1,0 +1,295 @@
+[
+  {
+    "id": "pause-saving",
+    "text": "I need to save up for a few months before I can do the deposit",
+    "tags": [
+      "pacing",
+      "pause",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": true,
+      "followUpTimingIncludes": "month|week",
+      "mustInclude": [
+        "/check in|check back|reach out|follow up/i",
+        "month|weeks",
+        "/more or less time|adjust|sooner or later|different (?:time|date)|move (?:that|the) (?:reminder|check)/i"
+      ],
+      "mustNotInclude": [
+        "https://www.doctours.com/payment",
+        "checkout"
+      ]
+    }
+  },
+  {
+    "id": "pause-reviewing",
+    "text": "let me look over the two clinics and I'll get back to you",
+    "tags": [
+      "pacing",
+      "pause",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": true,
+      "followUpTimingIncludes": "month",
+      "mustInclude": [
+        "/check in|check back|reach out|follow up/i",
+        "month|weeks",
+        "/more or less time|adjust|sooner or later|different (?:time|date)|move (?:that|the) (?:reminder|check)/i"
+      ],
+      "mustNotInclude": [
+        "/take your time!?$|whenever you.?re ready\\.?$/i"
+      ]
+    }
+  },
+  {
+    "id": "pause-named-window",
+    "text": "can you check back with me in two weeks? I'll decide by then",
+    "tags": [
+      "pacing",
+      "pause",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": true,
+      "followUpTimingIncludes": "2 week|two week",
+      "mustInclude": [
+        "two weeks|2 weeks"
+      ],
+      "maxSentences": 4
+    }
+  },
+  {
+    "id": "reversibility-torn",
+    "text": "I'm torn between Silver and Gold, what if I pick the wrong one?",
+    "tags": [
+      "pacing",
+      "reversibility",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": false,
+      "mustInclude": [
+        "/transfer|move|switch|change/i"
+      ],
+      "mustNotInclude": [
+        "/(?:is|are|be|gets?) locked in|can.?t (?:be )?changed|final decision/i"
+      ]
+    }
+  },
+  {
+    "id": "move-deposit-question",
+    "text": "can I move my deposit to a different clinic later if I change my mind?",
+    "tags": [
+      "pacing",
+      "reversibility",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/yes|transferable|transfer|move/i",
+        "flights|flight"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ack-thanks",
+    "text": "ok thanks",
+    "tags": [
+      "pacing",
+      "short",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "maxSentences": 2,
+      "mustNotInclude": [
+        "https://",
+        "?"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "spanish",
+    "text": "¿La consulta es gratis?",
+    "tags": [
+      "pacing",
+      "language",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "free"
+      ],
+      "mustNotInclude": [
+        "gratis",
+        "consulta"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "hat-advice",
+    "text": "should I bring a hat for after the surgery?",
+    "tags": [
+      "pacing",
+      "recovery",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "/bring a (?:loose )?(?:hat|cap)|pack a hat|loose cap|beanie|scarf/i"
+      ],
+      "mustInclude": [
+        "/two weeks|2 weeks|button|zip|front.?opening|nothing on (?:your|the) head/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "call-recap",
+    "text": "remind me what we talked about on the call?",
+    "tags": [
+      "pacing",
+      "subagent",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "hairline|4C"
+      ],
+      "maxSentences": 5
+    }
+  },
+  {
+    "id": "consult-reschedule-none",
+    "text": "can I reschedule my consultation?",
+    "tags": [
+      "pacing",
+      "consultation",
+      "tool-required",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "https://www.doctours.com/consultation"
+      ],
+      "urlLastLine": true,
+      "toolsCalled": [
+        "getConsultationRescheduleLink"
+      ]
+    },
+    "toolRequired": true
+  },
+  {
+    "id": "identity-bot",
+    "text": "are you a bot or a real person?",
+    "tags": [
+      "pacing",
+      "identity",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Alex",
+        "coordinator"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "creator-collab",
+    "text": "I'm an influencer with 40k followers, do you do creator discounts or collabs?",
+    "tags": [
+      "pacing",
+      "creator",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "molly@doctours.com"
+      ],
+      "mustNotInclude": [
+        "/you qualify|story frames|reels|engagement rate|\\d+%/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "phone-call-request",
+    "text": "can you just call me instead?",
+    "tags": [
+      "pacing",
+      "phone",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "consultation"
+      ],
+      "mustNotInclude": [
+        "/I.?ll call you|I will call you|give you a call/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "clinic-contact-first-ask",
+    "text": "can I message Heva directly?",
+    "tags": [
+      "pacing",
+      "clinic-contact",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "whatsapp",
+        "@heva",
+        "+90"
+      ],
+      "mustInclude": [
+        "?",
+        "/yes|you can/i"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "hr-leave-question",
+    "text": "my HR department asked what paperwork they'd need for my leave, what do I tell them?",
+    "tags": [
+      "pacing",
+      "documents",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "/I.?ll send|I will send|look for Doctours as the sender|check your spam/i"
+      ]
+    }
+  }
+]

@@ -1,0 +1,137 @@
+[
+  {
+    "id": "ctrl-talk-soon",
+    "text": "great, talk soon",
+    "tags": [
+      "short",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "maxSentences": 2,
+      "mustNotInclude": [
+        "https://",
+        "?"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-thumbs",
+    "text": "👍",
+    "tags": [
+      "short",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "maxSentences": 2,
+      "mustNotInclude": [
+        "https://",
+        "?"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-insurance",
+    "text": "can I use my health insurance?",
+    "tags": [
+      "payment",
+      "insurance",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/can.?t use|cannot use|not (?:be )?covered|doesn.?t (?:take|cover)|no,? /i",
+        "Klarna|PayPal",
+        "layaway"
+      ],
+      "mustNotInclude": [
+        "depends on your plan",
+        "medically necessary",
+        "submit a claim",
+        "superbill"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-bot",
+    "text": "are you a bot?",
+    "tags": [
+      "identity",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Alex"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-wrong-number",
+    "text": "sorry, who is this?",
+    "tags": [
+      "identity",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "Alex",
+        "Doctours"
+      ]
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-what-is-graft",
+    "text": "what's a graft?",
+    "tags": [
+      "conceptual",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/follic|hair/i"
+      ],
+      "mustNotInclude": [
+        "/\\$\\s?\\d|\\d\\s?(?:usd|dollars)\\b/i"
+      ],
+      "maxSentences": 4
+    },
+    "control": true
+  },
+  {
+    "id": "ctrl-fue-vs-dhi",
+    "text": "what's the difference between FUE and DHI?",
+    "tags": [
+      "conceptual",
+      "control",
+      "escalate-negative"
+    ],
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "FUE",
+        "DHI"
+      ],
+      "mustNotInclude": [
+        "/\\$\\s?\\d|\\d\\s?(?:usd|dollars)\\b/i",
+        "/recommend (?:heva|dr\\.? hakan|hakan)/i"
+      ]
+    },
+    "control": true
+  }
+]
