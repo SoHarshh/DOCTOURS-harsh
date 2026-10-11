@@ -111,7 +111,9 @@ export async function runMessage(ctx: Context, text: string, opts: RunOpts): Pro
       trace.attempts?.push({ response: res.rawText, escalate: false, toolCallCount: log.calls.length, violations: ["unparseable"] });
       if (attempt === 0) {
         trace.retried = true;
-        user = `${firstUser}\n\nA validator rejected the previous reply: it was not a valid JSON object of the required shape (${res.parseError}). Return only the JSON object.`;
+        user = res.parseError === "max_rounds"
+          ? `${firstUser}\n\nThe previous attempt used every tool round without answering. Answer now with what you already know, calling at most one more tool, and return only the JSON object.`
+          : `${firstUser}\n\nA validator rejected the previous reply: it was not a valid JSON object of the required shape (${res.parseError}). Return only the JSON object.`;
         continue;
       }
       trace.retryFixed = false;

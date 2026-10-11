@@ -140,6 +140,14 @@ describe("runMessage", () => {
       expect(c.calls[0].tools, text).toBeDefined();
     }
   });
+  it("when the tool loop runs out of rounds, the retry asks for an answer instead of blaming the JSON", async () => {
+    const loop = Array.from({ length: 4 }, (_, i) => toolResponse("getAllClinics", {}, `tu_${i}`));
+    const c = fakeClient([...loop, textResponse(baseReply({ response: "Anytime." }))]);
+    await runMessage(buildContext(), "hi there", opts(c));
+    const retryUser = JSON.stringify(c.calls[4].messages[0].content);
+    expect(retryUser).toMatch(/every tool round|ran out of tool rounds/);
+    expect(retryUser).not.toMatch(/not a valid JSON/);
+  });
   it("records total latency and prompt size", async () => {
     const c = fakeClient([textResponse(baseReply({ response: "Anytime." }))]);
     const { trace } = await runMessage(buildContext(), "ok thanks", opts(c));
