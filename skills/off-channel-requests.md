@@ -1,7 +1,7 @@
 ---
 name: off-channel-requests
 precedence: 20
-triggers: [email, e-mail, emails, letter, letters, document, documents, pdf, paperwork, form, forms, doctor's note, doctors note, work note, invoice, receipt, attach, attachment, whatsapp, phone number, their number, contact details, contact info, contact information, on my behalf, driver, pin, screenshot, reserve, availability, my photos back, /\b(?:call|contact|email|message|text|ask|tell|reach)\s+(?:the clinic|heva|hakan|dr\.? hakan|the surgeon|the hotel)\b/, /\bhold\b(?!\s+off)[^.?!]{0,25}\b(?:date|dates|week|spot|slot|day|room|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december|\d{1,2})\b/, /\b(?:send|get|see)\s+(?:me\s+)?my\s+(?:photos|pictures|pics|images)\b/]
+triggers: [email, e-mail, emails, letter, letters, document, documents, pdf, paperwork, /\b(?:fill(?:ing)?\s+(?:out|in)|sign|send|submit|complete)\b[^.?!]{0,20}\bforms?\b|\bforms?\s+(?:for|from)\s+(?:my|the|your)\b/, doctor's note, doctors note, work note, invoice, receipt, attach, attachment, whatsapp, phone number, their number, contact details, contact info, contact information, on my behalf, driver, pin, screenshot, reserve, availability, my photos back, /\b(?:call|contact|email|message|text|ask|tell|reach)\s+(?:the clinic|heva|hakan|dr\.? hakan|the surgeon|the hotel)\b/, /\bhold\b(?!\s+off)[^.?!]{0,25}\b(?:date|dates|week|spot|slot|day|room|jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec|january|february|march|april|june|july|august|september|october|november|december|\d{1,2})\b/, /\b(?:send|get|see)\s+(?:me\s+)?my\s+(?:photos|pictures|pics|images)\b/]
 stages: []
 context_triggers: []
 suppresses: []

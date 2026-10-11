@@ -220,3 +220,14 @@ describe("routing fixes from the first measured run", () => {
     expect(names("my hair is braided at the moment", lead)).toContain("image-delay");
   });
 });
+
+describe("review minors: homonyms", () => {
+  it("'Visa' the card does not load travel; a travel visa does", () => {
+    expect(names("can I pay the deposit with my Visa?")).not.toContain("travel");
+    expect(names("do I need a visa for Turkey?")).toContain("travel");
+  });
+  it("'form of payment' does not load off-channel requests; a paperwork form does", () => {
+    expect(names("what form of payment do you take?")).not.toContain("off-channel-requests");
+    expect(names("can you fill out a form for my employer?")).toContain("off-channel-requests");
+  });
+});

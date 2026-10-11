@@ -1,7 +1,7 @@
 ---
 name: travel
 precedence: 30
-triggers: [passport, passports, flight, flights, fly, flying, plane, airfare, ticket, tickets, travel, traveling, travelling, itinerary, arrive, arrival, arriving, depart, departure, visa, evisa, trip, /\bhow (?:long|many (?:days|nights))\b[^.?!]{0,30}\b(?:stay|there|trip|be in)\b/, /\bwhen should i (?:go|travel|fly|arrive|leave)\b/]
+triggers: [passport, passports, flight, flights, fly, flying, plane, airfare, ticket, tickets, travel, traveling, travelling, itinerary, arrive, arrival, arriving, depart, departure, /\b(?:e-?visa|travel visa|tourist visa|(?:need|get|apply for|require[sd]?)\s+a\s+visa|visa\s+(?:for|to|requirements?|application|on arrival))\b/, evisa, trip, /\bhow (?:long|many (?:days|nights))\b[^.?!]{0,30}\b(?:stay|there|trip|be in)\b/, /\bwhen should i (?:go|travel|fly|arrive|leave)\b/]
 stages: []
 context_triggers: []
 suppresses: []
