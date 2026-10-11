@@ -55,6 +55,13 @@ describe("null and wrong replies fail", () => {
   });
 });
 
+describe("sentence counting", () => {
+  it("does not split on titles like Dr. or Mr.", () => {
+    const c: CaseFile = { id: "s", text: "x", tags: [], expect: { escalate: false, maxSentences: 2 } };
+    expect(failed(runChecks(c, reply({ response: "Dr. Hakan Clinic has one package. Mr. Smith asked too." }), trace()))).not.toContain("maxSentences");
+  });
+});
+
 describe("matching rules", () => {
   it("supports alternates, regex, mustNotInclude and tool args", () => {
     const c: CaseFile = { id: "c", text: "x", tags: [], expect: { escalate: false, mustInclude: ["klarna|paypal", "/don.?t accept/i"], mustNotInclude: ["depends"], toolCallIncludes: [{ name: "getClinicPackages", argsContain: "Hakan" }] } };

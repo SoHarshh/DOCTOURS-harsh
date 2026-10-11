@@ -54,7 +54,9 @@ const isUrlLine = (l: string) => /^https?:\/\/\S+$/.test(l.trim());
 /** Sentences in the reply, not counting URL-only lines. */
 export function sentenceCount(text: string): number {
   const body = text.split("\n").filter((l) => !isUrlLine(l)).join(" ");
-  return body.trim().split(/(?<=[.!?])\s+/).filter(Boolean).length;
+  // Titles such as "Dr." end with a period but do not end a sentence.
+  const masked = body.replace(/\b(Dr|Mr|Mrs|Ms|St|vs|e\.g|i\.e)\./gi, "$1");
+  return masked.trim().split(/(?<=[.!?])\s+/).filter(Boolean).length;
 }
 
 /**
