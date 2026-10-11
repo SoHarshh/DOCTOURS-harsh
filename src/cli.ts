@@ -11,10 +11,10 @@ import { emptyTrace, type Reply, type Trace } from "./types.js";
 
 export type SystemName = "new" | "baseline";
 export interface Message { id: string; text: string }
-export interface Args { system: SystemName; in?: string; out?: string; trace?: string; model?: string }
+export interface Args { system: SystemName; in?: string; out?: string; trace?: string; model?: string; concurrency?: number }
 export interface RunAllOpts { client?: ClientLike; concurrency?: number; retryDelayMs?: number }
 
-const FLAGS = ["system", "in", "out", "trace", "model"] as const;
+const FLAGS = ["system", "in", "out", "trace", "model", "concurrency"] as const;
 
 export function parseArgs(argv: string[]): Args {
   const out: Record<string, string> = { system: "new" };
@@ -28,7 +28,9 @@ export function parseArgs(argv: string[]): Args {
     i++;
   }
   if (out.system !== "new" && out.system !== "baseline") throw new Error(`--system must be "new" or "baseline", got "${out.system}"`);
-  return out as unknown as Args;
+  if (out.concurrency === undefined) return out as unknown as Args;
+  if (!/^[1-9]\d*$/.test(out.concurrency)) throw new Error(`--concurrency must be a positive whole number, got "${out.concurrency}"`);
+  return { ...out, concurrency: Number(out.concurrency) } as unknown as Args;
 }
 
 /** Validates the CLI input: a JSON array of {id, text}. A missing id is filled from the item's position. */
@@ -60,10 +62,11 @@ function failedTurn(system: SystemName, m: Message, model: string, err: unknown)
 
 /**
  * Runs every message as an independent turn on the same fixed history and returns replies in input order.
- * Up to `concurrency` turns run at once (env CONCURRENCY, default 4). Throws only if every message failed.
+ * Up to `concurrency` turns run at once (--concurrency, else env CONCURRENCY, else 4). `failed` counts the
+ * messages handed to a person because their run threw. Throws only if every message failed.
  */
 export async function runAll(system: SystemName, messages: Message[], model?: string, opts: RunAllOpts = {}) {
-  if (messages.length === 0) return { replies: [] as Reply[], traces: [] as Trace[] };
+  if (messages.length === 0) return { replies: [] as Reply[], traces: [] as Trace[], failed: 0 };
   const deps = createDeps({ ...(model ? { model } : {}), ...(opts.client ? { client: opts.client } : {}) });
   const runOne = await runnerFor(system);
   const concurrency = Math.max(1, opts.concurrency ?? (Number(process.env.CONCURRENCY) || 4));
@@ -95,24 +98,24 @@ export async function runAll(system: SystemName, messages: Message[], model?: st
   };
   await Promise.all(Array.from({ length: Math.min(concurrency, messages.length) }, worker));
   if (errors.length === messages.length) throw errors[0];
-  return { replies: results.map((r) => r.reply), traces: results.map((r) => r.trace) };
+  return { replies: results.map((r) => r.reply), traces: results.map((r) => r.trace), failed: errors.length };
 }
 
 function oneLine(e: unknown): string {
   return (e instanceof Error ? e.message : String(e)).replace(/\s*\n\s*/g, " ").trim();
 }
 
-async function main() {
+export async function main(argv: string[] = process.argv.slice(2), opts: RunAllOpts = {}) {
   try {
-    const args = parseArgs(process.argv.slice(2));
+    const args = parseArgs(argv);
     const messages = parseMessages(readFileSync(args.in ?? 0, "utf8"));
-    const { replies, traces } = await runAll(args.system, messages, args.model);
+    const { replies, traces, failed } = await runAll(args.system, messages, args.model, { ...opts, ...(args.concurrency ? { concurrency: args.concurrency } : {}) });
     const json = JSON.stringify(replies, null, 2) + "\n";
     if (args.out) writeFileSync(args.out, json); else process.stdout.write(json);
     const tracePath = args.trace ?? join(RESULTS_DIR, "traces.jsonl");
     mkdirSync(dirname(tracePath), { recursive: true });
     writeFileSync(tracePath, traces.map((t) => JSON.stringify(t) + "\n").join(""));
-    process.stderr.write(`wrote ${replies.length} replies; traces in ${tracePath}\n`);
+    process.stderr.write(`wrote ${replies.length} replies; ${failed} handed off after errors; traces in ${tracePath}\n`);
   } catch (e) {
     process.stderr.write(`error: ${oneLine(e)}\n`);
     process.exitCode = 1;

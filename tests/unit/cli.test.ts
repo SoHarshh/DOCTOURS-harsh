@@ -1,9 +1,9 @@
 import { describe, it, expect, vi } from "vitest";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { parseArgs, parseMessages, runAll } from "../../src/cli.js";
+import { main, parseArgs, parseMessages, runAll } from "../../src/cli.js";
 import { ROOT } from "../../src/paths.js";
 import { textResponse, baseReply } from "./fakeClient.js";
 
@@ -46,6 +46,13 @@ describe("cli parsing", () => {
   it("rejects an unknown system", () => { expect(() => parseArgs(["--system", "old"])).toThrow(/system/); });
   it("rejects a flag with no value", () => { expect(() => parseArgs(["--in"])).toThrow(/--in/); });
   it("rejects unknown flags", () => { expect(() => parseArgs(["--input", "x"])).toThrow(/--input/); });
+  it("parses --concurrency as a number and leaves it unset by default", () => {
+    expect(parseArgs(["--concurrency", "8"]).concurrency).toBe(8);
+    expect(parseArgs([]).concurrency).toBeUndefined();
+  });
+  it("rejects a --concurrency that is not a positive whole number", () => {
+    for (const bad of ["0", "-2", "abc", "2.5"]) expect(() => parseArgs(["--concurrency", bad])).toThrow(/--concurrency must be a positive whole number/);
+  });
 
   it("rejects invalid JSON", () => { expect(() => parseMessages("[{")).toThrow(/JSON/); });
   it("rejects a non-array", () => { expect(() => parseMessages('{"id":1}')).toThrow(/array/); });
@@ -97,6 +104,11 @@ describe("runAll", () => {
     expect(traces[1].notes.join(" ")).toMatch(/boom on t1/);
   });
 
+  it("counts the messages handed to a person after errors", async () => {
+    expect((await runAll("baseline", msgs(3), undefined, { client: echoClient(["t1"]), retryDelayMs: 0 })).failed).toBe(1);
+    expect((await runAll("baseline", msgs(3), undefined, { client: echoClient() })).failed).toBe(0);
+  });
+
   it("retries a failed message once before handing it to a person", async () => {
     let failed = false;
     const flaky = {
@@ -124,8 +136,67 @@ describe("runAll", () => {
 
   it("returns nothing for no messages without calling the model", async () => {
     const c = echoClient();
-    expect(await runAll("baseline", [], undefined, { client: c })).toEqual({ replies: [], traces: [] });
+    expect(await runAll("baseline", [], undefined, { client: c })).toEqual({ replies: [], traces: [], failed: 0 });
     expect(c.calls.length).toBe(0);
+  });
+});
+
+/** Echoes each message and records the most calls that were in flight at once. */
+function countingClient() {
+  const c = { inFlight: 0, maxInFlight: 0, messages: { async create(p: any) {
+    c.inFlight++;
+    c.maxInFlight = Math.max(c.maxInFlight, c.inFlight);
+    await new Promise((r) => setTimeout(r, 5));
+    c.inFlight--;
+    return textResponse(baseReply({ response: `re:${/"([^"]*)"/.exec(p.messages[0].content)![1]}` }));
+  } } };
+  return c;
+}
+
+describe("main", () => {
+  const files = (n: number) => {
+    const dir = mkdtempSync(join(tmpdir(), "cli-"));
+    const f = { in: join(dir, "in.json"), out: join(dir, "out.json"), trace: join(dir, "t.jsonl") };
+    writeFileSync(f.in, JSON.stringify(msgs(n)));
+    return f;
+  };
+  const args = (f: ReturnType<typeof files>, ...extra: string[]) =>
+    ["--system", "baseline", "--in", f.in, "--out", f.out, "--trace", f.trace, ...extra];
+  const stderrOf = async (fn: () => Promise<void>) => {
+    const spy = vi.spyOn(process.stderr, "write").mockImplementation(() => true);
+    try { await fn(); return spy.mock.calls.map((c) => String(c[0])).join(""); } finally { spy.mockRestore(); }
+  };
+
+  it("runs at most --concurrency messages at once", async () => {
+    for (const n of [1, 3]) {
+      const c = countingClient();
+      const f = files(6);
+      await stderrOf(() => main(args(f, "--concurrency", String(n)), { client: c }));
+      expect(c.maxInFlight).toBe(n);
+      expect(JSON.parse(readFileSync(f.out, "utf8"))).toHaveLength(6);
+    }
+  });
+
+  it("still reads CONCURRENCY from the environment, and the flag wins over it", async () => {
+    const saved = process.env.CONCURRENCY;
+    process.env.CONCURRENCY = "2";
+    try {
+      const c = countingClient();
+      await stderrOf(() => main(args(files(6)), { client: c }));
+      expect(c.maxInFlight).toBe(2);
+      const d = countingClient();
+      await stderrOf(() => main(args(files(6), "--concurrency", "1"), { client: d }));
+      expect(d.maxInFlight).toBe(1);
+    } finally {
+      if (saved === undefined) delete process.env.CONCURRENCY; else process.env.CONCURRENCY = saved;
+    }
+  });
+
+  it("ends the stderr summary with how many messages were handed off after errors", async () => {
+    const f = files(3);
+    const err = await stderrOf(() => main(args(f), { client: echoClient(["t1"]), retryDelayMs: 0 }));
+    expect(err.trim().split("\n").at(-1)).toBe(`wrote 3 replies; 1 handed off after errors; traces in ${f.trace}`);
+    expect(process.exitCode).toBeFalsy();
   });
 });
 
@@ -146,6 +217,7 @@ describe("cli process", () => {
   it("exits 1 with one stderr line for an item without text", () => { oneLineError(run([], '[{"id":"a"}]'), /text/); });
   it("exits 1 with one stderr line for invalid JSON", () => { oneLineError(run([], "not json"), /JSON/); });
   it("exits 1 with one stderr line for an unknown system", () => { oneLineError(run(["--system", "old"], "[]"), /system/); });
+  it("exits 1 with one stderr line for a bad --concurrency", () => { oneLineError(run(["--concurrency", "0"], "[]"), /--concurrency must be a positive whole number/); });
   it("exits 1 with one stderr line for a missing input file", () => {
     const dir = mkdtempSync(join(tmpdir(), "cli-"));
     oneLineError(run(["--in", join(dir, "nope.json")]), /nope\.json/);
@@ -165,5 +237,6 @@ describe("cli process", () => {
     const r = run(["--system", "baseline", "--in", f, "--trace", join(dir, "t.jsonl")]);
     expect(r.status).toBe(0);
     expect(JSON.parse(r.stdout)).toEqual([]);
+    expect(r.stderr).toBe(`wrote 0 replies; 0 handed off after errors; traces in ${join(dir, "t.jsonl")}\n`);
   });
 });
