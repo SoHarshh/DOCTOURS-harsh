@@ -199,3 +199,24 @@ describe("conflicts settled in code", () => {
     ]);
   });
 });
+
+describe("routing fixes from the first measured run", () => {
+  const lead = { PIPELINE_STATUS: "LEAD", COLLECTION_STATUS: "area unknown; name unknown; photos missing." };
+  it("a hyphenated '$300-off code' loads the promo module", () => {
+    expect(names("I saw on Instagram there's a $300-off code this month. What's the code?")).toContain("promo");
+    expect(names("do you have a promo code?")).toContain("promo");
+  });
+  it("asking whether the clinic or surgeon will contact them loads the consultation module", () => {
+    expect(names("will the clinic contact me before the procedure?")).toContain("consultation");
+    expect(names("when do I get to talk to the surgeon?")).toContain("consultation");
+  });
+  it("braids as the cause of hair loss do not count as a photo delay", () => {
+    const r = names("my edges got pulled out from braids and I'm so embarrassed!! I just want them back", lead);
+    expect(r).not.toContain("image-delay");
+    expect(r).toContain("collection");
+  });
+  it("braids worn right now still count as a photo delay", () => {
+    expect(names("I have box braids right now so photos won't show much", lead)).toContain("image-delay");
+    expect(names("my hair is braided at the moment", lead)).toContain("image-delay");
+  });
+});

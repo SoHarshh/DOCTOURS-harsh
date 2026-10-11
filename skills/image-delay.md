@@ -1,7 +1,7 @@
 ---
 name: image-delay
 precedence: 20
-triggers: [weave, weaves, sew-in, sew-ins, sew in, braids, braided, cornrows, wig, wigs, hair system, toupee, lace front, buzz cut, /\b(?:i|i've|i have|i'm|im|just|recently|freshly)\s+(?:just\s+|recently\s+)?(?:shaved|buzzed)\b|\b(?:shaved|buzzed) (?:my|it|off)\b|\b(?:head|hair|scalp) is (?:shaved|buzzed)\b/, /\b(?:can'?t|cannot|won'?t|unable to)\b[^.?!]{0,25}\b(?:take|send|upload|get|do)\b[^.?!]{0,20}\b(?:photos?|pictures?|pics|images?)\b/, /\b(?:photos?|pictures?|pics|images?)\b[^.?!]{0,30}\b(?:later|tonight|tomorrow|this weekend|after work|next week|when i can)\b/, /\b(?:later|tonight|tomorrow|this weekend|after work|next week|when i can)\b[^.?!]{0,30}\b(?:photos?|pictures?|pics|images?)\b/]
+triggers: [weave, weaves, sew-in, sew-ins, sew in, /\b(?:braids|cornrows)\b[^.?!]{0,20}\b(?:in|right now|currently|still|at the moment)\b|\b(?:wearing|have|got|still have|currently have|in)\b[^.?!]{0,10}\b(?:braids|cornrows)\b|\b(?:hair is|it'?s) braided\b/, wig, wigs, hair system, toupee, lace front, buzz cut, /\b(?:i|i've|i have|i'm|im|just|recently|freshly)\s+(?:just\s+|recently\s+)?(?:shaved|buzzed)\b|\b(?:shaved|buzzed) (?:my|it|off)\b|\b(?:head|hair|scalp) is (?:shaved|buzzed)\b/, /\b(?:can'?t|cannot|won'?t|unable to)\b[^.?!]{0,25}\b(?:take|send|upload|get|do)\b[^.?!]{0,20}\b(?:photos?|pictures?|pics|images?)\b/, /\b(?:photos?|pictures?|pics|images?)\b[^.?!]{0,30}\b(?:later|tonight|tomorrow|this weekend|after work|next week|when i can)\b/, /\b(?:later|tonight|tomorrow|this weekend|after work|next week|when i can)\b[^.?!]{0,30}\b(?:photos?|pictures?|pics|images?)\b/]
 stages: []
 context_triggers: []
 suppresses: [collection, time-bound-pause]

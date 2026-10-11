@@ -1,7 +1,7 @@
 ---
 name: consultation
 precedence: 20
-triggers: [consultation, consultations, consult, phone call, a call, the call, call me, callback, call back, ring me, reschedule, rescheduling, appointment, zoom, video call, facetime, talk to the surgeon, speak to the surgeon, speak with the surgeon, talk to the doctor, speak to the doctor, speak with the doctor]
+triggers: [consultation, consultations, consult, phone call, a call, the call, call me, callback, call back, ring me, reschedule, rescheduling, appointment, zoom, video call, facetime, talk to the surgeon, speak to the surgeon, speak with the surgeon, talk to the doctor, speak to the doctor, speak with the doctor, /\b(?:clinic|surgeon|doctor)\b[^.?!]{0,30}\b(?:contact|call|reach out to|message|speak|talk)\b/, /\b(?:contact|call|speak|talk|reach out)\b[^.?!]{0,20}\b(?:the clinic|the surgeon|the doctor)\b/]
 stages: []
 context_triggers: []
 suppresses: []

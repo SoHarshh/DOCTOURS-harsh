@@ -1,7 +1,7 @@
 ---
 name: promo
 precedence: 20
-triggers: [promo, promos, promotion, promotions, discount, discounts, discounted, coupon, coupons, deals, any deal, better deal, special deal, good deal, sale, price match, special offer, /\b\d+\s*%\s*off\b|\$\s?\d[\d,]*\s+off\b/]
+triggers: [promo, promos, promotion, promotions, discount, discounts, discounted, coupon, coupons, deals, any deal, better deal, special deal, good deal, sale, price match, special offer, /\b\d+\s*%\s*-?\s*off\b|\$\s?\d[\d,]*\s*-?\s*off\b/, /\b(?:what'?s|give me|send me|share) (?:the|a|your) code\b/]
 stages: []
 context_triggers: []
 suppresses: []
