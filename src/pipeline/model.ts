@@ -75,7 +75,8 @@ export function createDeps(overrides: Partial<ModelDeps> = {}): ModelDeps {
   const effort = process.env.EFFORT ?? "medium";
   if (!(EFFORTS as readonly string[]).includes(effort)) throw new Error(`invalid EFFORT value: ${effort} (expected low, medium or high)`);
   return {
-    client: overrides.client ?? new Anthropic(),
+    // The SDK backs off and retries rate limits and server errors; 6 tries rides out short bursts on a low-tier key.
+    client: overrides.client ?? new Anthropic({ maxRetries: 6 }),
     model: process.env.MODEL ?? "claude-haiku-5-5",
     effort: effort as ModelDeps["effort"],
     maxRounds: 8,

@@ -97,6 +97,27 @@ describe("runAll", () => {
     expect(traces[1].notes.join(" ")).toMatch(/boom on t1/);
   });
 
+  it("retries a failed message once before handing it to a person", async () => {
+    let failed = false;
+    const flaky = {
+      messages: {
+        async create(p: any) {
+          const text = /"([^"]*)"/.exec(p.messages[0].content)![1];
+          if (text === "t1" && !failed) { failed = true; throw new Error("429 rate limited"); }
+          return textResponse(baseReply({ response: `re:${text}` }));
+        },
+      },
+    };
+    const { replies } = await runAll("baseline", msgs(2), undefined, { client: flaky, concurrency: 1, retryDelayMs: 0 });
+    expect(replies[1].escalate).toBe(false);
+    expect(replies[1].response).toBe("re:t1");
+  });
+
+  it("the default client retries API errors more than the SDK default", async () => {
+    const { createDeps } = await import("../../src/pipeline/model.js");
+    expect((createDeps().client as any).maxRetries).toBeGreaterThanOrEqual(5);
+  });
+
   it("throws when every message fails", async () => {
     await expect(runAll("baseline", msgs(2), undefined, { client: echoClient(["t0", "t1"]) })).rejects.toThrow(/boom/);
   });

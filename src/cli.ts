@@ -12,7 +12,7 @@ import { emptyTrace, type Reply, type Trace } from "./types.js";
 export type SystemName = "new" | "baseline";
 export interface Message { id: string; text: string }
 export interface Args { system: SystemName; in?: string; out?: string; trace?: string; model?: string }
-export interface RunAllOpts { client?: ClientLike; concurrency?: number }
+export interface RunAllOpts { client?: ClientLike; concurrency?: number; retryDelayMs?: number }
 
 const FLAGS = ["system", "in", "out", "trace", "model"] as const;
 
@@ -77,10 +77,19 @@ export async function runAll(system: SystemName, messages: Message[], model?: st
       const m = messages[i];
       try {
         results[i] = await runOne(buildContext(), m, deps);
-      } catch (e) {
-        errors.push(e);
-        process.stderr.write(`warning: message ${m.id} failed and was handed to a person: ${oneLine(e)}\n`);
-        results[i] = failedTurn(system, m, deps.model, e);
+      } catch (first) {
+        // One more try after a pause, so a burst of API errors does not turn an ordinary question into a handoff.
+        await new Promise((r) => setTimeout(r, opts.retryDelayMs ?? 2000));
+        try {
+          results[i] = await runOne(buildContext(), m, deps);
+          continue;
+        } catch (second) {
+          void first;
+          const e = second;
+          errors.push(e);
+          process.stderr.write(`warning: message ${m.id} failed twice and was handed to a person: ${oneLine(e)}\n`);
+          results[i] = failedTurn(system, m, deps.model, e);
+        }
       }
     }
   };
