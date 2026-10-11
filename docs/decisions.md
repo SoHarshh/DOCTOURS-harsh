@@ -69,3 +69,20 @@ The starting point is the best-evidenced setup, not a strawman. Later changes ar
 | New care line | Paste into the same prompt | New folder of modules with its own tests | Per-product content with a shared core is the standard pattern | Intercom multi-brand; DoorDash |
 | Cost | Full prompt every turn | Smaller prompt, fixed part cached, pre-gated handoffs skip the model | Cheaper and faster; quality is the main reason though | Anthropic prompt caching docs |
 | Evaluation | None | Test set from their rules, three reps, ToolFailBench failure labels, against the original prompt with caching | Small single runs are too noisy to trust | Miller 2024; ToolFailBench |
+
+## 8. Latency rule
+
+Everything runs per message at reply time. The new system's median and p95 latency must be no worse than the original prompt's on the same harness. A change that improves accuracy but breaks this is rejected.
+
+- Pre-gate, router, prompt assembly and validators are plain code, each under a millisecond.
+- The model reads a much smaller prompt, so the first token arrives sooner.
+- A pre-gated handoff skips the model entirely.
+- The fallback classifier for the router is left out of v1 because it would add about a second to unmatched messages.
+- The call-log summary is precomputed when a call is logged, not built at reply time.
+- Retry is capped at one, and its rate is reported. A high rate means a rule file needs fixing.
+
+Work that happens once, before any patient texts: cutting the prompt into files, writing tests, running evals, precomputing summaries.
+
+## Owed before hand-in
+
+- A workflow diagram comparing the original single-prompt flow with the new flow, marking what is new and how each part works.
