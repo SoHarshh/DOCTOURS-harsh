@@ -8,3 +8,4 @@ dist/
 # local only, not part of the deliverable
 CLAUDE.md
 pre-deposit-respond-packet.md
+.superpowers/
