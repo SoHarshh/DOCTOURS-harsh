@@ -87,6 +87,14 @@ describe("core prompt", () => {
   it("replies in English even when asked for another language", () => {
     expect(section("# WHAT YOU DO EACH TURN")).toMatch(/Always reply in English, even when the patient writes in or asks for another language/);
   });
+  it("tells the model getClinicPackages takes a clinic, and how to find a package by name", () => {
+    const tools = section("# TOOLS AND LINKS");
+    expect(tools).toMatch(/getClinicPackages: takes a clinic[^.]*not a package name/);
+    expect(tools).toMatch(/find a package by name, check each clinic/);
+  });
+  it("never re-asks what the last coordinator message asked", () => {
+    expect(section("# WHAT YOU DO EACH TURN")).toMatch(/never one the last coordinator message already asked/);
+  });
   it("does not contain any expected-reply text", () => {
     expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
   });
