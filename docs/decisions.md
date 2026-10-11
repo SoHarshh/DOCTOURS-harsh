@@ -102,3 +102,63 @@ Work that happens once, before any patient texts: cutting the prompt into files,
 **False positive fixed.** The assessment link contains an ID with long digit runs, and the card-number check read it as a card, which escalated a correct reply. Card checks now ignore links and IDs.
 
 **Assessment link moved from prompt to code.** With the link rule in the prompt, the model included the assessment link in one run and left it out in the next. That is the pattern the research predicts for a small model. Code now enforces it: when a reply tells the patient to pay, book, or open something in their assessment and has no assessment link, code calls the same tool the model would and appends the link as the last line. No retry and no model call. These code-made tool calls are tagged so the tool-use labels ignore them.
+
+## 10. How the original prompt was cut into modules
+
+Each module's body is the original prompt's text for those packet lines, copied verbatim by `scripts/extract-skills.sh`. Nothing in a module was rewritten. Precedence bands: hard rules 20, guidance 30, stage 40 (stage loads last so a specific rule sits before general stage guidance).
+
+| Module | Packet lines |
+|---|---|
+| stage-lead | 1250–1254 |
+| stage-prep-pre-clinical | 1256–1262 |
+| stage-pre-clinical-sent | 1264–1316, 1318–1324 |
+| stage-meeting-booked (also MEETING_COMPLETED) | 1326–1336 |
+| stage-meeting-missed | 1338–1339 |
+| stage-waiting | 1341–1342 |
+| financing-geography | 809–817 |
+| health-insurance | 821–838 |
+| carecredit | 842–858 |
+| clinic-website | 862–873 |
+| payment-and-deposit | 1439–1451, 1436–1438, 1026–1027 |
+| promo | 1523–1528 |
+| deposit-eligibility | 1030–1036 |
+| clinic-and-package-facts | 960–989, 1212–1246, 1387–1395, 1430, 1456–1460, 1412 |
+| clinic-status-tiers | 1369–1385 |
+| assessment | 1431–1435, 1000, 1418 |
+| image-delay | 1344–1360 |
+| time-bound-pause | 1170–1210, 996 |
+| consultation | 1453–1455, 1362–1367, 1406–1407, 1420 |
+| off-channel-requests | 894–920, 922–927 |
+| policy-grounding | 929–952 |
+| creator-partnership | 954–958 |
+| collection | 788–805, 1004, 1016–1017, 1043–1050, 1052–1056, 1058–1066, 1068–1099, 1101–1132, 1417 |
+| reversibility | 1134–1168 |
+| direct-clinic-quote | 1038–1041 |
+| travel | 1397–1404, 1427–1429, 1006 |
+| preferences-and-dates | 1414–1415, 1437 |
+| why-doctours | 1452 |
+| recovery | 999, 1000 |
+| fertility | written stub for a second care line, no packet source |
+
+**Two lines dropped**, because they contradicted the core escalation list:
+
+- Line 921: an example whose "correct" reply answers a request to hold a clinic date. Holding a date is now a handoff to a person.
+- Line 1317: "requests outside normal checkout are routed to a person before they reach you; if one slips through, answer the rest." Those requests now escalate. Its payment-link fallback sentence moved into the core prompt.
+
+**Conflict rules now enforced in code** (the sentence stays in the module text, the router does what it says):
+
+- time-bound-pause suppresses collection: packet lines 785 and 805 say a pause skips the collection ask.
+- image-delay suppresses collection: lines 1110, 1128 and 1345 say a hair-state photo delay overrides the photo ask.
+- image-delay suppresses time-bound-pause: lines 1190 and 1203 say a hair-state delay keeps the two-week reminder, not a month.
+
+These apply to the current message only. Rules that depend on earlier turns ("photos stay deferred on later turns", lines 805, 1352, 1393) still rely on the model reading the history.
+
+**Conflict rules left as text**, because both modules are needed in the same reply or the rule depends on tool data or history: financing vs insurance vs CareCredit lead-in order (815, 1450, 1321), pausing vs funnel advancement (1324), Instant Form intro vs consultation intro (1050, 1053), no URL before a first reply (1004), reversibility vs stage rules (1138, 1146), package aiContext overriding general rules (971, 972, 981).
+
+**Known gaps**, in neither the core nor any module: don't invent clinic nicknames (997), after a failed payment method suggest only the next option (884, 1549), and the hold-notice rule. Each is rare for a pre-deposit patient and would push the core past its size cap.
+
+## 11. Pre-gate and router details
+
+- The pre-gate matches per sentence. A card number needs a Luhn-valid run or a card word next to it, and a number starting with "+" is treated as a phone number. Negated or recurring-billing charge sentences do not fire. Identity questions ("are you a bot?") do not fire.
+- The router applies suppression before the three-module cap, and the stage module can never be suppressed. The cap keeps the modules with the most trigger hits, then lower precedence, then the more specific module.
+- The trace's routing list includes every module that matched, so capped modules are visible: routing minus loaded minus suppressed.
