@@ -46,7 +46,7 @@ The external, held-out and dev sets were each used to find and fix problems afte
 What the numbers say, plainly:
 
 - **The lead is in handoffs.** The original prompt has no handoff rule; it missed 41% to 49% of the messages that needed a person on the three independent sets, and when it did flag one it kept writing a sales answer. The new system misses almost none, and code writes the one-sentence handoff.
-- **On everything else the two are about even on unseen messages.** On blind cases that should not escalate, the original scored 97.5% and 90.8% and the new system 95.0% and 88.9%, within the noise. An independent audit of the external set reached the same conclusion. The restructuring did not make ordinary answers better on new wording; it made them cheaper, faster, traceable and testable, without making them worse.
+- **On everything else the two are about even on unseen messages.** On blind cases that should not escalate, the original scored 97.5% and 90.8% and the new system 95.0% and 88.9%: the original is 1 to 3.5 points ahead, within the noise. An independent audit of the external set reached the same conclusion. The restructuring did not make ordinary answers better on new wording; it made them cheaper, faster, traceable and testable, without making them worse.
 - **The new system's remaining errors on blind sets** were a pre-gate false handoff ("my girlfriend wants to talk to someone who's been through it"), refund-terms questions read as refund requests, and pause signals inside a multi-question message. These were fixed after the freeze; see "After the freeze" below.
 - **It is faster and cheaper on every set.**
 
@@ -60,7 +60,19 @@ Three bugs the blind sets exposed were fixed after their scores were recorded, e
 - "If I change my mind after the deposit, can I get it back?" was sometimes read as a refund request. A what-if about refund terms is now named as a normal answer.
 - A pause inside a multi-question message ("does Silver include the hotel? I'll need a few weeks to talk it over with my wife") did not load the pause rules. It now does.
 
-A regression run on all five sets stopped partway when the API credit ran out (held-out finished; the others completed 29% to 69% of their turns). On the 636 turns both versions completed, the results were unchanged within run-to-run noise: 606 passes before, 608 after; false escalations 3 before, 0 after; missed escalations 3 before, 4 after. Each targeted case that ran now passes. These numbers are not blind and are not used in the headline. Runs are in `results/runs/postfreeze/`.
+A full rerun of all five sets after these fixes (not blind, not used in the headline):
+
+| Set | Frozen | After fixes | False escalations, frozen → after |
+|---|---|---|---|
+| Escalation stress | 96.7% | 100% | 5 → 0 |
+| Robustness | 90.6% | 91.1% | 1 → 0 |
+| External | 92.5% | 92.2% | 0 → 0 |
+| Held-out | 100% | 98.7% | 0 → 0 |
+| Dev | 98.8% | 97.8% | 3 → 3 |
+
+Across all 1,116 turns, 1,062 passed before and 1,064 after; the small dips on dev and held-out are cases that have failed on and off in earlier runs. The 3 remaining false escalations are all "can you just call me instead?", the known callback ambiguity. Runs are in `results/runs/postfreeze/`.
+
+**Known gaps**, found by the independent audit of the blind sets and not fixed: after "thanks" or 👍 the reply sometimes repeats "did a clinic catch your eye?"; a fake-staff discount message gets a refusal without the actual price; recovery questions sometimes get general norms that are not in the data; "Dr. Hakan caught my eye, what's next?" does not always name its one package. Note also that the external set is not blind for the final system, since fixes were made after reading its failures; its first run (86.4%) is the blind figure.
 
 ## Run it
 

@@ -304,3 +304,9 @@ The system was frozen at commit 8ec6390 and run once on all five sets (`results/
 The honest reading: the lead is in handoffs. On blind cases that should not escalate, the systems are within noise of each other (95.0% vs 97.5% stress, 88.9% vs 90.8% robustness). The new system is faster and about half the cost on every set.
 
 Three general bugs from the blind sets were fixed after scoring (commits 2b964ec, 7b55b31, f5e2652): past-patient phrasing in the pre-gate, refund-terms questions read as refund requests, and pause signals in multi-question messages. A regression run stopped partway when the API credit ran out; on the 636 turns both versions completed, passes went 606 to 608, false escalations 3 to 0, missed escalations 3 to 4. Not blind, not used in the headline.
+
+## 21. Completed post-freeze run and final audit
+
+After the API credit was topped up, all five sets were rerun on the post-freeze system (f5e2652) with no infra errors: stress 100% (false escalations 5 to 0), robustness 91.1% (1 to 0), external 92.2%, held-out 98.7%, dev 97.8%. Across 1,116 turns, 1,062 passes before the fixes and 1,064 after.
+
+The independent audit of the frozen runs (`results/runs/final/audit.md`) re-scored every reply with no mismatches and confirmed the reading: all of the new system's lead is in handoffs; on blind cases that should not escalate the original prompt is 1.4 to 3.5 points ahead in every scoring variant. It also corrected one point: the external set is not blind for the final system, because fixes were made from reading its failures. False passes were under 5% of passing turns for both systems and change no comparison. Remaining known gaps are listed in the README.
