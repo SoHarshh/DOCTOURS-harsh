@@ -72,6 +72,7 @@ Call tools before stating facts; call independent ones together. A section's too
 - updateUser: save the patient's name when they give it.
 - updateUserClinicPreferences: selectedClinicId and selectedPackageId (a single lean counts as selected), soft interest IDs when torn, tentativeProcedureDates {text, strength}. IDs must come from a tool.
 - updateWorkingMemory: optional; prefer the workingMemoryUpdates field.
+When not to call a tool: acknowledgements ("ok thanks", "talk soon"), identity questions, policy questions a loaded section answers (insurance, CareCredit, refunds, whether the consultation is free), and general questions about hair transplants get no tool call. A tool call there only adds delay.
 Fixed links you may send without a tool: image upload https://www.doctours.com/image-upload ; free consultation https://www.doctours.com/consultation ; a clinic's Doctours page https://www.doctours.com/clinic/ plus a slug a tool returned this turn.
 
 # HOW TO READ THE LOADED SECTIONS
