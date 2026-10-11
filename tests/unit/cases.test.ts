@@ -191,23 +191,44 @@ describe("packet cases", () => {
 
 describe("expected outputs never leak into the cases", () => {
   const packetFile = join(ROOT, "pre-deposit-respond-packet.md");
-  // The packet is local-only (gitignored); without it there is nothing to compare against.
-  it.skipIf(!existsSync(packetFile))("no six-word run of a reference reply appears in any case message or expectation", () => {
+  // Links are tool fixture values that the reference replies and the expectations legitimately share.
+  const words = (s: string) => normalize(s.replace(/https?:\/\/\S+/g, " ")).split(/[^a-z0-9]+/).filter(Boolean);
+  /** Every six-word run of the packet's five reference replies. */
+  const referenceShingles = () => {
     const md = readFileSync(packetFile, "utf8");
     const block = md.slice(md.indexOf("const EXPECTED_REPLIES"), md.indexOf("];", md.indexOf("const EXPECTED_REPLIES")));
     const responses = [...block.matchAll(/response:([\s\S]*?)\n\s*\},/g)].map((m) =>
       [...m[1].matchAll(/"((?:[^"\\]|\\.)*)"/g)].map((s) => JSON.parse(`"${s[1]}"`)).join(" "));
     expect(responses.length).toBe(5);
-
-    // Links are tool fixture values that the reference replies and the expectations legitimately share.
-    const words = (s: string) => normalize(s.replace(/https?:\/\/\S+/g, " ")).split(/[^a-z0-9]+/).filter(Boolean);
     const shingles = new Set<string>();
     for (const r of responses) {
       const w = words(r);
       for (let i = 0; i + 6 <= w.length; i++) shingles.add(w.slice(i, i + 6).join(" "));
     }
     expect(shingles.size).toBeGreaterThan(0);
+    return shingles;
+  };
 
+  // The packet is local-only (gitignored); without it there is nothing to compare against.
+  it.skipIf(!existsSync(packetFile))("no six-word run of a reference reply appears in the core prompt or any module", () => {
+    const shingles = referenceShingles();
+    const skillsDir = join(ROOT, "skills");
+    const texts = [
+      { name: "prompts/core.md", text: readFileSync(join(ROOT, "prompts", "core.md"), "utf8") },
+      ...readdirSync(skillsDir).filter((f) => f.endsWith(".md")).map((f) => ({ name: `skills/${f}`, text: readFileSync(join(skillsDir, f), "utf8") })),
+    ];
+    expect(texts.length).toBeGreaterThan(1);
+    for (const { name, text } of texts) {
+      const mine = words(text);
+      for (let i = 0; i + 6 <= mine.length; i++) {
+        const s = mine.slice(i, i + 6).join(" ");
+        expect(shingles.has(s), `${name} repeats reference wording: "${s}"`).toBe(false);
+      }
+    }
+  });
+
+  it.skipIf(!existsSync(packetFile))("no six-word run of a reference reply appears in any case message or expectation", () => {
+    const shingles = referenceShingles();
     for (const c of all) {
       const mine = words([c.text, ...entriesOf(c), c.expect.followUpTimingIncludes ?? ""].join(" \n "));
       for (let i = 0; i + 6 <= mine.length; i++) {

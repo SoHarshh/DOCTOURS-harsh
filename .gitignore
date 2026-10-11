@@ -9,9 +9,6 @@ dist/
 pre-deposit-respond-packet.md
 
 # working eval outputs; measured runs are archived under results/runs/
-results/*.json
-results/*.jsonl
-results/*.log
-results/*/
+results/*
 !results/runs/
-results/*-compare.md
+!results/README.md

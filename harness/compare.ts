@@ -55,6 +55,9 @@ export interface Paired { n: number; wins: number; losses: number; ties: number;
 const mean = (xs: number[]) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0);
 const ratio = (num: number, den: number) => (den ? num / den : null);
 const gated = (r: Row) => r.trace.escalation?.source === "pregate";
+/** The case expects a handoff: its tag says so, or the scorer's own escalate check expected true (sets tag this differently). */
+const mustEscalate = (r: Row) =>
+  r.tags.includes("escalate-positive") || /^expected true\b/.test(r.checks.find((c) => c.name === "escalate")?.detail ?? "");
 
 /** Nearest-rank percentile; 0 for an empty list. */
 export function percentile(xs: number[], p: number): number {
@@ -81,7 +84,7 @@ export function summarize(rows: Row[]): Summary {
   let tp = 0, fp = 0, fn = 0, tn = 0;
   const falseBySource: Record<FalseSource, number> = { pregate: 0, model: 0, validator: 0, refusal: 0, unknown: 0 };
   for (const r of rows) {
-    const should = r.tags.includes("escalate-positive");
+    const should = mustEscalate(r);
     const did = !!r.reply?.escalate;
     if (should && did) tp++;
     else if (should) fn++;

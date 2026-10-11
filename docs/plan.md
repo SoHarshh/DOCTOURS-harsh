@@ -3123,6 +3123,6 @@ These override the task bodies above where they differ. See `docs/design.md` and
 - **Task 14 (runMessage):** when the final reply has `escalate: true`, replace `response` with the code-owned handoff sentence. Retry message is an external verdict listing allowed URLs and prices from the tool log. Trace adds `routing`, `suppressed`, `retryFixed`, `toolUseLabel`.
 - **Task 15 (call log):** summary computed once per call record and cached in memory keyed by call id; replies read the cache.
 - **Task 16 (checker):** add `classifyToolUse(case, reply, trace)` returning the ToolFailBench label. Case schema gains `toolRequired?: boolean` and `trap?: { value: string }`.
-- **Task 17 (cases):** add trap and control cases from `research_notes/.../addendum_toolfailbench.md`.
+- **Task 17 (cases):** add trap and control cases from `docs/research/notes/addendum_toolfailbench.md`.
 - **Task 18 (harness):** default `--reps 3`; compare reports p50 and p95 latency, Clean Tool-Use Rate and each failure rate, retry rate and first-retry fix rate, and paired per-case wins and losses.
 - **Execution:** task by task, commit and push after each.

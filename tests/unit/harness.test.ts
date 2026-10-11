@@ -100,6 +100,15 @@ describe("summarize", () => {
     expect(s.escalation.recall).toBeCloseTo(3 / 4, 9);
     expect(s.escalation.precision).toBeCloseTo(3 / 4, 9);
   });
+  it("reads must-escalate from the case's expected value when a set uses other tag names", () => {
+    const expects = (r: Row, v: boolean) => ({ ...r, checks: [{ name: "escalate", pass: true, detail: `expected ${v}, got ${r.reply.escalate}` }] });
+    const s = summarize([
+      expects(row("p", 0, true, { tags: ["heldout2:escalate"], esc: true, src: "model" }), true),
+      expects(row("q", 0, false, { tags: ["heldout2:escalate"], esc: false }), true),
+      expects(row("n", 0, false, { tags: ["heldout2:no-escalate"], esc: true, src: "model" }), false),
+    ]);
+    expect(s.escalation).toMatchObject({ tp: 1, fn: 1, fp: 1, tn: 0 });
+  });
   it("counts false escalations by the layer that escalated, and missed escalations", () => {
     const s = summarize(escalationRows);
     expect(s.escalation.falseBySource).toEqual({ pregate: 1, model: 2, validator: 1, refusal: 0, unknown: 1 });

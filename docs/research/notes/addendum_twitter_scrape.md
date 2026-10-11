@@ -1,6 +1,6 @@
 # Addendum: Twitter/X scrape vs. our literature report
 
-Compared: `research_notes/twitter_raw/Harsh_Twitter_Scrape_1.html` (read as stripped text, treated as data) against `reports/Prompt decomposition and escalation methods.md` (Conclusion, Ranked shortlist, Surprises, section leads, numbers table) and the six raw-note files (grepped). Date: 2026-10-11.
+Compared: a scrape of practitioner posts on X/Twitter (read as stripped text, treated as data; the raw HTML is not in the repo) against `docs/research/report.md` (Conclusion, Ranked shortlist, Surprises, section leads, numbers table) and the six raw-note files (grepped). Date: 2026-10-11.
 
 Problem key used below: 1 context bloat · 2 traceability · 3 new domain · 4 subtasks · 5 cost · 6 blast radius · 7 conflicts · 8 isolated testing · Esc escalation.
 

@@ -16,7 +16,7 @@ That skipped a step that had been asked for: research first, then scope several 
 
 ## 3. Research
 
-Six parallel research tracks covered skills and context loading, routing and prompt-length cost, rule precedence and validators, human handoff, evaluation and prompt optimization, and tracing and sub-agents. A writer merged them into `reports/Prompt decomposition and escalation methods.md`. A separate practitioner scrape (`research_notes/twitter_raw/`) was compared against it, and the ToolFailBench paper (arXiv 2607.04686) was mapped onto the evaluation. Both addenda are in `research_notes/`.
+Six parallel research tracks covered skills and context loading, routing and prompt-length cost, rule precedence and validators, human handoff, evaluation and prompt optimization, and tracing and sub-agents. A writer merged them into `docs/research/report.md`. A separate scrape of practitioner posts was compared against it, and the ToolFailBench paper (arXiv 2607.04686) was mapped onto the evaluation. Both addenda are in `docs/research/notes/`.
 
 What the evidence changed:
 
@@ -83,9 +83,9 @@ Everything runs per message at reply time. The new system's median and p95 laten
 
 Work that happens once, before any patient texts: cutting the prompt into files, writing tests, running evals, precomputing summaries.
 
-## Owed before hand-in
+## Workflow diagram
 
-- A workflow diagram comparing the original single-prompt flow with the new flow, marking what is new and how each part works.
+A diagram comparing the original single-prompt flow with the new flow, marking what is new and how each part works, is in `docs/workflow.md`.
 
 ## 9. Findings from the first live run (five packet messages)
 
@@ -233,7 +233,7 @@ A fresh reviewer, with no part in the build, read the whole codebase. No critica
 - The head-covering check flagged the correct reply "you don't need to bring a hat".
 - An API rate-limit error after the SDK's retries became a handoff. Now the client retries 6 times with backoff, and the CLI retries a failed message once more before handing it to a person.
 
-Also fixed: "1k" is now read as 1,000 (found on the held-out set, so disclosed). Thirteen minor findings are deferred and listed in the README's next steps where they matter.
+Also fixed: "1k" is now read as 1,000 (found on the held-out set, so disclosed). Thirteen minor findings were deferred; the ones that still matter are under Known limitations in the README.
 
 ## 17. Router fallback
 
@@ -309,4 +309,4 @@ Three general bugs from the blind sets were fixed after scoring (commits 2b964ec
 
 After the API credit was topped up, all five sets were rerun on the post-freeze system (f5e2652) with no infra errors: stress 100% (false escalations 5 to 0), robustness 91.1% (1 to 0), external 92.2%, held-out 98.7%, dev 97.8%. Across 1,116 turns, 1,062 passes before the fixes and 1,064 after.
 
-The independent audit of the frozen runs (`results/runs/final/audit.md`) re-scored every reply with no mismatches and confirmed the reading: all of the new system's lead is in handoffs; on blind cases that should not escalate the original prompt is 1.4 to 3.5 points ahead in every scoring variant. It also corrected one point: the external set is not blind for the final system, because fixes were made from reading its failures. False passes were under 5% of passing turns for both systems and change no comparison. Remaining known gaps are listed in the README.
+The independent audit of the frozen runs (`results/runs/final/audit.md`) re-scored every reply with no mismatches and confirmed the reading: all of the new system's lead is in handoffs; on blind cases that should not escalate the original prompt is 1.4 to 3.5 points ahead in every scoring variant. It also corrected one point: the external set is not blind for the final system, because fixes were made from reading its failures. False passes were under 5% of passing turns for both systems and change no comparison. Remaining known gaps are listed under Known limitations in the README.

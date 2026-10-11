@@ -2,7 +2,7 @@
 
 Date: 2026-10-10, revised 2026-10-11 after research. Budget: one 10–12 hour session.
 
-Revision note: the research in `reports/` and the decision log in `docs/decisions.md` changed five things from the first draft. Conflicts are resolved in code, not by precedence prose. Escalation is code-owned and the handoff sentence is written by code. Validator retries name the allowed values. The router has no fallback classifier in v1, for latency. Evaluation uses three reps and adds ToolFailBench failure labels, trap cases, control cases, and latency targets.
+Revision note: the research in `docs/research/` and the decision log in `docs/decisions.md` changed five things from the first draft. Conflicts are resolved in code, not by precedence prose. Escalation is code-owned and the handoff sentence is written by code. Validator retries name the allowed values. The router has no fallback classifier in v1, for latency. Evaluation uses three reps and adds ToolFailBench failure labels, trap cases, control cases, and latency targets.
 
 ## 1. Goal
 
