@@ -3109,3 +3109,20 @@ git push
 - **Type consistency.** `executeTool(name, input, log, overrides?)` is introduced in Task 3 with three parameters and extended in Task 17; `callModel` input gains `toolOverrides` in Task 17; `runBaseline` gains a fifth parameter in Task 17. `Trace` fields used in Tasks 6, 14, 18 match Task 1.
 - **Review Focus coverage.** 1 → Task 7 test. 2 → Task 9 test. 3 → Task 8 test and `esc-card-dashes`. 4 → Task 13 `autoFix` test. 5 → Task 3 test.
 - **Known risk.** `output_config.format` together with `tools` in one request is assumed to compose. Task 5 Step 7 is the live check with a documented fallback.
+
+---
+
+## Revisions after research (2026-10-11)
+
+These override the task bodies above where they differ. See `docs/design.md` and `docs/decisions.md`.
+
+- **Task 9 (router):** cap non-stage modules at 3 (most trigger hits, then lower precedence). Add `suppresses: [names]` frontmatter; when a winner and a suppressed module both match, drop the suppressed one and return `suppressed: [{winner, suppressed}]` in `RouteResult`. Tests: cap at 3; suppression drops and records.
+- **Task 10 (modules):** `time-bound-pause` suppresses `collection`; `image-delay` suppresses `collection`. Skill count stays as built.
+- **Task 11 (core prompt):** delete the CONFLICTS section. Escalation section lists triggers narrowly and says code writes the handoff sentence; the model sets `escalate` and `escalationReason` only.
+- **Task 13 (validators):** add `claimsVsReceipts` and `toolRequired`. `escalationShape` no longer checks length, because code replaces the response on escalation.
+- **Task 14 (runMessage):** when the final reply has `escalate: true`, replace `response` with the code-owned handoff sentence. Retry message is an external verdict listing allowed URLs and prices from the tool log. Trace adds `routing`, `suppressed`, `retryFixed`, `toolUseLabel`.
+- **Task 15 (call log):** summary computed once per call record and cached in memory keyed by call id; replies read the cache.
+- **Task 16 (checker):** add `classifyToolUse(case, reply, trace)` returning the ToolFailBench label. Case schema gains `toolRequired?: boolean` and `trap?: { value: string }`.
+- **Task 17 (cases):** add trap and control cases from `research_notes/.../addendum_toolfailbench.md`.
+- **Task 18 (harness):** default `--reps 3`; compare reports p50 and p95 latency, Clean Tool-Use Rate and each failure rate, retry rate and first-retry fix rate, and paired per-case wins and losses.
+- **Execution:** native, task by task, commit and push after each.
