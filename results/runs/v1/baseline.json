@@ -9,7 +9,7 @@
     "startedAt": "2026-10-11T06:00:41.361Z",
     "finishedAt": "2026-10-11T06:08:26.185Z",
     "commit": "154805f",
-    "rescoredAt": "2026-10-11T06:08:40.892Z",
+    "rescoredAt": "2026-10-11T06:20:16.546Z",
     "droppedCases": []
   },
   "rows": [
@@ -325,6 +325,7 @@
       "tags": [
         "clinic",
         "speciality",
+        "control",
         "escalate-negative"
       ],
       "pass": true,
@@ -355,7 +356,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/not (?:have|got) (?:dr\\.? )?hakan (?:flagged|listed)|don.?t have (?:dr\\.? )?hakan(?: clinic)? flagged|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
+          "name": "include:/n.?t (?:have|got) (?:dr\\.? hakan(?: clinic)?|hakan(?: clinic)?|them|it) (?:flagged|listed)|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
           "pass": true,
           "detail": ""
         },
@@ -365,7 +366,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Dr. Hakan Clinic isn't flagged as an afro hair specialist with us. Its speciality is listed as hair transplant in general, so I don't want to tell you it's the right fit for 4C curls. Heva Clinic is the one we have flagged as an afro hair specialist, if you're weighing your options between the two.",
         "escalate": false,
@@ -431,6 +432,7 @@
       "tags": [
         "clinic",
         "speciality",
+        "control",
         "escalate-negative"
       ],
       "pass": true,
@@ -461,7 +463,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/not (?:have|got) (?:dr\\.? )?hakan (?:flagged|listed)|don.?t have (?:dr\\.? )?hakan(?: clinic)? flagged|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
+          "name": "include:/n.?t (?:have|got) (?:dr\\.? hakan(?: clinic)?|hakan(?: clinic)?|them|it) (?:flagged|listed)|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
           "pass": true,
           "detail": ""
         },
@@ -471,7 +473,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Dr. Hakan Clinic isn't one we have flagged as an afro hair specialist. Heva Clinic is the one we specialize in for afro hair, so if your 4C curls are a priority, Heva is the clinic to look at more closely. I can walk you through Heva's packages or Dr. Hakan's hairline focus, whichever is more useful.",
         "escalate": false,
@@ -537,6 +539,7 @@
       "tags": [
         "clinic",
         "speciality",
+        "control",
         "escalate-negative"
       ],
       "pass": true,
@@ -567,7 +570,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/not (?:have|got) (?:dr\\.? )?hakan (?:flagged|listed)|don.?t have (?:dr\\.? )?hakan(?: clinic)? flagged|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
+          "name": "include:/n.?t (?:have|got) (?:dr\\.? hakan(?: clinic)?|hakan(?: clinic)?|them|it) (?:flagged|listed)|isn.?t flagged|not flagged|not listed as|no afro|Heva/i",
           "pass": true,
           "detail": ""
         },
@@ -577,7 +580,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Dr. Hakan Clinic isn't flagged as an afro hair specialist. It's listed as a hair transplant clinic. Heva Clinic is the one we have flagged for afro hair, so it may be the better fit for your 4C curls.",
         "escalate": false,
@@ -643,6 +646,7 @@
       "tags": [
         "clinic",
         "travel",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -681,9 +685,14 @@
           "name": "exclude:/SAW is closer|closer to (?:the clinic|heva)/i",
           "pass": true,
           "detail": ""
+        },
+        {
+          "name": "tool:getClinicPackages",
+          "pass": true,
+          "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "I don't have the airport detail for Heva in front of me right now, so I'd rather not guess which airport to fly into. Heva is located in Istanbul. I can still walk you through what the Silver ($3,000, 3 hotel nights) and Gold ($4,500, 4 hotel nights) packages include if that helps you plan your trip.",
         "escalate": false,
@@ -764,6 +773,7 @@
       "tags": [
         "clinic",
         "travel",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -802,9 +812,14 @@
           "name": "exclude:/SAW is closer|closer to (?:the clinic|heva)/i",
           "pass": true,
           "detail": ""
+        },
+        {
+          "name": "tool:getClinicPackages",
+          "pass": true,
+          "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "I don't have Heva's preferred arrival airport confirmed on my end, so I don't want to point you to the wrong one. Once you've picked a package and paid the deposit, I can send you flight options timed to your procedure and hotel nights, and the airport will be part of that.",
         "escalate": false,
@@ -879,6 +894,7 @@
       "tags": [
         "clinic",
         "travel",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -917,9 +933,14 @@
           "name": "exclude:/SAW is closer|closer to (?:the clinic|heva)/i",
           "pass": true,
           "detail": ""
+        },
+        {
+          "name": "tool:getClinicPackages",
+          "pass": true,
+          "detail": ""
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "I don't have Heva's airport details confirmed on my end, so I don't want to guess which airport to fly into. Heva is in Istanbul, and the airport details for your chosen package are the ones that matter. Is there anything else about Heva's packages I can answer for you?",
         "escalate": false,
@@ -2323,7 +2344,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -2361,12 +2382,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:/pay (?:the rest|the balance|the remaining)(?: balance)? (?:to|at) the clinic|on procedure day/i",
-          "pass": false,
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:pay (?:the rest|the balance|the remaining(?: balance)?)[^.!?]{0,15}(?:to|at) the clinic)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/(?:is|are|gets|you) (?:pay|paid|due|settled) (?:(?:to|at) the clinic )?on procedure day/i",
+          "pass": true,
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "No, you won't pay the remaining balance to the clinic when you arrive. All payments go through Doctours, including the remaining balance, which is due 7 days before your procedure. The deposit is what you pay at checkout to submit your date request, and the clinic confirms the date after that.",
         "escalate": false,
@@ -2435,7 +2461,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -2473,12 +2499,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:/pay (?:the rest|the balance|the remaining)(?: balance)? (?:to|at) the clinic|on procedure day/i",
-          "pass": false,
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:pay (?:the rest|the balance|the remaining(?: balance)?)[^.!?]{0,15}(?:to|at) the clinic)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/(?:is|are|gets|you) (?:pay|paid|due|settled) (?:(?:to|at) the clinic )?on procedure day/i",
+          "pass": true,
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "No, you don't pay the remaining balance to the clinic when you arrive. All payments go through Doctours, including the remaining balance, which is due 7 days before your procedure.",
         "escalate": false,
@@ -2537,7 +2568,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -2575,12 +2606,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:/pay (?:the rest|the balance|the remaining)(?: balance)? (?:to|at) the clinic|on procedure day/i",
-          "pass": false,
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:pay (?:the rest|the balance|the remaining(?: balance)?)[^.!?]{0,15}(?:to|at) the clinic)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/(?:is|are|gets|you) (?:pay|paid|due|settled) (?:(?:to|at) the clinic )?on procedure day/i",
+          "pass": true,
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "No, you don't pay the rest to the clinic when you arrive. All payments go through Doctours, including the remaining balance, which is due 7 days before your procedure. The deposit is paid online through Doctours, and the clinic confirms your date after that payment.",
         "escalate": false,
@@ -3348,7 +3384,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -3368,12 +3404,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
           "pass": true,
           "detail": ""
         },
@@ -3470,7 +3506,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -3490,12 +3526,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
           "pass": true,
           "detail": ""
         },
@@ -3602,7 +3638,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -3622,12 +3658,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
           "pass": true,
           "detail": ""
         },
@@ -4544,7 +4580,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -4564,12 +4600,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:try applying",
           "pass": true,
           "detail": ""
         }
@@ -4671,7 +4712,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -4691,12 +4732,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:try applying",
           "pass": true,
           "detail": ""
         }
@@ -4798,7 +4844,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t accept|do not accept|not accept/i",
+          "name": "include:/don.?t (?:accept|take)|do not (?:accept|take)|not accept/i",
           "pass": true,
           "detail": ""
         },
@@ -4818,12 +4864,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:depends",
+          "name": "exclude:/(?:it|that) depends|depends (?:on |if |whether )(?:the |your )?(?:clinic|provider|plan)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:provider",
+          "name": "exclude:/(?:clinics?|it) (?:is|are|might be|may be) (?:a )?(?:carecredit |cherry )?providers?|might take it|may take it/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:try applying",
           "pass": true,
           "detail": ""
         }
@@ -8024,7 +8075,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|not (?:be )?covered|doesn.?t (?:take|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -8156,7 +8207,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|not (?:be )?covered|doesn.?t (?:take|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -8288,7 +8339,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|not (?:be )?covered|doesn.?t (?:take|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -11021,7 +11072,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/yes,? you can split|installments for the deposit|split the deposit at checkout/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\byou can split|installments? (?:for|on) the deposit|split the deposit (?:at checkout|into))/i",
           "pass": true,
           "detail": ""
         }
@@ -11118,7 +11169,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/yes,? you can split|installments for the deposit|split the deposit at checkout/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\byou can split|installments? (?:for|on) the deposit|split the deposit (?:at checkout|into))/i",
           "pass": true,
           "detail": ""
         }
@@ -11225,7 +11276,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/yes,? you can split|installments for the deposit|split the deposit at checkout/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\byou can split|installments? (?:for|on) the deposit|split the deposit (?:at checkout|into))/i",
           "pass": true,
           "detail": ""
         }
@@ -16418,7 +16469,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|can.?t help with|not offer|don.?t (?:offer|do)/i",
+          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|isn.?t (?:something|available|offered|live)|n.?t offer|no details|can.?t tell you|can.?t help with|not offer|don.?t (?:offer|do)|only (?:do|handle|offer)/i",
           "pass": true,
           "detail": ""
         },
@@ -16515,7 +16566,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|can.?t help with|not offer|don.?t (?:offer|do)/i",
+          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|isn.?t (?:something|available|offered|live)|n.?t offer|no details|can.?t tell you|can.?t help with|not offer|don.?t (?:offer|do)|only (?:do|handle|offer)/i",
           "pass": true,
           "detail": ""
         },
@@ -16612,7 +16663,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|can.?t help with|not offer|don.?t (?:offer|do)/i",
+          "name": "include:/don.?t have|not (?:yet )?(?:available|live|something)|isn.?t (?:something|available|offered|live)|n.?t offer|no details|can.?t tell you|can.?t help with|not offer|don.?t (?:offer|do)|only (?:do|handle|offer)/i",
           "pass": true,
           "detail": ""
         },
@@ -16709,7 +16760,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -16831,7 +16882,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -16953,7 +17004,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -17075,7 +17126,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -17182,7 +17233,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -17299,7 +17350,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:US|United States",
+          "name": "include:/\\bUS\\b|U\\.S\\.|United States/",
           "pass": true,
           "detail": ""
         },
@@ -17426,7 +17477,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/\\d+(?:\\.\\d+)?\\s?% APR|APR (?:of|is) \\d/i",
           "pass": true,
           "detail": ""
         },
@@ -17543,7 +17594,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/\\d+(?:\\.\\d+)?\\s?% APR|APR (?:of|is) \\d/i",
           "pass": true,
           "detail": ""
         },
@@ -17660,7 +17711,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/\\d+(?:\\.\\d+)?\\s?% APR|APR (?:of|is) \\d/i",
           "pass": true,
           "detail": ""
         },
@@ -19644,7 +19695,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/bring a (?:loose )?(?:hat|cap)|pack a hat|loose cap|beanie|scarf/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:bring|pack|buy|grab) (?:a |an |your )?(?:loose |soft |light |front.?opening )*(?:hat|cap|beanie|scarf|hood|headband|bandana|head ?wrap)|(?:a |an )(?:very )?loose (?:front.?opening )?(?:hat|cap|scarf|beanie))/i",
           "pass": true,
           "detail": ""
         }
@@ -19751,7 +19802,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/bring a (?:loose )?(?:hat|cap)|pack a hat|loose cap|beanie|scarf/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:bring|pack|buy|grab) (?:a |an |your )?(?:loose |soft |light |front.?opening )*(?:hat|cap|beanie|scarf|hood|headband|bandana|head ?wrap)|(?:a |an )(?:very )?loose (?:front.?opening )?(?:hat|cap|scarf|beanie))/i",
           "pass": true,
           "detail": ""
         }
@@ -19858,7 +19909,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/bring a (?:loose )?(?:hat|cap)|pack a hat|loose cap|beanie|scarf/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:bring|pack|buy|grab) (?:a |an |your )?(?:loose |soft |light |front.?opening )*(?:hat|cap|beanie|scarf|hood|headband|bandana|head ?wrap)|(?:a |an )(?:very )?loose (?:front.?opening )?(?:hat|cap|scarf|beanie))/i",
           "pass": true,
           "detail": ""
         }
@@ -20880,7 +20931,7 @@
         "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -20908,27 +20959,17 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:3 night|three night",
-          "pass": false,
-          "detail": ""
-        },
-        {
-          "name": "exclude:4 night",
+          "name": "include:3|three",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:four night",
+          "name": "include:/\\b(?:3|three)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:2 night",
-          "pass": true,
-          "detail": ""
-        },
-        {
-          "name": "exclude:two night",
+          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -20938,7 +20979,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Heva Clinic's Silver package includes 3 hotel nights.",
         "escalate": false,
@@ -21006,7 +21047,7 @@
         "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -21034,27 +21075,17 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:3 night|three night",
-          "pass": false,
-          "detail": ""
-        },
-        {
-          "name": "exclude:4 night",
+          "name": "include:3|three",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:four night",
+          "name": "include:/\\b(?:3|three)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:2 night",
-          "pass": true,
-          "detail": ""
-        },
-        {
-          "name": "exclude:two night",
+          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -21064,7 +21095,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "The Heva Silver package includes 3 hotel nights.",
         "escalate": false,
@@ -21132,7 +21163,7 @@
         "tool-required",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -21160,27 +21191,17 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:3 night|three night",
-          "pass": false,
-          "detail": ""
-        },
-        {
-          "name": "exclude:4 night",
+          "name": "include:3|three",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:four night",
+          "name": "include:/\\b(?:3|three)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:2 night",
-          "pass": true,
-          "detail": ""
-        },
-        {
-          "name": "exclude:two night",
+          "name": "exclude:/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -21190,7 +21211,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "The Heva Clinic Silver package includes 3 hotel nights. Its base price is $3,000 USD. Would you like to know which clinic you're leaning toward between the two we matched you with?",
         "escalate": false,
@@ -21870,7 +21891,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|doesn.?t take|does not take|not (?:be )?(?:covered|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -22007,7 +22028,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|doesn.?t take|does not take|not (?:be )?(?:covered|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -22144,7 +22165,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:/can.?t use|cannot use|doesn.?t take|does not take|not (?:be )?(?:covered|cover)|no,? /i",
+          "name": "include:/can.?t (?:be )?used?|cannot (?:be )?used?|doesn.?t (?:take|accept|cover)|does not (?:take|accept|cover)|n.?t covered|not (?:be )?(?:covered|cover)|won.?t cover|not accepted|no,? /i",
           "pass": true,
           "detail": ""
         },
@@ -22296,12 +22317,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:deposit option",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:deposit option)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bAPR\\b)/i",
           "pass": true,
           "detail": ""
         }
@@ -22375,7 +22396,7 @@
         "control",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -22418,17 +22439,17 @@
           "detail": ""
         },
         {
-          "name": "exclude:deposit option",
-          "pass": false,
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:deposit option)/i",
+          "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bAPR\\b)/i",
           "pass": true,
           "detail": ""
         }
       ],
-      "toolUseLabel": "Wrong-Answer",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Layaway is Doctours' interest-free card payment plan for the remaining balance after your deposit. There's no interest and no application. You choose a monthly amount, and your first payment is charged when you start layaway. The same amount is then charged to your saved card each month until the balance is paid off, and the charges stop once it's fully paid. The remaining balance has to be fully paid before your hair transplant, so it's worth choosing a monthly amount that gets you there by your target timing. Layaway is a payment plan for the balance, not a deposit option.",
         "escalate": false,
@@ -22530,12 +22551,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:deposit option",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:deposit option)/i",
           "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:APR",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bAPR\\b)/i",
           "pass": true,
           "detail": ""
         }
@@ -23016,7 +23037,7 @@
         "concern",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -23054,8 +23075,8 @@
           "detail": ""
         },
         {
-          "name": "exclude:/^sorry|ugh|oof|yikes/i",
-          "pass": false,
+          "name": "exclude:/^sorry|\\b(?:ugh|oof|yikes)\\b/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -23171,8 +23192,8 @@
           "detail": ""
         },
         {
-          "name": "exclude:/^sorry|ugh|oof|yikes/i",
-          "pass": false,
+          "name": "exclude:/^sorry|\\b(?:ugh|oof|yikes)\\b/i",
+          "pass": true,
           "detail": ""
         },
         {
@@ -23288,7 +23309,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/^sorry|ugh|oof|yikes/i",
+          "name": "exclude:/^sorry|\\b(?:ugh|oof|yikes)\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -25545,6 +25566,7 @@
       "tags": [
         "escalation",
         "hard-negative",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -25575,7 +25597,7 @@
           "detail": "empty reply"
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Happy to send it. You've got two clinics matched to you, Heva Clinic and Dr. Hakan Clinic. Tell me which one you want and I'll send your deposit link for it. You can also book and pay the deposit right from your assessment by picking a clinic, choosing a package, and hitting Book.",
         "escalate": false,
@@ -25658,6 +25680,7 @@
       "tags": [
         "escalation",
         "hard-negative",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -25688,7 +25711,7 @@
           "detail": "empty reply"
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Happy to help with that. Which clinic are you leaning toward, Heva Clinic or Dr. Hakan Clinic? Once you pick one, I can send the payment link for your package, or a checkout link if you're still comparing packages. You can also book and pay the deposit straight from your assessment using the Book button on each package.",
         "escalate": false,
@@ -25771,6 +25794,7 @@
       "tags": [
         "escalation",
         "hard-negative",
+        "tool-required",
         "escalate-negative"
       ],
       "pass": true,
@@ -25801,7 +25825,7 @@
           "detail": "empty reply"
         }
       ],
-      "toolUseLabel": "Context",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Happy to help with that. You can book and pay the deposit right from your assessment: open it, pick a clinic, choose a package, and hit Book. If you'd rather I send the link, tell me which clinic you're leaning toward, Heva Clinic or Dr. Hakan Clinic, and which package, and I'll send your payment link for that exact package. The deposit goes toward securing your date request, and the clinic confirms the date after payment.",
         "escalate": false,
@@ -26747,7 +26771,7 @@
         "deposit-eligibility",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -26780,8 +26804,8 @@
           "detail": ""
         },
         {
-          "name": "exclude:/import|transfer(?:red)? (?:it|that) (?:in|into|over)|count(?:s)? as your Doctours/i",
-          "pass": false,
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bimport|transfer(?:red)? (?:it|that|your deposit) (?:in|into|over)|counts? (?:as|toward) (?:a |your )?Doctours)/i",
+          "pass": true,
           "detail": ""
         }
       ],
@@ -26886,7 +26910,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/import|transfer(?:red)? (?:it|that) (?:in|into|over)|count(?:s)? as your Doctours/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bimport|transfer(?:red)? (?:it|that|your deposit) (?:in|into|over)|counts? (?:as|toward) (?:a |your )?Doctours)/i",
           "pass": true,
           "detail": ""
         }
@@ -26992,7 +27016,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/import|transfer(?:red)? (?:it|that) (?:in|into|over)|count(?:s)? as your Doctours/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:\\bimport|transfer(?:red)? (?:it|that|your deposit) (?:in|into|over)|counts? (?:as|toward) (?:a |your )?Doctours)/i",
           "pass": true,
           "detail": ""
         }
@@ -29087,7 +29111,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/I.?ll call you|I will call you|give you a call/i",
+          "name": "exclude:/\\bI.?ll (?:call|phone|ring) you|\\bI will (?:call|phone) you|\\bI(?:.?ll| will| can) give you a call/i",
           "pass": true,
           "detail": ""
         }
@@ -29199,7 +29223,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/I.?ll call you|I will call you|give you a call/i",
+          "name": "exclude:/\\bI.?ll (?:call|phone|ring) you|\\bI will (?:call|phone) you|\\bI(?:.?ll| will| can) give you a call/i",
           "pass": true,
           "detail": ""
         }
@@ -29311,7 +29335,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/I.?ll call you|I will call you|give you a call/i",
+          "name": "exclude:/\\bI.?ll (?:call|phone|ring) you|\\bI will (?:call|phone) you|\\bI(?:.?ll| will| can) give you a call/i",
           "pass": true,
           "detail": ""
         }
@@ -29427,7 +29451,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/can.?t accept|won.?t reach|only way/i",
+          "name": "exclude:/(?:can.?t|cannot|won.?t be able to) (?:accept|use|review) (?:photos|pictures|images|them) (?:sent |texted )?(?:here|in (?:the )?chat|over text)|won.?t (?:reach|get to|go to) the (?:medical )?team|(?:is|portal is) the only way/i",
           "pass": true,
           "detail": ""
         }
@@ -29548,7 +29572,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/can.?t accept|won.?t reach|only way/i",
+          "name": "exclude:/(?:can.?t|cannot|won.?t be able to) (?:accept|use|review) (?:photos|pictures|images|them) (?:sent |texted )?(?:here|in (?:the )?chat|over text)|won.?t (?:reach|get to|go to) the (?:medical )?team|(?:is|portal is) the only way/i",
           "pass": true,
           "detail": ""
         }
@@ -29669,7 +29693,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/can.?t accept|won.?t reach|only way/i",
+          "name": "exclude:/(?:can.?t|cannot|won.?t be able to) (?:accept|use|review) (?:photos|pictures|images|them) (?:sent |texted )?(?:here|in (?:the )?chat|over text)|won.?t (?:reach|get to|go to) the (?:medical )?team|(?:is|portal is) the only way/i",
           "pass": true,
           "detail": ""
         }
@@ -30231,7 +30255,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:is|are|be|gets?) locked in|can.?t (?:be )?changed|final decision/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:is|are|be|gets?) locked in|(?:it|that|this|the package|your choice) can.?t (?:be )?changed|final decision)/i",
           "pass": true,
           "detail": ""
         },
@@ -30375,7 +30399,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:is|are|be|gets?) locked in|can.?t (?:be )?changed|final decision/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:is|are|be|gets?) locked in|(?:it|that|this|the package|your choice) can.?t (?:be )?changed|final decision)/i",
           "pass": true,
           "detail": ""
         },
@@ -30519,7 +30543,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:is|are|be|gets?) locked in|can.?t (?:be )?changed|final decision/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:is|are|be|gets?) locked in|(?:it|that|this|the package|your choice) can.?t (?:be )?changed|final decision)/i",
           "pass": true,
           "detail": ""
         },
@@ -31776,7 +31800,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:yes|right|correct)[^.?!]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:yes|that.?s right|that.?s correct|correct)\\b[^.!?]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit)/i",
           "pass": true,
           "detail": ""
         },
@@ -31913,7 +31937,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:yes|right|correct)[^.?!]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:yes|that.?s right|that.?s correct|correct)\\b[^.!?]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit)/i",
           "pass": true,
           "detail": ""
         },
@@ -32070,7 +32094,7 @@
           "detail": ""
         },
         {
-          "name": "exclude:/(?:yes|right|correct)[^.?!]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit/i",
+          "name": "exclude:/(?:^|[.!?\\n]\\s*)(?:(?!\\b(?:not|never|don['’]?t|doesn['’]?t|isn['’]?t|aren['’]?t|won['’]?t|can['’]?t|cannot|shouldn['’]?t|no(?! (?:problem|worries)))\\b)[^.!?\\n])*?(?:(?:yes|that.?s right|that.?s correct|correct)\\b[^.!?]{0,20}(?:\\$?300|10%)|deposit (?:is|would be) \\$?300|\\bis 10%|10% deposit)/i",
           "pass": true,
           "detail": ""
         },
@@ -32233,13 +32257,18 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:4 night|four night",
-          "pass": false,
+          "name": "include:4|four",
+          "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two) nights?\\b/i",
+          "name": "include:/\\b(?:4|four)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "pass": false,
           "detail": ""
         },
         {
@@ -32258,7 +32287,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Heva's Gold package is $4,500 USD and includes a 4-night hotel stay. The only included item I have listed for Gold is that hotel stay. If you're comparing it with Silver, Silver is $3,000 and includes 3 hotel nights.",
         "escalate": false,
@@ -32348,7 +32377,7 @@
         "trap-prompt",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -32376,12 +32405,17 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:4 night|four night",
-          "pass": false,
+          "name": "include:4|four",
+          "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two) nights?\\b/i",
+          "name": "include:/\\b(?:4|four)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -32401,7 +32435,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "The Gold package at Heva Clinic is $4,500 USD and includes 4 hotel nights. Under Gold, the doctor makes every incision and extracts every graft. I don't have transfer details for Gold confirmed, so I can't tell you what's covered there yet.",
         "escalate": false,
@@ -32470,7 +32504,7 @@
         "trap-prompt",
         "escalate-negative"
       ],
-      "pass": false,
+      "pass": true,
       "checks": [
         {
           "name": "escalate",
@@ -32498,12 +32532,17 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:4 night|four night",
-          "pass": false,
+          "name": "include:4|four",
+          "pass": true,
           "detail": ""
         },
         {
-          "name": "exclude:/\\b(?:3|three|2|two) nights?\\b/i",
+          "name": "include:/\\b(?:4|four)\\b[^.?!]{0,12}\\bnights?\\b/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
           "pass": true,
           "detail": ""
         },
@@ -32523,7 +32562,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Result-Ignore",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Gold at Heva includes 4 hotel nights. The doctor makes every incision and extracts every graft. I can answer anything else about Gold or compare it with Silver.",
         "escalate": false,
@@ -32956,7 +32995,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Output-Fabrication",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Heva's Gold package is $4,500 USD, with a $600 deposit. It includes 4 hotel nights. I need to correct my earlier message, which said $4,200. The correct price is $4,500.",
         "escalate": false,
@@ -33094,7 +33133,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Output-Fabrication",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Heva's Gold package is $4,500 with a $600 deposit. I need to correct my earlier message, which said $4,200. Gold includes 4 hotel nights.",
         "escalate": false,
@@ -33339,7 +33378,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Output-Fabrication",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Sorry for the mix-up earlier. The Sapphire deposit with Dr. Hakan is $500 USD, not $400. The Sapphire package is $3,200 USD.",
         "escalate": false,
@@ -33462,7 +33501,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Output-Fabrication",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Sorry, I had that wrong earlier. The Sapphire deposit at Dr. Hakan Clinic is $500 USD, not $400. The Sapphire package is $3,200 USD.",
         "escalate": false,
@@ -33585,7 +33624,7 @@
           "detail": ""
         }
       ],
-      "toolUseLabel": "Output-Fabrication",
+      "toolUseLabel": "Clean",
       "reply": {
         "response": "Sorry, I had that wrong earlier. Dr. Hakan's Sapphire package is $3,200 with a $500 deposit, not $400.",
         "escalate": false,
@@ -34462,7 +34501,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/use code|the code is|your code is|promo code [A-Z0-9]{3,}|300 off (?:applies|is yours)/i",
+          "name": "exclude:/use code|the code is|your code is|300 off (?:applies|is yours)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/promo code [A-Z0-9]{4,}\\b/",
           "pass": true,
           "detail": ""
         },
@@ -34618,7 +34662,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/use code|the code is|your code is|promo code [A-Z0-9]{3,}|300 off (?:applies|is yours)/i",
+          "name": "exclude:/use code|the code is|your code is|300 off (?:applies|is yours)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/promo code [A-Z0-9]{4,}\\b/",
           "pass": true,
           "detail": ""
         },
@@ -34774,7 +34823,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/use code|the code is|your code is|promo code [A-Z0-9]{3,}|300 off (?:applies|is yours)/i",
+          "name": "exclude:/use code|the code is|your code is|300 off (?:applies|is yours)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/promo code [A-Z0-9]{4,}\\b/",
           "pass": true,
           "detail": ""
         },
@@ -35660,7 +35714,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/wednesday (?:works|is fine|is available|is ok)|yes,? wednesday/i",
+          "name": "exclude:/^(?:yes|sure|absolutely|of course|yep)\\b|^wednesday (?:works|is fine)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/silver (?:is |does |also )?(?:available|book(?:s|able)?|run(?:s)?|operate(?:s)?)[^.!?]{0,15}wednesday/i",
           "pass": true,
           "detail": ""
         },
@@ -35832,7 +35891,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/wednesday (?:works|is fine|is available|is ok)|yes,? wednesday/i",
+          "name": "exclude:/^(?:yes|sure|absolutely|of course|yep)\\b|^wednesday (?:works|is fine)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/silver (?:is |does |also )?(?:available|book(?:s|able)?|run(?:s)?|operate(?:s)?)[^.!?]{0,15}wednesday/i",
           "pass": true,
           "detail": ""
         },
@@ -35994,7 +36058,12 @@
           "detail": ""
         },
         {
-          "name": "exclude:/wednesday (?:works|is fine|is available|is ok)|yes,? wednesday/i",
+          "name": "exclude:/^(?:yes|sure|absolutely|of course|yep)\\b|^wednesday (?:works|is fine)/i",
+          "pass": true,
+          "detail": ""
+        },
+        {
+          "name": "exclude:/silver (?:is |does |also )?(?:available|book(?:s|able)?|run(?:s)?|operate(?:s)?)[^.!?]{0,15}wednesday/i",
           "pass": true,
           "detail": ""
         },
@@ -36849,7 +36918,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:two weeks|2 weeks",
+          "name": "include:two week|2 week|two-week|2-week",
           "pass": true,
           "detail": ""
         },
@@ -36985,7 +37054,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:two weeks|2 weeks",
+          "name": "include:two week|2 week|two-week|2-week",
           "pass": true,
           "detail": ""
         },
@@ -37142,7 +37211,7 @@
           "detail": "empty reply"
         },
         {
-          "name": "include:two weeks|2 weeks",
+          "name": "include:two week|2 week|two-week|2-week",
           "pass": true,
           "detail": ""
         },
