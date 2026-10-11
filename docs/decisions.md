@@ -162,3 +162,30 @@ These apply to the current message only. Rules that depend on earlier turns ("ph
 - The pre-gate matches per sentence. A card number needs a Luhn-valid run or a card word next to it, and a number starting with "+" is treated as a phone number. Negated or recurring-billing charge sentences do not fire. Identity questions ("are you a bot?") do not fire.
 - The router applies suppression before the three-module cap, and the stage module can never be suppressed. The cap keeps the modules with the most trigger hits, then lower precedence, then the more specific module.
 - The trace's routing list includes every module that matched, so capped modules are visible: routing minus loaded minus suppressed.
+
+## 12. First measured run and triage
+
+Run v1 (`results/runs/v1/`): 107 cases, 3 reps each, same model (claude-haiku-5-5), same tools, same schema, same caching for both systems.
+
+| | Original prompt | New system |
+|---|---|---|
+| Pass rate | 70.7% | 88.5% |
+| Paired per case | | +17.8 points (SE 4.5); 35 wins, 11 losses, 61 ties |
+| Escalation recall | 58.8% | 98.0% |
+| Escalation precision | 90.9% | 89.3% |
+| Median / p95 latency | 5.3 s / 9.8 s | 3.4 s / 7.4 s |
+| Cost per 1,000 turns | $1.72 | $0.90 |
+
+The original prompt is strong on ordinary policy questions (83% on the 90 cases that should not escalate). Most of the gain comes from escalation and from fewer ignored or invented tool values.
+
+Triage of the 11 per-case losses:
+
+- **Validator too strict (history traps).** The model gave the right price and corrected the wrong one from the chat history ("I quoted $4,200 earlier, which was wrong"). The price check treated $4,200 as invented and escalated. Fix: a number from the chat history is allowed when its sentence is a correction; stated as fact it is still blocked. Same rule in the tool-use labeler.
+- **Routing misses.** "$300-off code" did not load the promo module (hyphen); "will the clinic contact me?" did not load the module that says clinic contact comes after the deposit; "edges pulled out from braids" loaded the photo-delay module, which then suppressed the photo request. Trigger lists fixed, each with a test.
+- **Call requests.** In one rep the model escalated "can you just call me instead?". The packet's rule is to offer the free consultation call and keep helping. The core prompt now lists a call request among the things that get a normal answer.
+- **Test-case bugs**, reported to the case owner: "3 hotel nights" did not match "3 night"; negated replies ("you don't need to bring a hat", "you don't pay the rest to the clinic") matched forbidden phrases; the fertility check missed "isn't something I have details on".
+- **Left as known gaps:** first-contact lead replies sometimes open with "Sorry" or leave out the upload link (both systems fail these); the model sometimes answers "who makes the incisions" without checking the package's notes.
+
+## 13. Advisor tool: considered, not on the main path
+
+The advisor tool lets a fast model consult a stronger one mid-generation. Not adopted on the main reply path: the docs call it a weak fit for single-turn Q&A, each consult adds a non-streaming call to a larger model, which would break the latency rule, and most remaining failures are routing and checking problems, not reasoning. It is a candidate pivot on the retry path only (2.8% of turns, first-retry fix rate 37.5%), paired with an advisor that returns plaintext advice (Opus 4.8 on a Haiku 5.5 executor) so the trace stays readable.
