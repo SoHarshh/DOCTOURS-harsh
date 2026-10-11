@@ -16,7 +16,15 @@ const REASONS: Record<PregateCategory, string> = {
 const STAFF = "(?:human being|human|real person|actual person|live person|real human|person|someone|somebody|agent|representative|rep|operator|manager|supervisor|staff member|team member)";
 // "talk to someone at home first" is about the patient's own people, not our staff
 // "someone at the clinic", "a rep from Heva": reaching the clinic is a first-ask question the model answers
-const NOT_STAFF_AFTER = "(?!\\s+(?:at home|in my family|i know|close to me|first|before|about it first|who (?:has|had|have|did|went|got)|(?:at|from|with|in) (?:the clinic|the hospital|heva|hakan|dr\\b|dr\\.? ?hakan|dr\\.? ?hakan'?s office|the surgeon'?s office|the doctor'?s office)))";
+// "someone who's been through it", "somebody that had it done", "a person who was a patient": a past patient,
+// not our staff. "someone who is in charge" and "someone who can help" still count as staff.
+const PAST_PATIENT =
+  "(?:who|that)(?:['’]s\\s+(?:been|had|done|gone|gotten|got|undergone|already|recently|(?:a |an )?(?:patient|client|customer|former|past|previous))" +
+  "|['’]ve\\s+(?:been|had|done|gone|gotten|got|undergone|already|recently)" +
+  "|\\s+(?:has|have)\\s+(?:been|had|done|gone|gotten|got|undergone|already|recently|also)" +
+  "|\\s+(?:is|was|were)\\s+(?:a |an )?(?:patient|client|customer|former|past|previous)" +
+  "|\\s+(?:had|did|went|got|underwent|tried|used)\\b)";
+const NOT_STAFF_AFTER = "(?!\\s+(?:at home|in my family|i know|close to me|first|before|about it first|" + PAST_PATIENT + "|(?:at|from|with|in) (?:the clinic|the hospital|heva|hakan|dr\\b|dr\\.? ?hakan|dr\\.? ?hakan'?s office|the surgeon'?s office|the doctor'?s office)))";
 const LONE_STAFF = "(?:human being|human|person|agent|representative|rep|operator|manager|supervisor)";
 const HUMAN_PATTERNS = [
   // talk/speak/chat/reach ... to/with ... a person

@@ -95,6 +95,20 @@ describe("pregate review fixes", () => {
   it("asking to hear from a past patient is not a handoff", () => {
     no("Can I speak to someone who has had the procedure at Heva?");
   });
+  it("past-patient asks with contractions, 'who is/was' or 'that' do not fire", () => {
+    for (const t of [
+      "my brother would like to speak with someone who's had a transplant",
+      "can I talk to a person who’s been through this?",
+      "is there any way to chat with somebody who was a patient at Hakan",
+      "I'd love to talk to someone that has done it before",
+      "could my wife speak with someone who's a former patient?",
+      "can I talk to someone who went to Heva?",
+      "can I speak to somebody who've done the Gold package",
+    ]) no(t);
+  });
+  it("a request for staff still fires, including 'who is' about our side", () => {
+    for (const t of ["can I talk to someone on your team?", "I want to speak to someone who can actually help me", "let me talk to someone who is in charge"]) yes(t, "human_request");
+  });
   it("charge requests naming the card brand or using 'put' fire", () => {
     yes("Charge my Visa for the deposit", "charge_request");
     yes("Put the deposit on my card please", "charge_request");
