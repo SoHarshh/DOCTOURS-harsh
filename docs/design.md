@@ -1,6 +1,8 @@
 # Design: routed reply system with human escalation
 
-Date: 2026-10-10. Budget: one 10–12 hour session.
+Date: 2026-10-10, revised 2026-10-11 after research. Budget: one 10–12 hour session.
+
+Revision note: the research in `reports/` and the decision log in `docs/decisions.md` changed five things from the first draft. Conflicts are resolved in code, not by precedence prose. Escalation is code-owned and the handoff sentence is written by code. Validator retries name the allowed values. The router has no fallback classifier in v1, for latency. Evaluation uses three reps and adds ToolFailBench failure labels, trap cases, control cases, and latency targets.
 
 ## 1. Goal
 
@@ -9,6 +11,8 @@ Replace one 800-line system prompt with a system that loads only the rules a mes
 Success means:
 
 - Every case in our test set passes the deterministic checks, and the five packet cases match on `escalate` and required facts.
+- Pass rate beats the original prompt by more than the noise floor (about 7 points at three reps), with the original prompt given the same model, tools, schema, and caching.
+- Median and p95 latency are no worse than the original prompt's. This is a hard rule: a change that breaks it is rejected.
 - Mean input tokens per turn drop substantially versus the baseline (target: under 40% of baseline).
 - Escalation recall is 100% on the adversarial set; precision is high enough that ordinary questions never escalate.
 - Each of the packet's eight problems has a concrete artifact that answers it (see §9).
@@ -28,14 +32,15 @@ Success means:
 ```
 message
   → pre-gate (code)         escalation triggers, card-digit redaction
-  → router (code)           stage + triggers → list of skills, in precedence order
-  → assemble (code)         core prompt + stage skill + matched skills + context block
-  → model call (1 call)     tool loop, ends with a structured submit_reply
-  → validators (code)       format, provenance, escalation shape; retry once, else fix or escalate
+  → router (code)           stage + triggers → at most 3 modules + stage; suppressions applied
+  → assemble (code)         cached core prompt + modules + context block
+  → model call (1 call)     tool loop, ends with structured Reply
+  → validators (code)       format, provenance, claims vs tool log; one retry naming allowed values
+  → escalation (code)       if escalate: replace response with code-owned handoff sentence
   → Reply + Trace
 ```
 
-Code decides routing, escalation gating, and validity. The model drafts prose and makes judgment calls the code cannot.
+Code decides routing, conflicts, escalation, and validity. The model drafts prose and makes judgment calls the code cannot. Everything runs per message at reply time; the only extra model calls are a retry after a failed check and nothing else on the normal path.
 
 ## 4. Components
 
@@ -56,7 +61,7 @@ Pure functions over the message text. Fires `escalate` with a reason category wh
 
 When the pre-gate fires, the main model call is skipped. The reply is a fixed-shape one-to-two sentence handoff keyed by reason category, in the coordinator's first-person voice. `escalate: true`, `escalationReason` set, no URL, no price.
 
-Other escalation triggers (moving already-paid money, asking us to contact a clinic or hold a date, a second request for clinic contact details) are judgment calls that depend on phrasing and intent. The core prompt instructs the model to set `escalate: true` for those, and the validator enforces the reply shape when it does. The trace records whether escalation came from `pregate` or `model`.
+Other escalation triggers (moving already-paid money, refunds, asking us to contact a clinic or hold a date, a second request for clinic contact details) are judgment calls that depend on phrasing and intent. The core prompt lists them narrowly; the model sets `escalate: true` and a reason. Code then replaces whatever response the model wrote with the code-owned handoff sentence, so the handoff text never answers the sales question and never varies. The trace records whether escalation came from `pregate`, `model`, `validator`, or `refusal`. No confidence threshold is used: research shows model confidence is poorly calibrated and "escalate if unsure" inflates false handoffs.
 
 ### 4.4 Router
 
@@ -64,10 +69,12 @@ Input: context plus message text. Output: ordered list of skill names.
 
 - The stage skill for the current pipeline status always loads.
 - Each skill file's frontmatter declares `triggers` (case-insensitive phrases or regexes) and optional `context_triggers` (predicates on context, for example "collection has an outstanding item"). A skill loads when any trigger matches.
-- Loaded skills are sorted by their `precedence` number. Lower loads first and wins conflicts.
+- At most 3 non-stage modules load. When more match, the ones with the most trigger hits win, then lower `precedence`.
+- **Conflicts are resolved here, in code.** A module may declare `suppresses: [other-module]`. When both match, the suppressed one is dropped before the prompt is built and the trace records `{winner, suppressed}`. Example: `time-bound-pause` suppresses `collection`, because the packet says a pause close overrides the collection ask. This replaces "this overrides X" prose, which a Haiku-class model follows about 28% of the time (IHEval).
+- Loaded modules are ordered by `precedence`, non-negotiables first within each module.
 - No model call. The router's decision is fully reproducible from inputs and is written to the trace.
 
-If the measured run shows the router missing intents on unseen phrasings, the upgrade path is a small-model classifier that runs only when no non-stage skill matched. That is not built in v0.
+If the measured run shows the router missing intents on unseen phrasings, the upgrade path is a small-model classifier that runs only when no non-stage module matched. It is not in v1 because it adds about a second to those messages and would break the latency rule.
 
 ### 4.5 Core prompt (always loaded)
 
@@ -78,8 +85,8 @@ Target under 150 lines. Contains only what every turn needs:
 - Plain text, no markdown. Any URL is the last line.
 - Grounding: package, clinic, price, and policy facts come only from a tool result this turn or a loaded section. Never invent URLs, prices, slugs, or IDs. If not grounded, say you don't have it.
 - No off-channel promises: never say you will send, check, call, contact, or follow up on anything you have no tool for.
-- Escalation rule: when the patient needs something no tool and no loaded rule can do, set `escalate: true`, give a short reason, reply in one short sentence, and stop.
-- Conflict rule: when two loaded sections disagree, the one that appears first wins.
+- Escalation rule: a short enumerated list of what needs a person; set `escalate: true` and a reason. Code writes the handoff sentence.
+- No conflict rule. Conflicts are settled by the router before the prompt exists. Instructions in the original that only told the model how to arbitrate between sections are dropped, and each drop is listed in `docs/decisions.md`.
 - Output field definitions for the structured reply.
 - One-line description of each tool.
 
@@ -126,8 +133,10 @@ Pure functions over `(reply, toolLog, context)`. Each returns a list of violatio
 - `escalationShape`: `escalate: true` implies at most two sentences, no URL, no price, non-empty reason; `escalate: false` implies reason is null.
 - `fieldSanity`: `templateId` null, `attachmentUrls` at most 3 and all from the tool log.
 - `bannedPhrases`: a short list from the packet's HARD rules (assessment turnaround windows, "I'll check on", "I'll get back to you", "let me look into", head coverings).
+- `claimsVsReceipts`: the reply may not claim an action the tool log does not show. "I've saved", "I've updated", "I've sent you the link" need the matching tool call; "I'm getting a person", "I've passed this to the team" need `escalate: true`. Research found false success claims are a large failure class and simple text checks catch them better than judges.
+- `toolRequired` (ToolFailBench Tool-Skip): a package price, deposit, or clinic fact stated with no clinic or package tool call this turn.
 
-Policy on failure: formatting violations are auto-fixed in code (strip markdown, move URLs to the end). Any other violation triggers one retry with the violations appended to the user turn. If the retry still fails, the reply escalates with reason `validator:<name>`.
+Policy on failure: formatting violations are auto-fixed in code (strip markdown, move URLs to the end). Any other violation triggers one retry. The retry message is phrased as an external verdict ("A validator rejected the previous reply") and lists the allowed values: the URLs and prices that tool results this turn actually contain. Retries stop at one. If the retry still fails, the reply escalates with reason `validator:<name>`. The trace records which validator fired and whether the retry fixed it, so the first-retry fix rate is measured.
 
 ### 4.9 Trace
 
@@ -138,9 +147,13 @@ Emitted beside every reply, written to stdout as a separate stream or file by th
   "id": "...",
   "escalation": { "source": "pregate" | "model" | "validator" | null, "reason": "..." },
   "skillsLoaded": ["stage-pre-clinical-sent", "packages-and-pricing"],
+  "routing": [{ "module": "carecredit", "by": "trigger:carecredit" }],
+  "suppressed": [{ "winner": "time-bound-pause", "suppressed": "collection" }],
   "toolsCalled": [{ "name": "getClinicPackages", "args": {...} }],
   "validators": { "passed": [...], "failed": [...], "autoFixed": [...] },
   "retried": false,
+  "retryFixed": null,
+  "toolUseLabel": "Clean" | "Tool-Skip" | "Result-Ignore" | "Output-Fabrication" | "Unnecessary-Tool-Use" | "Gated",
   "tokens": { "input": 0, "output": 0, "cacheRead": 0 },
   "latencyMs": 0
 }
@@ -163,7 +176,9 @@ This is what a human reads on handoff and what a debugger reads on a bad reply.
 Rules so the comparison is trustworthy, not just favorable:
 
 - **Infra errors are not model failures.** A timeout, API error after retries, unparseable output, or truncated response goes to an errors sidecar with a failure class. It never lands in results as a fail.
-- **Reps.** The runner takes `--reps N`. Default 2. Pass rates are reported with the spread across reps. With roughly sixty cases and two reps, differences under about ten points are inside the noise and the README says so.
+- **Reps.** The runner takes `--reps N`. Default 3. Results are paired per case between systems. With about seventy cases and three reps, differences under about seven points are inside the noise and the README says so (Miller 2024).
+- **Latency.** Median and p95 per system, from the final successful request. The new system must not be worse on either.
+- **ToolFailBench labels.** A rule classifier assigns each reply one label from the trace and fixtures: Clean, Tool-Skip, Result-Ignore, Output-Fabrication, Unnecessary-Tool-Use, or Gated (pre-gate handled it, no model call). The compare table reports Clean Tool-Use Rate and each failure rate, on the first attempt and on the delivered reply.
 - **Oracle and null checks before the first paid run.** A hand-written correct reply for a few cases must pass the checker. An empty reply and a reply with an invented URL must fail. If either check is wrong, the checker is fixed before any model run.
 - **Tokens from the API, cost from the row's model and cache rates.** Never estimated from string length. Latency is the final successful request only, retries excluded and counted separately.
 - **Warm cache for both systems.** Each system runs one unscored warm-up call before the measured pass so cache-read share is comparable.
@@ -196,6 +211,8 @@ Rules so the comparison is trustworthy, not just favorable:
 - Roughly forty cases extracted from the packet's BAD/GOOD contrastive pairs. Each becomes a patient message that triggers the rule, `mustInclude` from the GOOD shape, `mustNotInclude` from the BAD shape.
 - Roughly fifteen escalation cases: clear positives (demand a human, card digits, "move the $500 I paid to Hakan", "call Heva and hold Dec 8"), and hard negatives that must not escalate ("is that humanly possible", "my HR department asked about leave", "can I move my deposit later?", "are you a bot").
 - A few stage and country overrides: LEAD with no photos, non-US financing question, unknown country.
+- **Trap cases** (ToolFailBench): a wrong price or fact planted by the patient, by the chat history, or by stale text inside the original prompt itself (its "$3,000 to $6,000" range, "MetropolMED", "VIP package"). Clean behavior states the tool's value.
+- **Control cases** (ToolFailBench): messages that need no tool ("ok thanks", identity questions). Calling clinic or payment tools on these counts as Unnecessary-Tool-Use.
 
 ## 7. Escalation design
 
@@ -214,7 +231,7 @@ Two sources, one shape.
 | 1, 5 Context bloat and cost | compare table: mean input tokens, baseline vs new |
 | 2 Untraceable failures | trace per reply with skills, tools, validators |
 | 3 New care line collides | `skills/fertility.md` plus a test showing it loads alone |
-| 4 Subtasks have nowhere to go | `subagents/callLog.ts`: a separate small call summarizes `getFullCalls` output when the message asks about the call, result injected as context |
+| 4 Subtasks have nowhere to go | `subagents/callLog.ts`: a separate small call summarizes `getFullCalls` output. It runs once when a call is logged and is cached, so no reply pays for it live; the summary is injected only when the message asks about a call |
 | 6 Policy change blast radius | `harness/blast.ts` output for one skill |
 | 7 Conflicts resolve differently | precedence numbers in frontmatter, order recorded in trace |
 | 8 Can't test one behavior | one test case file per policy, runnable by tag |
@@ -232,9 +249,16 @@ Each item states the limit, the fix, and why it is not in v0.
 - Eval runs by hand. Fix: CI gate that blocks a skill change when its blast-radius cases regress.
 - Skills are files in the repo. Fix: versioned, with a changelog, so a reply can be reproduced against the skill set that produced it.
 
-## 10. Out of scope for v0
+## 10. Pivots and out of scope
 
-Prompt optimization loops (DSPy or similar), LLM router versus rule router comparison, multi-run variance beyond one rerun, LLM-as-judge for tone. Each is listed in the README as a next step with the reason it was cut.
+First pivots, each run as an A/B against v1 on the same harness and accepted only if it beats v1 beyond the noise without breaking the latency rule:
+
+1. Code-chosen modules versus a tool the model calls to load a module.
+2. Escalation by code triggers versus by the prompt alone.
+3. Validator retry with the allowed values listed versus without.
+4. Router fallback classifier for unmatched messages, only if the trace shows misses.
+
+Out of scope for v1: prompt optimization loops (GEPA, DSPy), an LLM judge for tone, a trimmed-monolith second baseline. Each is a README next step with the reason it was cut.
 
 ## 11. Repository layout
 
