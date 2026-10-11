@@ -30,6 +30,9 @@ export interface RunOpts {
   routerFallback?: boolean;
 }
 
+/** Checks that are heuristics, not proof of a wrong reply. Everything else (invented links or prices, card digits, false handoff claims, banned promises) is hard. */
+const SOFT_CHECKS = new Set(["toolRequired"]);
+
 let defaultSkills: Skill[] | null = null;
 let defaultCore: string | null = null;
 
@@ -150,6 +153,14 @@ export async function runMessage(ctx: Context, text: string, opts: RunOpts): Pro
       continue;
     }
     trace.retryFixed = false;
+    // Soft checks are heuristics ("named a package without looking it up"). If only those still fail after the
+    // retry, the reply carries no invented link, price or false claim, so it is sent rather than handed to a person.
+    if (!fixed.reply.escalate && failed.every((n) => SOFT_CHECKS.has(n))) {
+      trace.notes.push(`delivered with soft check failures: ${failed.join(", ")}`);
+      const linked = ensureActionLink(fixed.reply, log, opts.toolOverrides);
+      if (linked.added) { trace.validators.autoFixed.push("assessmentLink"); trace.toolsCalled = log.calls; }
+      return finish(linked.reply);
+    }
     const reason = `validator:${failed[0]}`;
     trace.escalation = { source: "validator", reason, category: "validator" };
     return finish(handoffReply("validator", reason));

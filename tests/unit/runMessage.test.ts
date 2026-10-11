@@ -87,6 +87,17 @@ describe("runMessage", () => {
     expect(reply.escalationReason).toMatch(/^validator:/);
   });
 
+  it("after a failed retry, a reply that only trips a heuristic check is delivered, not handed off", async () => {
+    const soft = baseReply({ response: "Gold is the Heva package where the doctor does every incision." });
+    const c = fakeClient([textResponse(soft), textResponse(soft)]);
+    const { reply, trace } = await runMessage(buildContext(), "tell me about the pricier heva option", opts(c));
+    expect(c.calls.length).toBe(2);
+    expect(reply.escalate).toBe(false);
+    expect(reply.response).toContain("Gold");
+    expect(trace.escalation.source).toBeNull();
+    expect(trace.validators.failed).toEqual(["toolRequired"]);
+    expect(trace.notes.join(" ")).toMatch(/delivered with soft check/);
+  });
   it("a model escalation keeps the reason but code writes the sentence", async () => {
     const c = fakeClient([textResponse(baseReply({ escalate: true, escalationReason: "asked us to contact the clinic", response: "Sure! I'll call Heva and hold Dec 8, Silver is $3,000." }))]);
     const { reply, trace } = await runMessage(buildContext(), "call Heva and hold Dec 8 for me", opts(c));
