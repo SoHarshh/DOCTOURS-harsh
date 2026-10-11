@@ -4,29 +4,51 @@ The original system drafted every patient reply from one 800-line prompt and had
 
 ## Results
 
-Both systems use the same model (`claude-haiku-5-5`), the same 14 tools, the same output schema, and the same prompt caching. Each of 107 test cases ran 3 times per system.
+Both systems use the same model (`claude-haiku-5-5`), the same 14 tools, the same output format, and the same prompt caching. Only the system around the model differs. Every case runs 3 times per system and is scored by code.
+
+**Headline, on 25 cases neither system was ever tuned on** (written blind from the brief by a separate agent that never saw either system's output):
 
 | | Original prompt | New system |
 |---|---|---|
-| Pass rate (all checks pass) | 74.1% | **97.2%** |
-| Per case, new minus original | | **+23.1 points** (35 better, 2 worse, 70 same) |
-| Escalation: cases that must escalate and did | 58.8% | **100%** |
-| Escalation: escalations that were right | 90.9% | **96.2%** |
-| Replies that ignored or invented a tool value | 7.5% | **3.2%** |
+| Pass rate | 74.7% | **89.3%** |
+| Cases that must escalate, handled right | 83.3% | **100%** |
+
+**Every measurement:**
+
+| Test set | What it is | Original | New |
+|---|---|---|---|
+| The brief's 5 sample messages | The only expected replies we were given, scored by the brief's own rule | 3 of 15 runs | **15 of 15** |
+| Held-out, blind (25 cases) | Written from the brief only; run before any change was made because of it | 74.7% | **89.3%** |
+| Dev set, first run (107 cases) | Written from the original prompt's rules; first run, before any tuning | 76.0% | **93.5%** |
+| Dev set, final (107 cases) | After fixing what the runs exposed; optimistic, since fixes were found on these cases | 76.0% | **99.4%** |
+| Held-out, after the router fallback | No longer blind: its failures motivated the fallback | 74.7% | **100%** |
+
+**Split by kind of case** (dev set, final):
+
+| | Original | New |
+|---|---|---|
+| Must escalate (51 runs) | 3.9% | **100%** |
+| Everything else (270 runs) | 89.6% | **99.3%** |
+| Escalation precision (handoffs that were right) | 90.9% | **100%** |
+
+**Speed and cost** (dev set, final; latency over replies that reached the model):
+
+| | Original | New |
+|---|---|---|
 | Median latency | 5.3 s | **3.7 s** |
-| Slowest 5% of replies | 9.8 s | **7.1 s** |
+| Slowest 5% | 9.8 s | **7.2 s** |
 | Prompt size per message | 167k characters | **40k characters** |
-| Cost per 1,000 replies | $1.72 | **$0.88** |
-
-Latency and prompt size are over replies that reached the model. Handoffs caught by the pre-gate (33 of 321) take no model call at all.
-
-The difference is well outside the noise: the per-case standard error is 3.8 points. One caveat: some fixes were found by studying failures on this same test set. Each was a general rule, not a patch for one case, but the first measured run is the more conservative number: 92.8% against the same 74.1%. Both runs are in [`results/runs/`](results/runs/), and every fix is explained in [`docs/decisions.md`](docs/decisions.md). The full table, per policy area, is in [`results/compare.md`](results/compare.md).
+| Cost per 1,000 replies | $1.72 | **$0.86** |
+| Handoffs answered with no model call | 0 | 33 of 321 |
 
 What the numbers say:
 
-- **Escalation is the biggest gain.** The original prompt has no handoff rule. It sometimes set the flag but then kept writing a sales answer. The new system hands off in one sentence, and clear cases never reach the model.
-- **On ordinary policy questions the original prompt was already decent** (83% on cases that should not escalate). The new system is better there too, mostly because it ignores or invents fewer tool values.
-- **It is faster and cheaper**, because each message reads about a quarter of the prompt.
+- **Escalation is the biggest difference.** The original prompt has no handoff rule. When a patient asked for a person it often set the flag, then kept writing a sales answer. The new system hands off in one sentence written by code.
+- **On everything else the original prompt was already decent** (about 90%). The new system's first, untuned run was only about 3 points better there. The fixes that followed came from studying failures, which is why the blind held-out number is the one to trust.
+- **The new system's main weakness is new wording.** On the blind set, two messages missed their policy module because no trigger phrase matched ("does blue cross cover any of this?", "need to talk to my wife first"). A small fallback classifier now handles messages no phrase matches. It fixed both, but that result is no longer blind.
+- **It is faster and cheaper,** because each message reads about a quarter of the prompt.
+
+Each run is in [`results/runs/`](results/runs/) with every reply and trace. [`results/compare.md`](results/compare.md) has the full table by policy area. Every fix, and why, is in [`docs/decisions.md`](docs/decisions.md).
 
 ## Run it
 
@@ -45,7 +67,7 @@ The command that answers messages reads a JSON array of `{ "id", "text" }` and w
 npm run -s reply -- --in messages.json --out replies.json
 ```
 
-Use `-s` (or `--out`) so npm's banner does not end up in the JSON. A trace for every reply goes to `results/traces.jsonl`. Add `--system baseline` to run the original prompt instead.
+Use `-s` (or `--out`) so npm's banner does not end up in the JSON. API errors are retried; a message that still fails is handed to a person and a warning is printed to stderr. A trace for every reply goes to `results/traces.jsonl`. Add `--system baseline` to run the original prompt instead.
 
 Tests and the comparison:
 
@@ -64,6 +86,7 @@ A full eval run is 321 turns per system, about 10 minutes and under a dollar on 
 message
   -> pre-gate (code)      asks for a person, or shares card details? hand off now, no model call
   -> router (code)        pick the stage module plus up to 3 policy modules; settle conflicts here
+                          if no phrase matched (and it is not "ok thanks"), one small classifier call picks modules
   -> assemble (code)      core prompt + chosen modules + patient context, each block cached
   -> model call           the same 14 tools as before; reads only what this message needs
   -> validators (code)    links and prices from tools? plain text? link last? no card digits? no false claims?
@@ -76,7 +99,7 @@ There is a before-and-after diagram in [`docs/workflow.md`](docs/workflow.md).
 
 **What stays loaded on every turn:** the core prompt, [`prompts/core.md`](prompts/core.md), about 1,400 words. It covers identity and voice, answering only what was asked, plain text with links last, grounding every fact in a tool result, what the coordinator cannot do, when a person must take over, and the output fields. Plus the patient's context.
 
-**What loads per message:** the stage module for the patient's pipeline stage, and up to three policy modules from [`skills/`](skills/). There are 30 modules. Each one is the original prompt's text for one policy, copied word for word, so the gains come from structure, not from rewriting their rules. Each module declares the phrases that load it, a priority, and which other modules it overrides. The router is plain code, so its choice is the same every time and is written to the trace.
+**What loads per message:** the stage module for the patient's pipeline stage, and up to three policy modules from [`skills/`](skills/). There are 30 modules. Each one is the original prompt's text for one policy, copied word for word, so the gains come from structure, not from rewriting their rules. Each module declares the phrases that load it, a priority, and which other modules it overrides. The router is plain code, so its choice is the same every time and is written to the trace. When no phrase matches, a small classifier call picks modules from one-line descriptions; it fails open, adds about a second, and runs on roughly 5 to 15% of messages. Set `ROUTER_FALLBACK=off` to disable it.
 
 **How conflicts are settled:** in code, before the prompt is built. Where the original prompt said "this overrides that", the module declares it, and the router drops the losing module. Research shows a small model follows "this rule beats that rule" instructions poorly, so the model never has to decide.
 
@@ -131,6 +154,7 @@ Module "carecredit" loads for 2 of 107 cases. Editing it can change only these:
 ## How it was tested
 
 - **The test set** is 107 cases written from the original prompt's own rules, its examples of good and bad replies, and the tool data. None of them copy the sample replies in the brief. It includes 17 cases that must escalate, hard cases that must not ("is that humanly possible?"), 13 trap cases where a wrong price is planted in the message, the chat history, or the original prompt's own outdated text, and 38 cases that need no tool at all.
+- **A blind held-out set** of 25 more cases was written by a separate agent from the brief alone. It never saw the system's prompts, modules, code, or results. It is in `tests/heldout/`.
 - **The checks** are code, not a judging model: required facts, forbidden phrases, link placement, escalation, tools called. A rescore command reapplies corrected checks to saved replies without new API calls.
 - **The tool-use labels** follow ToolFailBench (arXiv 2607.04686): did the model skip a tool, ignore its result, or invent a value, and did it call tools it did not need.
 - **Fairness:** the original prompt gets the same model, tools, schema and caching. Infra errors are counted separately, never as failures. Three reps per case, compared case by case.
@@ -147,7 +171,7 @@ At 200,000 active users and a few messages each per day, expect around a million
 | Conversation state | Each message is answered on its own, from the history passed in | A session store per thread for working memory and handoff state, so a handed-off thread stays with the person | The brief's command answers independent messages |
 | Escalation | Sets a flag; nothing routes it | A handoff inbox with a response-time target, with the trace attached so the person sees why | Outside the reply system |
 | Traces | Written to a file | OpenTelemetry spans to a tracing backend, with module names as attributes | A file is enough to debug and grade |
-| Router misses | A message phrased in a way no trigger expects loads only the stage module | A small classifier that runs only when no trigger matched, logged in the trace. Measure the miss rate first: it adds about a second to those messages | It would break the latency target on those messages without evidence it is needed |
+| Router misses | Wording no trigger expects falls to the fallback classifier, which costs a second | Log every fallback decision and turn frequent ones into trigger phrases, so the fallback runs less over time | Needs real traffic |
 | Policy changes | Modules are files in the repo | Version the module set, run the affected test cases in CI on every change, and block a change that drops their pass rate | Needs a CI setup |
 | Call summaries | Summarized by a script | Summarize when a call is logged, from an event | Needs the call system |
 
@@ -155,7 +179,6 @@ At 200,000 active users and a few messages each per day, expect around a million
 
 Each of these runs as an experiment against the current version on the same harness, and is kept only if it wins beyond the noise without making replies slower:
 
-- Router fallback classifier for messages no trigger matches.
 - On the retry path only, let the model consult a stronger model (the API's advisor tool), and measure whether more retries succeed.
 - Let the model load a module itself, as a tool, versus code choosing. Code choosing is the current design, based on published results; the experiment would measure it here.
 - More first-contact test cases, and a judging model for tone, checked against hand labels.
