@@ -19,7 +19,7 @@ describe("callModel", () => {
     expect(r.stopReason).toBe("end_turn");
   });
 
-  it("sends the schema, effort, tools and a cache breakpoint on the first system block only", async () => {
+  it("sends the schema, effort, tools, and cache breakpoints on every system block plus the growing messages", async () => {
     const c = fakeClient([textResponse(baseReply())]);
     await callModel(deps(c), input(new ToolLog()));
     const p = c.calls[0];
@@ -28,8 +28,11 @@ describe("callModel", () => {
     expect(p.output_config.format.type).toBe("json_schema");
     expect(p.output_config.format.schema.properties.response).toBeDefined();
     expect(p.output_config.format.schema.properties.workingMemoryUpdates).toBeDefined();
+    // system[0] (fixed core) is reused across messages; the last block is reused across tool rounds within one message;
+    // top-level automatic caching covers tool results as the conversation grows between rounds.
     expect(p.system[0].cache_control).toEqual({ type: "ephemeral" });
-    expect(p.system[1].cache_control).toBeUndefined();
+    expect(p.system[p.system.length - 1].cache_control).toEqual({ type: "ephemeral" });
+    expect(p.cache_control).toEqual({ type: "ephemeral" });
     expect(p.tools.map((t: any) => t.name)).toEqual(TOOL_DEFINITIONS.map((t) => t.name));
     expect(p.messages).toEqual([{ role: "user", content: "hi" }]);
     expect(p.tool_choice).toBeUndefined();

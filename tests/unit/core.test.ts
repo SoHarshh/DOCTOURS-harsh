@@ -44,6 +44,10 @@ describe("core prompt", () => {
     for (const t of TOOL_DEFINITIONS) expect(tools, t.name).toMatch(new RegExp(`\\b${t.name}\\b`));
     expect(tools).toMatch(/Tool suffix/);
   });
+  it("settles the repeated-link conflict: a page the patient must act on gets its link", () => {
+    const voice = section("# VOICE AND FORMAT");
+    expect(voice).toMatch(/unless the patient asks again or you are telling them to do something on that page/i);
+  });
   it("does not contain any expected-reply text", () => {
     expect(core).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at|Silver is \$3,000|Asked to talk to a human|Asked to charge a card number/);
   });

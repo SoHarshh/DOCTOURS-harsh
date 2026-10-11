@@ -94,7 +94,10 @@ function usageOf(u: any): Usage {
 
 /** One model turn: a manual tool loop capped at maxRounds, ending in a structured Reply. Never throws on bad output, only on a wrong served model or an API error. */
 export async function callModel(deps: ModelDeps, input: ModelCallInput): Promise<ModelCallResult> {
-  const system = input.system.map((b, i) => (i === 0 ? { ...b, cache_control: { type: "ephemeral" as const } } : b));
+  // Cache breakpoints: the first block (fixed core prompt) is shared across messages; the last block is shared
+  // across tool rounds within this message. Top-level cache_control (below) also caches the growing tool results.
+  const last = input.system.length - 1;
+  const system = input.system.map((b, i) => (i === 0 || i === last ? { ...b, cache_control: { type: "ephemeral" as const } } : b));
   const messages: Anthropic.MessageParam[] = [{ role: "user", content: input.user }];
   let usage = zeroUsage();
   let rounds = 0;
@@ -114,6 +117,7 @@ export async function callModel(deps: ModelDeps, input: ModelCallInput): Promise
       system,
       tools: input.tools,
       messages,
+      cache_control: { type: "ephemeral" },
       output_config: { effort: deps.effort, format: REPLY_FORMAT },
     });
     latencyMs += Date.now() - t0;
