@@ -70,6 +70,30 @@ export function allowedPriceSet(log: ToolLog, patientText?: string): Set<number>
   return out;
 }
 
+/** A sentence that corrects an earlier figure rather than asserting it. */
+const CORRECTION_RE = /\b(?:wrong|earlier|incorrect|mistake|mistaken|not|instead|rather than|disregard|correction|actually|outdated|old)\b/i;
+
+export const historyText = (ctx: Context) => `${ctx.CHAT_LIST}\n${ctx.RECENT_CONVERSATION_SUMMARY}`;
+
+/**
+ * Prices in the reply that nothing supports. Supported: tool results this turn, policy values, a price minus a deposit,
+ * numbers the patient wrote, and a number from the chat history when the sentence is correcting it
+ * ("I quoted $4,200 earlier, which was wrong"). A history number stated as fact is still unsupported.
+ */
+export function unsupportedPrices(text: string, log: ToolLog, patientText?: string, history?: string): number[] {
+  const ok = allowedPriceSet(log, patientText);
+  const fromHistory = new Set(history ? numbersIn(history) : []);
+  const out: number[] = [];
+  for (const sentence of sentences(text)) {
+    for (const n of moneyIn(sentence)) {
+      if (ok.has(n)) continue;
+      if (fromHistory.has(n) && CORRECTION_RE.test(sentence)) continue;
+      out.push(n);
+    }
+  }
+  return out;
+}
+
 function urlPlacementOk(text: string): boolean {
   const urls = urlsIn(text);
   if (urls.length === 0) return true;
@@ -108,8 +132,7 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
   const okUrls = new Set(allowedValues(log).urls);
   for (const u of urlsIn(text)) if (!okUrls.has(u)) add("urlProvenance", `URL not returned by a tool this turn: ${u}`);
 
-  const okPrices = allowedPriceSet(log, patientText);
-  for (const n of moneyIn(text)) if (!okPrices.has(n)) add("priceProvenance", `price not returned by a tool this turn: ${n}`);
+  for (const n of unsupportedPrices(text, log, patientText, historyText(_ctx))) add("priceProvenance", `price not returned by a tool this turn: ${n}`);
 
   if (CARD_RE.test(withoutLinksAndIds(text))) add("noCardDigits", "card digits echoed back");
 

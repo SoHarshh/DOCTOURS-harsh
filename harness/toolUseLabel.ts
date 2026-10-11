@@ -2,7 +2,7 @@ import type { Reply, Trace, ToolUseLabel } from "../src/types.js";
 import { ToolLog } from "../src/tools/toolLog.js";
 import { executeTool } from "../src/tools/execute.js";
 import { buildContext, type Context } from "../src/context/buildContext.js";
-import { allowedPriceSet, allowedValues, moneyIn, urlsIn } from "../src/pipeline/validators.js";
+import { allowedValues, historyText, unsupportedPrices, urlsIn } from "../src/pipeline/validators.js";
 import { runChecks, textIncludes, type CaseFile } from "./checker.js";
 
 /**
@@ -31,8 +31,7 @@ function replayTools(c: CaseFile, trace: Pick<Trace, "toolsCalled">): ToolLog {
 export function fabricatedValues(c: CaseFile, reply: Reply, log: ToolLog, ctx: Context): string[] {
   const text = reply.response;
   const out: string[] = [];
-  const prices = allowedPriceSet(log, c.text);
-  for (const n of moneyIn(text)) if (!prices.has(n)) out.push(`price ${n}`);
+  for (const n of unsupportedPrices(text, log, c.text, historyText(ctx))) out.push(`price ${n}`);
   const urls = new Set(allowedValues(log).urls);
   for (const u of urlsIn(text)) if (!urls.has(u)) out.push(`url ${u}`);
   const known = `${log.resultsText()}\n${c.text}\n${ctx.CLINIC_FLAGS}`.toLowerCase();

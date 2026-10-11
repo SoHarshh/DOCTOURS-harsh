@@ -69,6 +69,18 @@ describe("priceProvenance", () => {
   });
 });
 
+describe("priceProvenance with a wrong price in the chat history", () => {
+  const hist = buildContext({ CHAT_LIST: "[Sep 26, 8:20 AM] Alex: Heva's Gold package is $4,200 with a $600 deposit." });
+  it("allows the old price when the reply corrects it", () => {
+    const r = reply({ response: "Heva's Gold package is $4,500 with a $600 deposit. I quoted $4,200 earlier, which was wrong." });
+    expect(validate(r, heva(), hist).map((v) => v.name)).not.toContain("priceProvenance");
+  });
+  it("still blocks the old price stated as fact", () => {
+    const r = reply({ response: "Heva's Gold package is $4,200." });
+    expect(validate(r, heva(), hist).map((v) => v.name)).toContain("priceProvenance");
+  });
+});
+
 describe("noCardDigits", () => {
   it("flags echoed card digits", () => {
     expect(names(reply({ response: "I can't charge the card ending in 4242." }))).toContain("noCardDigits");
