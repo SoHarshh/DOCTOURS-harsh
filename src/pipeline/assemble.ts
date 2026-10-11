@@ -34,7 +34,7 @@ export function assembleSystem(core: string, modules: PolicyModule[], ctx: Conte
     ? `# LOADED POLICY SECTIONS\n\n${modules.map((m) => `<!-- module: ${m.name} -->\n${m.body}`).join("\n\n")}`
     : "# LOADED POLICY SECTIONS\n(none for this message)";
   return [
-    { type: "text", text: core },
+    { type: "text", text: core.replaceAll("{coordinator name}", ctx.COORDINATOR_DISPLAY_NAME) },
     { type: "text", text: policy },
     { type: "text", text: `# CONTEXT\n\n${renderContextBlock(ctx, extras)}` },
   ];

@@ -48,3 +48,9 @@ describe("renderContextBlock", () => {
     expect(renderContextBlock(buildContext({ CHAT_LIST: "", RECENT_CALLS: "" }))).toContain("(no messages yet)");
   });
 });
+
+describe("review minors", () => {
+  it("fills the coordinator name into the core prompt", () => {
+    expect(assembleSystem("I'm {coordinator name}, your coordinator.", [], buildContext())[0].text).toBe("I'm Alex, your coordinator.");
+  });
+});
