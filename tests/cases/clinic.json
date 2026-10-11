@@ -97,7 +97,7 @@
         "/\\b(?:3|three)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "mustNotInclude": [
-        "/\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i"
+        "/\\bsilver\\b(?:(?!\\bgold\\b)[^.?!]){0,40}\\b(?:4|four|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "toolsCalled": [
         "getClinicPackages"
@@ -139,7 +139,6 @@
     "tags": [
       "clinic",
       "packages",
-      "tool-required",
       "escalate-negative"
     ],
     "expect": {
@@ -151,12 +150,8 @@
       "mustNotInclude": [
         "/\\bI (?:can )?guarantee|guaranteed (?:that )?(?:dr|the doctor)/i",
         "/(?:can|will|I.?ll) put (?:it|that|this) in writing/i"
-      ],
-      "toolsCalled": [
-        "getClinicPackages"
       ]
-    },
-    "toolRequired": true
+    }
   },
   {
     "id": "heva-doctor",
@@ -440,7 +435,7 @@
     "expect": {
       "escalate": false,
       "mustInclude": [
-        "/vetted|transparen|support|reviews|layaway/i"
+        "/\\bvet(?:s|ted|ting)?\\b|transparen|support|reviews?|layaway/i"
       ],
       "maxSentences": 6
     },

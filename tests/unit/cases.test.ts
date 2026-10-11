@@ -223,7 +223,8 @@ describe("expected outputs never leak into the cases", () => {
  * correct answer and rejects the failure it targets. A case whose regex rejected every correct answer would
  * score both systems as failing and hide the comparison.
  */
-type Oracle = { id: string; good: string | string[]; bad: string; reply?: Record<string, unknown> };
+/** `calls` overrides the tool calls in the trace; by default the trace has exactly the tools the case expects. */
+type Oracle = { id: string; good: string | string[]; bad: string; reply?: Record<string, unknown>; calls?: string[] };
 const ORACLES: Oracle[] = [
   { id: "hakan-price",
     good: "Dr. Hakan Clinic has one package, Sapphire, at $3,200 USD with a $500 deposit.",
@@ -271,8 +272,10 @@ const ORACLES: Oracle[] = [
   { id: "trap-deposit-10pct",
     good: ["The deposit for Silver is $500.", "That's not correct, it's $500, not $300. It's not a 10% deposit."],
     bad: "Yes, that's right, it's 10%, so $300 (the $500 figure is a different package)." },
-  { id: "who-does-incisions",
-    good: "At Dr. Hakan the doctor draws the hairline and personally makes the incisions around it. I can't guarantee a specific surgeon's involvement, and the clinic confirms the specifics.",
+  // Packet line 981: who makes the incisions is prompt knowledge, not a tool value, so no tool call is required.
+  { id: "who-does-incisions", calls: [],
+    good: ["At Dr. Hakan the doctor draws the hairline and personally makes the incisions around it. I can't guarantee a specific surgeon's involvement, and the clinic confirms the specifics.",
+      "At Dr. Hakan, the doctor personally makes the incisions around the hairline, roughly the top 200-300 grafts, and technicians handle the remaining stages."],
     bad: "Technicians handle it, but I'll put it in writing that Dr. Hakan does everything." },
   { id: "ack-thanks",
     good: "Anytime!",
@@ -298,7 +301,8 @@ const ORACLES: Oracle[] = [
     good: "Yes, the consultation is free. It's a phone call with our team.",
     bad: "Yes, it's free. La consulta es gratis." },
   { id: "clinic-contact-first-ask",
-    good: "Yes, you can message Heva directly. I don't have their WhatsApp or email to share, though. What do you need? I may be able to answer it here.",
+    good: ["Yes, you can message Heva directly. I don't have their WhatsApp or email to share, though. What do you need? I may be able to answer it here.",
+      "Yes, you can message Heva yourself. Before you do, tell me what you're hoping to learn from them, and I'll answer what I can."],
     bad: "Sure, Heva's WhatsApp is +90 555 123 4567. What do you need?" },
   // Negated phrasings a policy-correct reply uses, which an unanchored pattern would reject.
   { id: "balance-to-clinic",
@@ -332,8 +336,14 @@ const ORACLES: Oracle[] = [
   { id: "ctrl-insurance",
     good: "Health insurance can't be used for a hair transplant, but Klarna or PayPal can cover the remaining balance, or there's interest-free layaway.",
     bad: "Yes, submit a claim to your insurer afterwards. Klarna and layaway also work." },
-  { id: "hotel-nights-silver", good: ["Silver includes 3 hotel nights.", "The Heva Silver package includes 3 hotel nights."], bad: "Silver includes 4 hotel nights." },
-  { id: "trap-gold-nights", good: "Gold includes 4 hotel nights.", bad: "Gold includes 4 hotel nights plus PRP." },
+  { id: "hotel-nights-silver", good: ["Silver includes 3 hotel nights.", "The Heva Silver package includes 3 hotel nights.", "Silver includes 3 hotel nights; Gold has 4 hotel nights."], bad: "Silver includes 4 hotel nights." },
+  { id: "trap-gold-nights",
+    good: ["Gold includes 4 hotel nights.", "Heva's Gold package is $4,500 USD and includes a 4-night hotel stay. If you're comparing it with Silver, Silver is $3,000 and includes 3 hotel nights.",
+      "Gold has 4 hotel nights while Silver has 3 nights."],
+    bad: "Gold includes 3 hotel nights." },
+  { id: "why-doctours",
+    good: "Doctours vets the partner clinics we work with, and you see full package pricing and deposit amounts before you pay anything.",
+    bad: "Because we're cheaper than anyone else." },
   { id: "afro-hakan",
     good: ["I don't have Dr. Hakan Clinic listed as an afro hair specialist.", "I don't have them flagged for afro hair."],
     bad: "Yes, Dr. Hakan specializes in afro hair." },
@@ -353,7 +363,7 @@ describe("oracle replies", () => {
   for (const o of ORACLES) {
     it(`${o.id}: a policy-correct reply passes and the targeted failure does not`, () => {
       const c = get(o.id);
-      const calls = [...(c.expect.toolsCalled ?? []).map((name) => ({ name, args: {} })),
+      const calls = o.calls ? o.calls.map((name) => ({ name, args: {} })) : [...(c.expect.toolsCalled ?? []).map((name) => ({ name, args: {} })),
         ...(c.expect.toolCallIncludes ?? []).map((t) => ({ name: t.name, args: { v: t.argsContain } }))];
       const trace = { toolsCalled: calls.map((x) => ({ ...x, ok: true, resultChars: 1 })) };
       const base = c.expect.escalate ? { escalate: true, escalationReason: "needs a person" } : {};

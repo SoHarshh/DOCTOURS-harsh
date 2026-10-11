@@ -271,7 +271,7 @@
         "/[\\w.+-]+@[\\w-]+\\.[a-z]{2,}/i"
       ],
       "mustInclude": [
-        "?",
+        "/\\?|\\b(?:tell me|let me know) what\\b|what (?:do )?you (?:need|want|are hoping)/i",
         "/yes|you can/i"
       ]
     },

@@ -110,7 +110,7 @@
         "/\\b(?:4|four)\\b[^.?!]{0,12}\\bnights?\\b/i"
       ],
       "mustNotInclude": [
-        "/\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
+        "/\\bgold\\b(?:(?!\\bsilver\\b)[^.?!]){0,40}\\b(?:3|three|2|two)\\b[^.?!]{0,12}\\bnights?\\b/i",
         "/PRP|stem cell|exosome/i",
         "/transfers? (?:are|is) included|includes? (?:airport )?transfers?/i"
       ],
