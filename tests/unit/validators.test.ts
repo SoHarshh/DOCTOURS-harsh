@@ -221,3 +221,31 @@ describe("retry message", () => {
     expect([...VALIDATOR_NAMES].sort()).toEqual(["bannedPhrases", "claimsVsReceipts", "escalationShape", "fieldSanity", "noCardDigits", "plainText", "priceProvenance", "toolRequired", "urlLastLine", "urlProvenance"]);
   });
 });
+
+describe("review minors", () => {
+  it("autoFix moves several adjacent URLs without repeating the pointer phrase", () => {
+    const r = autoFix(reply({ response: "Links: https://www.doctours.com/consultation https://www.doctours.com/image-upload" })).reply.response;
+    expect(r).not.toMatch(/using the link below.*using the link below/);
+    expect(r.split("\n").slice(-2)).toEqual(["https://www.doctours.com/consultation", "https://www.doctours.com/image-upload"]);
+  });
+  it("toolRequired does not fire on a deposit amount the patient wrote", () => {
+    expect(names(reply({ response: "Yes, the $500 deposit comes off your total." }), new ToolLog(), "is the deposit $500?")).not.toContain("toolRequired");
+  });
+  it("a history price stated as fact with 'not' in the sentence is still flagged", () => {
+    const hist = buildContext({ CHAT_LIST: "[Sep 26, 8:20 AM] Alex: Heva's Gold package is $4,200 with a $600 deposit." });
+    expect(validate(reply({ response: "Gold is $4,200, not including flights." }), heva(), hist).map((v) => v.name)).toContain("priceProvenance");
+  });
+  it("autoFix trims attachments to three", () => {
+    const { reply: r, fixed } = autoFix(reply({ attachmentUrls: ["https://a", "https://b", "https://c", "https://d"] }));
+    expect(r.attachmentUrls).toEqual(["https://a", "https://b", "https://c"]);
+    expect(fixed).toContain("fieldSanity");
+  });
+  it("a lowercase package name with 'package' still needs the package tool; a silver lining does not", () => {
+    expect(names(reply({ response: "The gold package has more hotel nights." }))).toContain("toolRequired");
+    expect(names(reply({ response: "The silver lining is you can pay from home." }))).not.toContain("toolRequired");
+  });
+  it("turnaround check only fires when the timing is about the assessment itself", () => {
+    expect(names(reply({ response: "Once you've read your assessment, the free consultation usually takes about half an hour." }))).not.toContain("bannedPhrases");
+    expect(names(reply({ response: "Your assessment usually takes a few days." }))).toContain("bannedPhrases");
+  });
+});

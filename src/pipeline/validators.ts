@@ -26,6 +26,10 @@ const MD_RE = /(\*\*|__|`|^#{1,6}\s|^\s*[-*•]\s+)/m;
 const CARD_RE = /\b(?:\d[ -]?){13,19}\b|\b(?:ending|ends|last (?:four|4)|last digits?)\b[^.?!]{0,12}\b\d{4}\b/i;
 const MONEY_SRC = String.raw`(?:\$|usd\s?|€|£)\s?(\d[\d,]*(?:\.\d+)?)|(\d[\d,]*(?:\.\d+)?)\s?(?:usd|dollars|eur|euros|gbp)\b`;
 const PACKAGE_NAME_RE = /\b(Silver|Gold|Sapphire|Diamond|VIP|Platinum|Premier)\b/;
+/** "the gold package": a lowercase tier name counts only next to a word that makes it a package ("silver lining" does not). */
+const PACKAGE_WORD_RE = /\b(silver|gold|sapphire|diamond|vip|platinum|premier)\s+(?:package|tier|option|plan)\b/i;
+/** The timing phrase is about the assessment itself, not something mentioned after it. */
+const ASSESSMENT_TIMING_RE = /\bassessment\b[^.?!,]{0,30}\b(?:ready|back|done|complete|completed|finished|arrive|arrives|takes?|should|will be|usually|typically|get|receive)\b|\b(?:ready|back|done|complete|finished)\b[^.?!,]{0,30}\bassessment\b/i;
 
 const STALL_RE = /\b(?:I'?ll (?:get back to you|check on|look into|find out)|let me (?:check|look into|find out)|I(?:'ve)? checked our (?:side|system))\b/i;
 const TURNAROUND_RE = /\b(?:a few hours|couple of hours|later today|by tomorrow|within a day|24 hours|24-48 hours|48 hours|a few days|couple of days|typically takes|usually takes|should be ready|will be ready (?:in|by|within))\b/i;
@@ -76,7 +80,7 @@ export function allowedPriceSet(log: ToolLog, patientText?: string): Set<number>
 }
 
 /** A sentence that corrects an earlier figure rather than asserting it. */
-const CORRECTION_RE = /\b(?:wrong|earlier|incorrect|mistake|mistaken|not|instead|rather than|disregard|correction|actually|outdated|old)\b/i;
+const CORRECTION_RE = /\b(?:wrong|earlier|incorrect|mistake|mistaken|instead|rather than|disregard|correction|outdated|previously|before)\b/i;
 
 export const historyText = (ctx: Context) => `${ctx.CHAT_LIST}\n${ctx.RECENT_CONVERSATION_SUMMARY}`;
 
@@ -143,7 +147,7 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
 
   if (STALL_RE.test(text)) add("bannedPhrases", "promises a later check or follow-up nobody can trigger");
   for (const s of sentences(text)) {
-    if (/assessment/i.test(s) && TURNAROUND_RE.test(s)) add("bannedPhrases", `assessment turnaround promise: ${s}`);
+    if (ASSESSMENT_TIMING_RE.test(s) && TURNAROUND_RE.test(s)) add("bannedPhrases", `assessment turnaround promise: ${s}`);
     if (HEADCOVER_RE.test(s) && !HEADCOVER_TIMING_RE.test(s) && !HEADCOVER_NEGATED_RE.test(s)) add("bannedPhrases", `head-covering advice: ${s}`);
   }
 
@@ -153,8 +157,9 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
   if (SENT_CLAIM_RE.test(text) && urlsIn(text).length === 0) add("claimsVsReceipts", "refers to a link but the reply contains none");
 
   if (!log.called("getClinicPackages")) {
-    const prices = moneyIn(text).filter((n) => !POLICY_PRICES.includes(n));
-    const pkg = text.match(PACKAGE_NAME_RE);
+    const patientNums = new Set(patientText ? numbersIn(patientText) : []);
+    const prices = moneyIn(text).filter((n) => !POLICY_PRICES.includes(n) && !patientNums.has(n));
+    const pkg = text.match(PACKAGE_NAME_RE) ?? text.match(PACKAGE_WORD_RE);
     if (prices.length) add("toolRequired", `states a price (${prices[0]}) without calling getClinicPackages this turn`);
     else if (pkg) add("toolRequired", `names a package (${pkg[1]}) without calling getClinicPackages this turn`);
   }
@@ -183,7 +188,8 @@ export function autoFix(reply: Reply): { reply: Reply; fixed: string[] } {
         body = body.replace(new RegExp(`(?:\\s+\\b(?:at|via|on|from|here)\\b\\s*:?|\\s*:)?\\s*${esc}`), " using the link below");
       }
       body = body.split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean)
-        .map((l) => (/using the link below$/.test(l) ? `${l}.` : l)).join("\n");
+        .map((l) => l.replace(/using the link below(?:\s*using the link below)+/g, "using the links below"))
+        .map((l) => (/using the links? below$/.test(l) ? `${l}.` : l)).join("\n");
       text = `${body}\n${[...new Set(urls)].join("\n")}`;
       fixed.push("urlLastLine");
     }
@@ -194,6 +200,7 @@ export function autoFix(reply: Reply): { reply: Reply; fixed: string[] } {
     fixed.push("escalationShape");
   }
   if (out.templateId !== null) { out = { ...out, templateId: null }; fixed.push("fieldSanity"); }
+  if (out.attachmentUrls && out.attachmentUrls.length > 3) { out = { ...out, attachmentUrls: out.attachmentUrls.slice(0, 3) }; fixed.push("fieldSanity"); }
   return { reply: out, fixed: [...new Set(fixed)] };
 }
 
