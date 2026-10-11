@@ -14,7 +14,8 @@
     "compare": "tsx harness/compare.ts",
     "blast": "tsx harness/blast.ts",
     "typecheck": "tsc --noEmit",
-    "precompute": "tsx scripts/precompute-call-summaries.ts"
+    "precompute": "tsx scripts/precompute-call-summaries.ts",
+    "rescore": "tsx harness/rescore.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",
