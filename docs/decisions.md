@@ -94,3 +94,9 @@ Work that happens once, before any patient texts: cutting the prompt into files,
 **Link conflict.** "Do not resend a link already sent" collided with "tell the patient they can pay from their assessment". The model followed the first rule and left the assessment link out. Resolution, in the core prompt: when you tell the patient to do something on a page (pay, book), include that page's link even if it was sent before. This is a general rule, but it was found because a sample message exposed it, and that is stated here so a reviewer can judge it.
 
 **Baseline on the same five messages.** The original prompt missed the Hakan deposit, left out the consultation link, kept answering after "I demand to talk to a human", and did not escalate the card request.
+
+**Quoting rule.** A second run of the Hakan question printed "a basePrice of 3200 USD" and dropped the deposit. Core prompt now says to give a package's price in the clinic's currency with its deposit, in plain words, without field names. Before a deposit is paid, the deposit is the patient's next cost, so it belongs with every price.
+
+**Cache layout.** The prompt is now three blocks, each cached: the core (same for every message), the chosen modules (same for every message that routes the same way, across patients), and the patient context (reused across tool rounds of one message).
+
+**False positive fixed.** The assessment link contains an ID with long digit runs, and the card-number check read it as a card, which escalated a correct reply. Card checks now ignore links and IDs.
