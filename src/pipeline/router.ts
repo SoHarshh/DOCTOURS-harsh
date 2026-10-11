@@ -56,7 +56,8 @@ function triggerHits(s: Skill, ctx: Context, text: string): string[] {
 
 const byPrecedence = (a: Skill, b: Skill) => a.precedence - b.precedence || a.name.localeCompare(b.name);
 
-export function route(ctx: Context, text: string, all: Skill[]): RouteResult {
+/** `extra`: module names picked by the fallback classifier; they compete with phrase matches under the same rules. */
+export function route(ctx: Context, text: string, all: Skill[], extra: string[] = []): RouteResult {
   const norm = normalize(text);
   const stageName = stageSkillName(ctx.PIPELINE_STATUS);
   const matched: RouteResult["matched"] = [];
@@ -76,6 +77,16 @@ export function route(ctx: Context, text: string, all: Skill[]): RouteResult {
       candidates.push({ skill: s, hits: hits.length });
       matched.push({ skill: s.name, by: hits[0] });
     }
+  }
+
+  // Classifier picks count as one hit; agreeing with a phrase match adds one.
+  for (const name of extra) {
+    const s = all.find((x) => x.name === name);
+    if (!s || s.name.startsWith("stage-") || (s.stages.length && !s.stages.includes(ctx.PIPELINE_STATUS))) continue;
+    const existing = candidates.find((c) => c.skill.name === name);
+    if (existing) existing.hits += 1;
+    else candidates.push({ skill: s, hits: 1 });
+    if (!matched.some((m) => m.skill === name)) matched.push({ skill: name, by: "classifier" });
   }
 
   // Conflicts: a winner drops the modules it suppresses, when both matched. Only a module that no

@@ -143,6 +143,14 @@ describe("runMessage", () => {
     expect(trace.subagents).toContain("routerFallback");
     expect(trace.usage.input).toBeGreaterThanOrEqual(300);
   });
+  it("union mode asks the classifier even when a phrase matched, and merges its picks", async () => {
+    const pick = { model: "claude-haiku-5-5", stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify({ modules: ["consultation"] }) }], usage: { input_tokens: 200, output_tokens: 10 } };
+    const c = fakeClient([pick, toolResponse("getClinicPackages", { clinicName: "Dr. Hakan" }), textResponse(baseReply({ response: "Sapphire is 3,200 USD with a 500 USD deposit." }))]);
+    const { trace } = await runMessage(buildContext(), "What does Dr. Hakan cost?", opts(c, { routerFallback: true, routerMode: "union" }));
+    expect(c.calls.length).toBe(3);
+    expect(c.calls[0].tools).toBeUndefined();
+    expect(trace.skillsLoaded).toEqual(expect.arrayContaining(["clinic-and-package-facts", "consultation"]));
+  });
   it("router fallback is skipped for acknowledgements, matched messages, and when turned off", async () => {
     for (const [text, on] of [["ok thanks", true], ["What does Dr. Hakan Clinic cost?", true], ["is the phone thing gratis", false]] as const) {
       const c = fakeClient([textResponse(baseReply({ response: "Sure." }))]);

@@ -148,3 +148,26 @@ describe("route cap", () => {
     expect(names(r)).toEqual(["carecredit", "payment", "travel", "stage-lead"]);
   });
 });
+
+describe("route with classifier picks (union mode)", () => {
+  it("adds extra modules as candidates, applies suppression and the cap, and records them", async () => {
+    const { loadSkills } = await import("../../src/pipeline/skills.js");
+    const { SKILLS_DIR } = await import("../../src/paths.js");
+    const real = loadSkills(SKILLS_DIR);
+    const ctx = buildContext();
+    const r = route(ctx, "does blue cross cover any of this?", real, ["health-insurance"]);
+    expect(r.skills.map((s) => s.name)).toContain("health-insurance");
+    expect(r.matched.find((m) => m.skill === "health-insurance")?.by).toBe("classifier");
+    const lead = buildContext({ PIPELINE_STATUS: "LEAD", COLLECTION_STATUS: "area unknown; name unknown; photos missing." });
+    const s = route(lead, "need to talk to my wife first", real, ["time-bound-pause"]);
+    expect(s.skills.map((x) => x.name)).not.toContain("collection");
+    const capped = route(ctx, "x", real, ["health-insurance", "carecredit", "financing-geography", "travel", "recovery"]);
+    expect(capped.skills.filter((x) => !x.name.startsWith("stage-")).length).toBeLessThanOrEqual(3);
+  });
+  it("ignores unknown or stage names from the classifier", async () => {
+    const { loadSkills } = await import("../../src/pipeline/skills.js");
+    const { SKILLS_DIR } = await import("../../src/paths.js");
+    const r = route(buildContext(), "hello", loadSkills(SKILLS_DIR), ["made-up", "stage-lead"]);
+    expect(r.skills.map((s) => s.name)).toEqual(["stage-pre-clinical-sent"]);
+  });
+});

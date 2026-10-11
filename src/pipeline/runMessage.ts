@@ -28,6 +28,8 @@ export interface RunOpts {
   callSummaries?: SummaryStore;
   /** When no module matched, ask a small classifier (default on; env ROUTER_FALLBACK=off turns it off). */
   routerFallback?: boolean;
+  /** "fallback": classifier only when no phrase matched (default). "union": classifier on every non-acknowledgement. Env ROUTER_MODE. */
+  routerMode?: "fallback" | "union";
 }
 
 /** Checks that are heuristics, not proof of a wrong reply. Everything else (invented links or prices, card digits, false handoff claims, banned promises) is hard. */
@@ -63,26 +65,25 @@ export async function runMessage(ctx: Context, text: string, opts: RunOpts): Pro
   // 2. Router: which policy modules this message needs, with conflicts settled in code.
   const skills = opts.skills ?? (defaultSkills ??= loadSkills(SKILLS_DIR));
   const core = opts.core ?? (defaultCore ??= loadPrompt("core"));
-  const routed = route(ctx, text, skills);
-  trace.skillsLoaded = routed.skills.map((s) => s.name);
-  trace.routing = routed.matched;
-  trace.suppressed = routed.suppressed;
-  if (!routed.stageSkill) trace.notes.push(`no stage module for ${ctx.PIPELINE_STATUS}`);
-
-  // 2b. Router fallback: no phrase matched and the message is more than an acknowledgement.
-  let chosen = routed.skills;
+  // Router fallback: a small classifier picks modules from one-line descriptions. In "fallback" mode it runs only
+  // when no phrase matched; in "union" mode it runs on every message that is more than an acknowledgement.
+  // Either way its picks go through the same conflict rules and cap as phrase matches.
+  let routed = route(ctx, text, skills);
   const fallbackOn = opts.routerFallback ?? process.env.ROUTER_FALLBACK !== "off";
-  const anyPolicy = chosen.some((s) => !s.name.startsWith("stage-"));
-  if (fallbackOn && !anyPolicy && !isAcknowledgement(text)) {
+  const mode = opts.routerMode ?? (process.env.ROUTER_MODE === "union" ? "union" : "fallback");
+  const anyPolicy = routed.skills.some((s) => !s.name.startsWith("stage-"));
+  if (fallbackOn && !isAcknowledgement(text) && (mode === "union" || !anyPolicy)) {
     const picked = await classifyModules(opts.deps, gate.redactedText, skills);
     trace.subagents.push("routerFallback");
     trace.usage = addUsage(trace.usage, picked.usage);
     if (picked.error) trace.notes.push(`router fallback: ${picked.error}`);
-    const extra = skills.filter((s) => picked.names.includes(s.name));
-    for (const s of extra) trace.routing.push({ skill: s.name, by: "classifier" });
-    chosen = [...chosen, ...extra].sort((a, b) => a.precedence - b.precedence || a.name.localeCompare(b.name));
-    trace.skillsLoaded = chosen.map((s) => s.name);
+    routed = route(ctx, text, skills, picked.names);
   }
+  const chosen = routed.skills;
+  trace.skillsLoaded = chosen.map((s) => s.name);
+  trace.routing = routed.matched;
+  trace.suppressed = routed.suppressed;
+  if (!routed.stageSkill) trace.notes.push(`no stage module for ${ctx.PIPELINE_STATUS}`);
 
   // 3. Side task: a call summary prepared ahead of time, added only when the patient asks about a call.
   const extras: string[] = [];
