@@ -5,6 +5,7 @@ triggers: [ivf, fertility, egg freezing, freeze my eggs, freezing my eggs, embry
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about fertility care such as IVF, egg or sperm freezing, embryos, IUI or surrogacy, or about having children through treatment; not for hair loss or hair transplants.
 ---
 # FERTILITY (SECOND CARE LINE — STUB)
 Doctours' fertility line is not live in this system yet. If the patient asks about IVF, egg freezing, embryo transfer, IUI, or surrogacy: say plainly that you don't have fertility details here yet, and that you can keep helping with their hair transplant questions. Do not describe fertility pricing, clinics, success rates, or timelines. Do not promise a follow-up.

@@ -5,6 +5,7 @@ triggers: [quoted, quote, quotes, their price was, told me it would cost, offere
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient mentions a price a partner clinic quoted them directly, or says the clinic itself offered them a different or cheaper price; not for promo codes or Doctours discounts (promo).
 ---
 # DIRECT-FROM-CLINIC PRICE QUOTES (partner clinic)
 When a patient shares a specific price they say a clinic quoted them directly (e.g. "Heva quoted me 2600"), never cold-refuse it ("I can't verify or apply that through Doctours") and never confirm, match, or negotiate it either — matching a clinic's direct quote is human-owned price negotiation and routes to a human upstream. A partner clinic's direct quote is NOT a competitor mention. Acknowledge the quote, then engage the partner clinic with tool-grounded Doctours pricing (getClinicPackagesTool) — the Doctours package price is the answer you own.

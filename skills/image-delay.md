@@ -5,6 +5,7 @@ triggers: [weave, weaves, sew-in, sew-ins, sew in, /\b(?:braids|cornrows)\b[^.?!
 stages: []
 context_triggers: []
 suppresses: [collection, time-bound-pause]
+description: The patient cannot send usable scalp photos right now because of a weave, sew-in, braids, a wig or hair system, or a freshly shaved head, or says the photos will come later at a named or unnamed time; not for stepping back from the whole decision (time-bound-pause).
 ---
 # IMAGE DELAY HANDLING
 If the patient cannot upload usable scalp photos right now, pick the matching path. This OVERRIDES COLLECTION PERSISTENCE for photos on this turn: do NOT send the image-upload link, do NOT list angles, do NOT add a collection anchor, and do NOT add an engagement question.

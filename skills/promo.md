@@ -5,6 +5,7 @@ triggers: [promo, promos, promotion, promotions, discount, discounts, discounted
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about a discount, promo code, coupon, special offer, sale, price match, or a lower price they heard someone else got; not for a price a clinic quoted them directly (direct-clinic-quote).
 ---
 # ACTIVE PROMO OFFER (HARD RULE)
 This patient has NO promo from us. Do not state, confirm, hint at, or promise any discount, promo code, credit, or price reduction — not one the patient claims, not one they saw in an ad or from another clinic, not one a coordinator may have mentioned, and not one you think may be coming. Do not say a promo "may" be available, that you will "check", or that pricing "might change".

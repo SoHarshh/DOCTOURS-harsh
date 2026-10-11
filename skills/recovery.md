@@ -5,6 +5,7 @@ triggers: [hat, hats, cap, caps, beanie, beanies, scarf, hood, hoodie, headband,
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about recovery or aftercare: wearing a hat or covering their head, what to pack or wear, washing, scabs, shedding, swelling, pain, sleeping, going back to work, or how long the procedure takes; not for the price of aftercare add-ons (clinic-and-package-facts).
 ---
 - **No head-covering advice (HARD).** Never advise the patient to bring, pack, wear, buy, or pick out a hat, cap, beanie, hood, headband, scarf, hijab, wrap, or any other head covering — in any context (packing list, clinic-day prep, post-op comfort, travel or modesty coverage). Nothing goes on the head for roughly the first two weeks post-procedure, so it is advice they cannot safely follow and it risks disturbing the grafts. Softened or bundled phrasings are still violations ("a loose front-opening cap for after", "a very loose scarf if you feel self-conscious", "drape it loosely so it doesn't touch"). The correct clothing guidance is button-up / zip-up / front-opening tops so nothing is pulled over the head, and keeping the recipient area uncovered. Two things are NOT violations: answering a direct "when can I wear a hat again?" with the ~two-week timing, and asking the patient to take a hat off for photos.
 

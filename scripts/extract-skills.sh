@@ -17,9 +17,12 @@ rm -f "$OUT"/*.md
 
 mk() { # name precedence triggers stages context_triggers suppresses ranges...
   local name="$1" prec="$2" trig="$3" stages="$4" ctx="$5" sup="$6"; shift 6
+  local d; d="$(desc "$name")"
   {
-    printf -- '---\nname: %s\nprecedence: %s\ntriggers: [%s]\nstages: [%s]\ncontext_triggers: [%s]\nsuppresses: [%s]\n---\n' \
+    printf -- '---\nname: %s\nprecedence: %s\ntriggers: [%s]\nstages: [%s]\ncontext_triggers: [%s]\nsuppresses: [%s]\n' \
       "$name" "$prec" "$trig" "$stages" "$ctx" "$sup"
+    if [ -n "$d" ]; then printf 'description: %s\n' "$d"; fi
+    printf -- '---\n'
     local first=1
     for r in "$@"; do
       [ "$first" = 1 ] || echo
@@ -27,6 +30,39 @@ mk() { # name precedence triggers stages context_triggers suppresses ranges...
       sed -n "${r}p" "$P"
     done
   } > "$OUT/$name.md"
+}
+
+# One sentence per policy module, in terms of patient intent, for the router's fallback classifier
+# (src/pipeline/classifier.ts). Written from each module's packet text; it says what the module is
+# NOT for when a neighbouring module is close. Stage modules need none: the classifier skips them.
+desc() {
+  case "$1" in
+    financing-geography) echo "The patient asks about paying over time in any wording: financing, monthly payments, instalments, a payment plan, Klarna, PayPal, Affirm or pay-later services, credit checks or approval, or financing they saw advertised; not for insurance or medical credit cards, which have their own modules." ;;
+    health-insurance) echo "The patient asks whether health insurance or any medical plan can pay for or reimburse the procedure, naming an insurer, Medicare, Medicaid, an employer plan, an HMO or PPO, a claim, a superbill, medical necessity, or HSA or FSA money; not for travel insurance or work-leave letters." ;;
+    carecredit) echo "The patient asks about paying with a medical credit card or healthcare lender such as CareCredit, Cherry or Alphaeon, including applying for one or using one for the deposit or the balance; not for Klarna, PayPal or general financing (financing-geography)." ;;
+    clinic-website) echo "The patient wants a clinic's website, web page, online listing, URL or link, or asks where they can read about or look up a clinic online; not for the clinic's phone number, WhatsApp or email (off-channel-requests)." ;;
+    payment-and-deposit) echo "The patient asks how paying works: the deposit and how to pay it, a payment or checkout link, card, cash, wire or other methods, when the remaining balance is due, refunds or cancelling, the price lock, layaway, or being ready to book and pay; not for financing or monthly plans (financing-geography) or money already paid to a clinic (deposit-eligibility)." ;;
+    promo) echo "The patient asks about a discount, promo code, coupon, special offer, sale, price match, or a lower price they heard someone else got; not for a price a clinic quoted them directly (direct-clinic-quote)." ;;
+    deposit-eligibility) echo "The patient says they already paid, or are about to pay, a deposit straight to a clinic outside Doctours, or asks whether such a clinic deposit can count toward, move into or replace a Doctours deposit; not for a deposit paid through Doctours (payment-and-deposit)." ;;
+    clinic-and-package-facts) echo "The patient asks about a specific clinic or package: prices, what is included, hotels and nights, airports, transport from their own hotel, which weekdays it can be booked, add-ons, sedation or pain control, the surgeons and who makes the incisions, hair type or afro specialty, comparing tiers or whether an upgrade is worth it, or where to buy finasteride or minoxidil; not for whether we work in a city or country (clinic-status-tiers)." ;;
+    clinic-status-tiers) echo "The patient asks which clinics we work with, whether we have a clinic in a city or country such as Mexico or Turkey, whether a named clinic is recommended or any good, or why a clinic is not recommended; not for the prices or packages of a clinic already known (clinic-and-package-facts)." ;;
+    assessment) echo "The patient asks about their assessment or treatment plan: when it will be ready, a status update, resending or opening the link, what the graft estimate, hairline drawing or donor area means, or wanting the hairline, grafts or recommended clinics changed; not for sending intake photos (collection)." ;;
+    image-delay) echo "The patient cannot send usable scalp photos right now because of a weave, sew-in, braids, a wig or hair system, or a freshly shaved head, or says the photos will come later at a named or unnamed time; not for stepping back from the whole decision (time-bound-pause)." ;;
+    time-bound-pause) echo "The patient is stepping back from the next decision rather than asking a question: they need time, want to think it over, are still comparing, are saving money, have things to sort out first, are waiting on a doctor or test, or will get back in touch later; not for a photo delay caused by their hair (image-delay)." ;;
+    consultation) echo "The patient asks about the free consultation call, such as whether it costs anything, whether it is by phone or video, who it is with, booking, confirming or rescheduling it, speaking with the surgeon or doctor before paying, or asks to be called; not for contacting the clinic itself (off-channel-requests)." ;;
+    off-channel-requests) echo "The patient asks us to do something beyond this reply: send or email a document, letter, invoice or form, contact or message the clinic for them, give out the clinic's phone, WhatsApp or email, hold or reserve a date, check which dates are open, arrange a hotel, transfer or driver, or return their photos; not for a clinic's website (clinic-website)." ;;
+    policy-grounding) echo "The patient asks how part of the service works where a guessed answer is easy to get wrong: financing terms or interest, whether a date is locked or guaranteed, the booking portal, drive times or distances, which airport is closer, airport transfers or pickup, or whether the consultation is by video; not for package prices (clinic-and-package-facts)." ;;
+    creator-partnership) echo "The person is an influencer, content creator or brand asking about a collaboration, sponsorship, affiliate deal, or a free or discounted procedure in exchange for content, or shares follower counts or a media kit; not for a patient who only mentions seeing an ad." ;;
+    fertility) echo "The patient asks about fertility care such as IVF, egg or sperm freezing, embryos, IUI or surrogacy, or about having children through treatment; not for hair loss or hair transplants." ;;
+    collection) echo "The patient talks about intake photos, such as taking, uploading or sending them, which angles, the upload page not working, or replying done, or describes their hair loss and which area bothers them, or gives their name; not for a photo delay caused by braids, a weave, a wig or shaving (image-delay)." ;;
+    reversibility) echo "The patient worries that a choice is permanent: what if they change their mind, whether they can switch clinic, package, add-ons or date later, whether the deposit is refundable or transferable, whether the plan is final, or they feel torn or unsure; not for stepping back from the whole decision (time-bound-pause)." ;;
+    direct-clinic-quote) echo "The patient mentions a price a partner clinic quoted them directly, or says the clinic itself offered them a different or cheaper price; not for promo codes or Doctours discounts (promo)." ;;
+    travel) echo "The patient asks about traveling for the procedure: passports or visas, flights and whether we help with them, when to arrive and leave, how long to stay, or trip timing; not for airport transfers or drive times (policy-grounding)." ;;
+    preferences-and-dates) echo "The patient states a preference or plan: leaning toward or choosing a clinic or package, being torn between options, or a month, season or rough timeframe for the procedure; not for which weekdays a package can be booked (clinic-and-package-facts)." ;;
+    why-doctours) echo "The patient asks why they should use Doctours instead of booking with a clinic directly, what Doctours adds, or about reviews and other patients' experiences." ;;
+    recovery) echo "The patient asks about recovery or aftercare: wearing a hat or covering their head, what to pack or wear, washing, scabs, shedding, swelling, pain, sleeping, going back to work, or how long the procedure takes; not for the price of aftercare add-ons (clinic-and-package-facts)." ;;
+    *) echo "" ;;
+  esac
 }
 
 # ---- stage modules (40): exactly one loads, chosen by pipeline status ----

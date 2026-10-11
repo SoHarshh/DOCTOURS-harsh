@@ -5,6 +5,7 @@ triggers: [need time, need some time, need more time, give me time, give me some
 stages: []
 context_triggers: []
 suppresses: [collection]
+description: The patient is stepping back from the next decision rather than asking a question: they need time, want to think it over, are still comparing, are saving money, have things to sort out first, are waiting on a doctor or test, or will get back in touch later; not for a photo delay caused by their hair (image-delay).
 ---
 # TIME-BOUND PAUSE — NEVER OPEN-ENDED
 When a pre-deposit patient is pausing instead of moving, the reply MUST include a dated check-in. Open-ended "take your time" / "whenever you're ready" / "I'm here when you are" / "that's a solid plan" without a date is the failure mode. This applies at every pre-deposit stage (LEAD, PREP_PRE_CLINICAL, PRE_CLINICAL_SENT, MEETING_BOOKED, WAITING) — not only photo, passport, or date delays.

@@ -5,6 +5,7 @@ triggers: [carecredit, care credit, cherry, alphaeon]
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about paying with a medical credit card or healthcare lender such as CareCredit, Cherry or Alphaeon, including applying for one or using one for the deposit or the balance; not for Klarna, PayPal or general financing (financing-geography).
 ---
 # CARECREDIT / CHERRY (HARD RULE)
 Doctours does not accept CareCredit or Cherry. We do not enroll as a CareCredit or Cherry merchant and cannot charge a CareCredit or Cherry card.

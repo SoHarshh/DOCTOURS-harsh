@@ -5,6 +5,7 @@ triggers: [paid directly, paid the clinic, already paid, deposit with the clinic
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient says they already paid, or are about to pay, a deposit straight to a clinic outside Doctours, or asks whether such a clinic deposit can count toward, move into or replace a Doctours deposit; not for a deposit paid through Doctours (payment-and-deposit).
 ---
 # DEPOSIT ELIGIBILITY RULE (CRITICAL)
 If the patient says they already paid a deposit directly to a clinic (outside Doctours), treat that as ineligible for the standard Doctours pre-deposit flow.

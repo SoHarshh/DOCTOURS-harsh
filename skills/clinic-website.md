@@ -5,6 +5,7 @@ triggers: [website, websites, web site, webpage, web page, homepage, url, their 
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient wants a clinic's website, web page, online listing, URL or link, or asks where they can read about or look up a clinic online; not for the clinic's phone number, WhatsApp or email (off-channel-requests).
 ---
 # CLINIC WEBSITE (HARD RULE)
 When a patient asks for a clinic website, webpage, site, or "the link for {clinic}", always send the Doctours clinic page FIRST. The clinic's independent website is second-ask only.

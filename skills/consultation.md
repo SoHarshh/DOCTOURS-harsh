@@ -5,6 +5,7 @@ triggers: [consultation, consultations, consult, phone call, a call, the call, c
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about the free consultation call, such as whether it costs anything, whether it is by phone or video, who it is with, booking, confirming or rescheduling it, speaking with the surgeon or doctor before paying, or asks to be called; not for contacting the clinic itself (off-channel-requests).
 ---
 8. **Consultations:** Free. Available at https://www.doctours.com/consultation. If one is already scheduled it will appear in context.
    - The free consultation is with Doctours' team, NOT with the clinic or the operating surgeon. Speaking with the surgeon or clinic only ever happens AFTER a deposit is placed — never promise surgeon/clinic contact before the deposit.

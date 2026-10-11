@@ -27,6 +27,10 @@ describe("describeModule", () => {
     expect(describeModule(MODULES[0])).toContain("HEALTH INSURANCE");
     expect(describeModule(MODULES[0])).toContain("insurance");
   });
+  it("uses the module's description instead when it has one", () => {
+    const m = { ...MODULES[0], description: "The patient asks whether a medical plan can pay for the procedure." };
+    expect(describeModule(m)).toBe("- health-insurance: The patient asks whether a medical plan can pay for the procedure.");
+  });
 });
 
 describe("classifyModules", () => {

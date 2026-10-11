@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
-import { loadSkills, type Skill } from "../../src/pipeline/skills.js";
+import { loadSkills, parseSkill, type Skill } from "../../src/pipeline/skills.js";
 import { route, MAX_MODULES } from "../../src/pipeline/router.js";
 import { buildContext, type Context } from "../../src/context/buildContext.js";
 import { ROOT, SKILLS_DIR } from "../../src/paths.js";
@@ -60,6 +60,41 @@ describe("skill files", () => {
     const packet = new Set(readFileSync(join(ROOT, "pre-deposit-respond-packet.md"), "utf8").split("\n"));
     for (const s of all.filter((x) => x.name !== "fertility")) {
       for (const line of s.body.split("\n")) if (line.trim()) expect(packet.has(line), `${s.name}: ${line.slice(0, 60)}`).toBe(true);
+    }
+  });
+});
+
+describe("module descriptions (for the fallback classifier)", () => {
+  const words = (t: string) => t.toLowerCase().replace(/[^a-z0-9' ]+/g, " ").split(/\s+/).filter(Boolean);
+  it("parses an optional one-line description, colons and commas included", () => {
+    expect(parseSkill("d.md", "---\nname: d\ndescription: The patient asks about X: Y, or Z.\n---\nbody").description).toBe("The patient asks about X: Y, or Z.");
+    expect(parseSkill("e.md", "---\nname: e\n---\nbody").description).toBeUndefined();
+  });
+  it("every policy module says, in one sentence of patient intent, when it is needed", () => {
+    for (const s of all.filter((x) => !x.name.startsWith("stage-"))) {
+      expect(s.description, s.name).toMatch(/^The (?:patient|person) /);
+      expect(s.description!.length, s.name).toBeGreaterThan(60);
+      expect(s.description!.length, s.name).toBeLessThan(500);
+      expect(s.description!.split(/(?<=[.?!])\s+(?=[A-Z])/).length, `${s.name}: one sentence`).toBe(1);
+    }
+  });
+  it("descriptions share no six-word run with any test case message", () => {
+    const dirs = ["tests/cases", "tests/heldout", "tests/external", "tests/escalation-stress"].map((d) => join(ROOT, d)).filter((d) => existsSync(d));
+    const files = [...dirs.flatMap((d) => readdirSync(d).filter((f) => f.endsWith(".json")).map((f) => join(d, f))), join(ROOT, "tests", "packet-messages.json")].filter((f) => existsSync(f));
+    const grams = new Set<string>();
+    for (const f of files) {
+      const data = JSON.parse(readFileSync(f, "utf8"));
+      for (const c of Array.isArray(data) ? data : Object.values(data).flat()) {
+        if (typeof (c as any)?.text !== "string") continue;
+        const w = words((c as any).text);
+        for (let i = 0; i + 6 <= w.length; i++) grams.add(w.slice(i, i + 6).join(" "));
+      }
+    }
+    expect(grams.size).toBeGreaterThan(100);
+    for (const s of all) {
+      if (!s.description) continue;
+      const w = words(s.description);
+      for (let i = 0; i + 6 <= w.length; i++) expect(grams.has(w.slice(i, i + 6).join(" ")), `${s.name}: "${w.slice(i, i + 6).join(" ")}"`).toBe(false);
     }
   });
 });

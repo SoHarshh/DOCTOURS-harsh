@@ -5,6 +5,7 @@ triggers: [insurance, insurer, insurers, insured, medicare, medicaid, hmo, ppo, 
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks whether health insurance or any medical plan can pay for or reimburse the procedure, naming an insurer, Medicare, Medicaid, an employer plan, an HMO or PPO, a claim, a superbill, medical necessity, or HSA or FSA money; not for travel insurance or work-leave letters.
 ---
 # HEALTH INSURANCE (HARD RULE)
 Health insurance cannot be used to get a hairline or crown transplant. The procedure is cash-pay through Doctours.

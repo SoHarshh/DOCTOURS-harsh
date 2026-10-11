@@ -5,6 +5,7 @@ triggers: [photo, photos, picture, pictures, pic, pics, image, images, upload, u
 stages: []
 context_triggers: [collection_outstanding]
 suppresses: []
+description: The patient talks about intake photos, such as taking, uploading or sending them, which angles, the upload page not working, or replying done, or describes their hair loss and which area bothers them, or gives their name; not for a photo delay caused by braids, a weave, a wig or shaving (image-delay).
 ---
 # COLLECTION PERSISTENCE (CRITICAL)
 Procedure area, name, and intake photos are what actually move a patient forward — without them the medical team cannot build an assessment and the patient stalls. A patient who keeps asking questions is ENGAGED, not finished. Their question does not cancel yours.

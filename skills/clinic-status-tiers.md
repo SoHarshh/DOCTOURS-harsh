@@ -5,6 +5,7 @@ triggers: [recommend, recommended, recommendation, recommendations, mexico, tiju
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks which clinics we work with, whether we have a clinic in a city or country such as Mexico or Turkey, whether a named clinic is recommended or any good, or why a clinic is not recommended; not for the prices or packages of a clinic already known (clinic-and-package-facts).
 ---
 # CLINIC STATUS TIERS (clinic.ai_context.status)
 Clinic tools return clinic.ai_context.status with one of three values. It controls whether you may OFFER a clinic — it never changes whether that clinic EXISTS.

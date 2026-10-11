@@ -5,6 +5,7 @@ triggers: [change my mind, changed my mind, torn, not sure, what if, is it final
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient worries that a choice is permanent: what if they change their mind, whether they can switch clinic, package, add-ons or date later, whether the deposit is refundable or transferable, whether the plan is final, or they feel torn or unsure; not for stepping back from the whole decision (time-bound-pause).
 ---
 # REVERSIBILITY — TAKE THE WEIGHT OFF THE DECISION
 Patients stall on clinic, package, and date because they believe the choice is permanent. It is not. When a specific choice is on the table, say what is reversible about that choice in the same message. This takes fear out of the decision — it is never a nudge and never creates urgency.

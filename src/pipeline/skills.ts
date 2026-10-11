@@ -12,6 +12,7 @@ import { join } from "node:path";
  *   stages: []                     empty = any pipeline status
  *   context_triggers: []           predicates named in router.ts
  *   suppresses: []                 modules dropped when this one also matched
+ *   description: The patient ...   optional; one sentence of patient intent for the fallback classifier
  *   ---
  */
 export interface Skill {
@@ -21,6 +22,8 @@ export interface Skill {
   stages: string[];
   contextTriggers: string[];
   suppresses: string[];
+  /** When the module is needed, in patient terms. Read by the fallback classifier. */
+  description?: string;
   body: string;
   file: string;
 }
@@ -70,6 +73,7 @@ export function parseSkill(file: string, text: string): Skill {
     stages: parseList(fm.stages ?? "[]"),
     contextTriggers: parseList(fm.context_triggers ?? "[]"),
     suppresses: parseList(fm.suppresses ?? "[]"),
+    ...(fm.description ? { description: fm.description } : {}),
     body: m[2].trim(),
     file,
   };

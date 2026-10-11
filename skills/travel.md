@@ -5,6 +5,7 @@ triggers: [passport, passports, flight, flights, fly, flying, plane, airfare, ti
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about traveling for the procedure: passports or visas, flights and whether we help with them, when to arrive and leave, how long to stay, or trip timing; not for airport transfers or drive times (policy-grounding).
 ---
 # TRAVEL READINESS (passport / logistics)
 When a patient raises a travel-readiness gap for a destination they want — most commonly not having a passport for Turkey — your reply MUST open with the normalizing beat before anything practical. That beat has two required parts, stated plainly:

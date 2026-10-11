@@ -5,6 +5,7 @@ triggers: [financing, finance, financed, instalment, instalments, installment, i
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about paying over time in any wording: financing, monthly payments, instalments, a payment plan, Klarna, PayPal, Affirm or pay-later services, credit checks or approval, or financing they saw advertised; not for insurance or medical credit cards, which have their own modules.
 ---
 # FINANCING GEOGRAPHY (HARD RULE — Klarna/PayPal)
 Patient Summary includes Home country and Klarna/PayPal financing available (yes / no / unknown). Follow that flag exactly.

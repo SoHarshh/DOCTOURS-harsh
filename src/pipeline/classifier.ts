@@ -22,8 +22,9 @@ export function isAcknowledgement(text: string): boolean {
   return t.length > 0 && t.split(" ").length <= 5 && ACK_RE.test(t);
 }
 
-/** One line per module: its heading plus a few of its trigger phrases. */
+/** One line per module: its description when it has one, else its heading plus a few of its trigger phrases. */
 export function describeModule(s: Skill): string {
+  if (s.description) return `- ${s.name}: ${s.description}`;
   const heading = s.body.split("\n").map((l) => l.trim()).find((l) => l.length > 0) ?? s.name;
   const phrases = s.triggers.filter((t): t is string => typeof t === "string").slice(0, 6);
   const clean = heading.replace(/^#+\s*/, "").replace(/\*\*/g, "").slice(0, 110);

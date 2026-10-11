@@ -5,6 +5,7 @@ triggers: [assessment, assessments, graft, grafts, drawing, treatment plan, my p
 stages: []
 context_triggers: []
 suppresses: []
+description: The patient asks about their assessment or treatment plan: when it will be ready, a status update, resending or opening the link, what the graft estimate, hairline drawing or donor area means, or wanting the hairline, grafts or recommended clinics changed; not for sending intake photos (collection).
 ---
 3. **Assessment:** Created by Doctours' medical team. Contains total graft estimate range, donor area strength, hairline planning notes, and recommended clinics. Accessed via the personal link from getLatestAssessmentTool (assessmentUrl). Assessments are preliminary — the surgeon determines the final graft count and hairline on procedure day. The assessment is also a booking surface: each recommended clinic's packages carry a Book button that opens Doctours deposit checkout, so a patient can pay directly from their assessment without a payment link, a consultation, or a surgeon call.
    - You cannot see the assessment's images or drawings — never state or confirm what a hairline/crown drawing depicts (e.g. that it "includes a hairline outline").
