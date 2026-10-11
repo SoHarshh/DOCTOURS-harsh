@@ -14,12 +14,17 @@ import { zeroUsage, type Usage } from "../types.js";
 
 const MAX = 3;
 
-const ACK_RE = /^(?:ok(?:ay)?|k|kk|cool|great|nice|perfect|sounds good|got it|thanks?|thank you|ty|thx|lol|haha|awesome|sure|yes|yep|yeah|no worries|talk soon|will do|alright|appreciate it|[\p{Emoji}\s])+[\s,.!]*$/iu;
+// No two alternatives may match the same text ("k" and "kk" did): a long run of such letters that then fails
+// makes the regex try every split, which takes seconds at 30 characters and hangs at 50.
+const ACK_RE = /^(?:ok(?:ay)?|k|cool|great|nice|perfect|sounds good|got it|thanks?|thank you|ty|thx|lol|haha|awesome|sure|yes|yep|yeah|no worries|talk soon|will do|alright|appreciate it|[\p{Emoji}\s])+[\s,.!]*$/iu;
+
+/** Longer than any acknowledgement; also bounds the regex's work on odd input. */
+const MAX_ACK_CHARS = 80;
 
 /** "ok thanks", "👍", "great, talk soon": nothing to route. */
 export function isAcknowledgement(text: string): boolean {
   const t = text.trim().toLowerCase().replace(/[,.!]+/g, " ").replace(/\s+/g, " ").trim();
-  return t.length > 0 && t.split(" ").length <= 5 && ACK_RE.test(t);
+  return t.length > 0 && t.length <= MAX_ACK_CHARS && t.split(" ").length <= 5 && ACK_RE.test(t);
 }
 
 /** One line per module: its description when it has one, else its heading plus a few of its trigger phrases. */

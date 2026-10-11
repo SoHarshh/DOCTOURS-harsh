@@ -40,9 +40,10 @@ const IDENTITY = /\b(?:are you|is this|am i (?:talking|speaking|chatting) (?:to|
 // "will I talk to a person on the call?", "do I need a person to drive me?" ask how something works
 const INFO_QUESTION = /\b(?:will|do|does|did|should)\s+(?:i|we)\s+(?:get to\s+)?(?:talk|speak|chat|need)\b/i;
 
-// 13-19 digits, separators of up to three spaces, dots or dashes; not glued to word characters,
-// dashes (UUIDs) or a leading "+" (international phone numbers)
-const CARD_RUN_SRC = "(?<![\\w+-])\\d(?:[ .\\-]{0,3}\\d){12,18}(?![\\w-])";
+// 13-19 digits, separators of up to three whitespace characters (line breaks too, so a number split
+// across lines still counts), dots or dashes; not glued to word characters, dashes (UUIDs) or a
+// leading "+" (international phone numbers)
+const CARD_RUN_SRC = "(?<![\\w+-])\\d(?:[\\s.\\-]{0,3}\\d){12,18}(?![\\w-])";
 const CARD_RUN_G = new RegExp(CARD_RUN_SRC, "g");
 const CARD_WORD = /\b(?:card|visa|mastercard|amex|discover|credit|debit|cvv|cvc|exp|expiry|expires)\b/i;
 const CARD_ENDING = /\b(?:card|visa|mastercard|amex|discover)\b[^.?!]{0,30}\b(?:ending|ends|last (?:four|4)|last digits?)\b[^.?!]{0,12}\b\d{4}\b/i;
