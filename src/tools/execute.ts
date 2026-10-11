@@ -20,5 +20,11 @@ export function executeTool(name: string, input: unknown, log: ToolLog, override
   if (key in overrides) return log.record(name, input, overrides[key]);
   const fn = TABLE[key];
   if (!fn) return log.record(name, input, { error: `unknown tool ${name}` });
-  return log.record(name, input, fn(input ?? {}));
+  try {
+    return log.record(name, input, fn(input ?? {}));
+  } catch (e) {
+    // A bad argument (e.g. a number where a name was expected) must not end the turn; the model sees the error.
+    log.record(name, input, null);
+    return JSON.stringify({ error: `tool ${name} failed: ${e instanceof Error ? e.message : String(e)}` });
+  }
 }

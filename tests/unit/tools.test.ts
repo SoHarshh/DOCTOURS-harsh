@@ -50,3 +50,12 @@ describe("executeTool + ToolLog", () => {
     expect(log.slugs()).toEqual(new Set(["heva", "dr-hakan"]));
   });
 });
+
+describe("review minors", () => {
+  it("a tool that throws returns an error result instead of ending the turn", () => {
+    const log = new ToolLog();
+    const out = executeTool("getClinicPackages", { clinicName: 123 }, log);
+    expect(out).toMatch(/error/);
+    expect(log.calls[0].ok).toBe(false);
+  });
+});
