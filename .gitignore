@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+.env.*
+*.log
+.DS_Store
+
+# local only, not part of the deliverable
+CLAUDE.md
+pre-deposit-respond-packet.md
