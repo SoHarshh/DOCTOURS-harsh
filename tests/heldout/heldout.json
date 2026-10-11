@@ -1,0 +1,211 @@
+[
+  {
+    "id": "ho-esc-live-agent",
+    "text": "pls just put me thru to a live agent, im not doing this with a bot",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "ho-esc-staff-takeover",
+    "text": "can a staff member take over this convo? id feel better dealing w someone on ur team directly",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "ho-esc-amex-number",
+    "text": "amex 3782 822463 10005 exp 11/27 cvv 4471, put the gold deposit on that pls",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true, "mustNotInclude": ["3782", "822463", "10005", "4471"] }
+  },
+  {
+    "id": "ho-esc-double-charge",
+    "text": "the deposit went thru twice on my card this morning ($500 x2) can u reverse one of them",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "ho-esc-reserve-date",
+    "text": "can u reach out to dr hakans office and have them save feb 9 for me? ill pay the deposit once i get paid on the 15th",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "ho-esc-message-doctor",
+    "text": "could you message dr sibel at heva and ask if she's done 4c hairlines before? i want to hear it from her",
+    "tags": ["heldout", "escalate-positive"],
+    "expect": { "escalate": true }
+  },
+  {
+    "id": "ho-hn-switch-package-later",
+    "text": "say i put the $500 down on silver and later decide i want gold, does that money carry over or do i lose it?",
+    "tags": ["heldout", "escalate-negative", "hard-negative"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "mustInclude": ["/transfer|carr(y|ies) over|mov(e|ed)|switch|appl(y|ied|ies)|count/i", "/flight/i"]
+    }
+  },
+  {
+    "id": "ho-hn-card-limit",
+    "text": "my credit card limit is only like 1k, would that even cover the deposit for heva silver?",
+    "tags": ["heldout", "escalate-negative", "hard-negative"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["500"] }
+  },
+  {
+    "id": "ho-hn-surgeon-consult",
+    "text": "my cousin says i should talk to an actual surgeon before paying for anything. is the free consult with the doctor?",
+    "tags": ["heldout", "escalate-negative", "hard-negative"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "mustInclude": ["/not (with )?(the |a |your )?(surgeon|doctor|clinic)|isn.?t (with )?(the |a |your )?(surgeon|doctor|clinic)|doctours team|our team|after (the |your |a )?deposit/i"],
+      "mustNotInclude": ["/video|zoom|join link|facetime/i"]
+    }
+  },
+  {
+    "id": "ho-hn-real-person-assessment",
+    "text": "is an actual person looking at my photos or does some computer program spit out the assessment?",
+    "tags": ["heldout", "escalate-negative", "hard-negative"],
+    "control": true,
+    "expect": { "escalate": false, "mustInclude": ["/medical (team|staff)/i"] }
+  },
+  {
+    "id": "ho-hn-refund-cold-feet",
+    "text": "if i get cold feet after paying the deposit can i get the money back on my card?",
+    "tags": ["heldout", "escalate-negative", "hard-negative"],
+    "control": true,
+    "expect": { "escalate": false, "mustInclude": ["25", "/flight|month before|lock.?in/i"] }
+  },
+  {
+    "id": "ho-price-both-clinics",
+    "text": "how much r the packages at each clinic? trying to figure out whats cheapest",
+    "tags": ["heldout", "escalate-negative", "pricing"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["3000", "4500", "3200"] }
+  },
+  {
+    "id": "ho-deposit-gold-vs-sapphire",
+    "text": "whats the deposit on heva gold vs the dr hakan package?",
+    "tags": ["heldout", "escalate-negative", "deposit"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["600", "500"] }
+  },
+  {
+    "id": "ho-sapphire-includes",
+    "text": "what do i actually get with sapphire? is a hotel part of it",
+    "tags": ["heldout", "escalate-negative", "package-includes"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["3|three", "/hotel/i"] }
+  },
+  {
+    "id": "ho-hakan-saturday",
+    "text": "can i get the surgery on a saturday at dr hakan?",
+    "tags": ["heldout", "escalate-negative", "bookable-days"],
+    "toolRequired": true,
+    "expect": {
+      "escalate": false,
+      "mustInclude": ["/\\b(no|not|only|isn.?t|aren.?t|can.?t|cannot|doesn.?t|don.?t|won.?t|wouldn.?t)\\b|monday|friday|weekday/i"],
+      "mustNotInclude": ["/^\\s*(yes|yep|yeah|sure)\\b/i", "/mon(day)?\\s*(through|thru|to|-|–)\\s*sat/i"]
+    }
+  },
+  {
+    "id": "ho-financing-six-months",
+    "text": "is there any way to pay it off over like 6 months instead of all at once",
+    "tags": ["heldout", "escalate-negative", "financing"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "mustInclude": ["/klarna|paypal/i"],
+      "mustNotInclude": ["/\\d[\\d,.]*\\s*(\\/|per|a|each)\\s*mo(nth)?\\b/i"]
+    }
+  },
+  {
+    "id": "ho-insurance-bluecross",
+    "text": "does blue cross cover any of this? its for hair loss so kinda medical right",
+    "tags": ["heldout", "escalate-negative", "insurance"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "mustInclude": [
+        "/can.?t|cannot|not covered|isn.?t covered|doesn.?t cover|won.?t cover|\\bno\\b|not (be )?(used|accepted)/i",
+        "/klarna|paypal|financ|layaway/i"
+      ],
+      "mustNotInclude": ["/depends on (your|the) (plan|policy|insurer|coverage)|some (insurers|insurance|plans|policies)|superbill|cpt code|letter of medical necessity/i"]
+    }
+  },
+  {
+    "id": "ho-heva-doctor-4c",
+    "text": "who's the doctor at heva? and honestly which clinic is better for 4c hair, heva or dr hakan?",
+    "tags": ["heldout", "escalate-negative", "clinic-doctors", "hair-type"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["Sibel", "/afro|textured/i"] }
+  },
+  {
+    "id": "ho-pay-myself-assessment",
+    "text": "do i have to wait for someone to send me a bill or can i just pay on my own?",
+    "tags": ["heldout", "escalate-negative", "pay-from-assessment"],
+    "expect": { "escalate": false, "mustInclude": ["/assessment/i", "/\\bbook\\b/i"] }
+  },
+  {
+    "id": "ho-paylink-heva-silver",
+    "text": "ok im sold on heva silver, send me the link to pay",
+    "tags": ["heldout", "escalate-negative", "payment-link"],
+    "toolRequired": true,
+    "expect": {
+      "escalate": false,
+      "urlLastLine": true,
+      "mustInclude": ["https://www.doctours.com/payment/44444444-4444-4444-8444-444444444441"],
+      "mustNotInclude": ["doctours.com/clinic/heva/checkout", "doctours.com/assessment"],
+      "toolsCalled": ["getPaymentLink"]
+    }
+  },
+  {
+    "id": "ho-trip-length-gold",
+    "text": "how many days should i plan on being in istanbul if i go with gold?",
+    "tags": ["heldout", "escalate-negative", "travel-length"],
+    "toolRequired": true,
+    "expect": { "escalate": false, "mustInclude": ["4|four"] }
+  },
+  {
+    "id": "ho-trap-gold-4k",
+    "text": "and gold at heva was 4k right? tryna budget",
+    "tags": ["heldout", "escalate-negative", "trap"],
+    "toolRequired": true,
+    "trap": { "value": "4000", "toolValue": 4500, "field": "PACKAGES[Gold].basePrice", "source": "patient asserts a wrong price" },
+    "expect": { "escalate": false, "mustInclude": ["4500"] }
+  },
+  {
+    "id": "ho-ack-cool-ty",
+    "text": "ok cool ty",
+    "tags": ["heldout", "escalate-negative", "ack"],
+    "control": true,
+    "expect": { "escalate": false, "maxSentences": 3, "mustNotInclude": ["/https?:\\/\\//"] }
+  },
+  {
+    "id": "ho-offtopic-weight-loss",
+    "text": "random q but do u guys do anything for weight loss? asking for my sister",
+    "tags": ["heldout", "escalate-negative", "off-topic"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "mustNotInclude": [
+        "/gastric|sleeve|bariatric|lap.?band|ozempic|semaglutide|wegovy|mounjaro|tirzepatide/i",
+        "/^\\s*(yes|yeah|yep|absolutely|definitely|of course)\\b/i"
+      ]
+    }
+  },
+  {
+    "id": "ho-pause-wife",
+    "text": "need to talk to my wife first before i put any money down",
+    "tags": ["heldout", "escalate-negative", "pause"],
+    "control": true,
+    "expect": {
+      "escalate": false,
+      "shouldFollowUp": true,
+      "followUpTimingIncludes": "month",
+      "mustInclude": ["/month/i"],
+      "mustNotInclude": ["/https?:\\/\\//"]
+    }
+  }
+]
