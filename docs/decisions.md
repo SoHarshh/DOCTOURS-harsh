@@ -288,3 +288,19 @@ Changes, each with tests:
 Union did not help and broke the latency rule on the external set. Fallback stays the default; union remains available with `ROUTER_MODE=union`.
 
 Remaining ambiguities: "can you just call me instead?" now escalates (3 of 3) under the callback rule, while the dev set expected an answer; "move my direct Heva deposit into Doctours now" gets the direct-deposit answer (new deposit needed) in 2 of 3, while the external set expected a handoff. Both readings are defensible from the brief.
+
+## 20. Final runs, blind sets, and after the freeze
+
+The system was frozen at commit 8ec6390 and run once on all five sets (`results/runs/final/`). The two sets written blind during the generalization round (escalation stress, robustness) were scored only then.
+
+| Set | Original | New (frozen) | Paired difference |
+|---|---|---|---|
+| Escalation stress (blind) | 67.8% | 96.7% | +28.9 (SE 6.5) |
+| Robustness (blind) | 78.3% | 90.6% | +12.2 (SE 5.4) |
+| External | 68.3% | 92.5% | +24.2 (SE 3.9) |
+| Held-out | 74.7% | 100% | +25.3 (SE 8.5) |
+| Dev | 78.5% | 98.8% | +20.2 (SE 3.8) |
+
+The honest reading: the lead is in handoffs. On blind cases that should not escalate, the systems are within noise of each other (95.0% vs 97.5% stress, 88.9% vs 90.8% robustness). The new system is faster and about half the cost on every set.
+
+Three general bugs from the blind sets were fixed after scoring (commits 2b964ec, 7b55b31, f5e2652): past-patient phrasing in the pre-gate, refund-terms questions read as refund requests, and pause signals in multi-question messages. A regression run stopped partway when the API credit ran out; on the 636 turns both versions completed, passes went 606 to 608, false escalations 3 to 0, missed escalations 3 to 4. Not blind, not used in the headline.

@@ -4,51 +4,63 @@ The original system drafted every patient reply from one 800-line prompt and had
 
 ## Results
 
-Both systems use the same model (`claude-haiku-5-5`), the same 14 tools, the same output format, and the same prompt caching. Only the system around the model differs. Every case runs 3 times per system and is scored by code.
+Both systems use the same model (`claude-haiku-5-5`), the same 14 tools, the same output format, and the same prompt caching. Only the system around the model differs. Every case runs 3 times per system, is scored by code, and the comparison is made case by case.
 
-**Headline, on 25 cases neither system was ever tuned on** (written blind from the brief by a separate agent that never saw either system's output):
+**Headline: two sets written blind by separate agents, scored once on the frozen system.** Nobody tuned the system on them.
 
-| | Original prompt | New system |
-|---|---|---|
-| Pass rate | 74.7% | **89.3%** |
-| Cases that must escalate, handled right | 83.3% | **100%** |
+| Blind set | What it tests | Original prompt | New system | Per case, new minus original |
+|---|---|---|---|---|
+| Escalation stress (60 cases) | 20 must-escalate, 40 look-alikes that must not, 19 minimal pairs | 67.8% | **96.7%** | +28.9 points (SE 6.5) |
+| Robustness (60 cases) | Multi-question, messy, emotional, adversarial, non-English, answers not in the data | 78.3% | **90.6%** | +12.2 points (SE 5.4) |
 
-**Every measurement:**
+**Every set:**
 
-| Test set | What it is | Original | New |
+| Test set | Written by | Original | New |
 |---|---|---|---|
-| The brief's 5 sample messages | The only expected replies we were given, scored by the brief's own rule | 3 of 15 runs | **15 of 15** |
-| Held-out, blind (25 cases) | Written from the brief only; run before any change was made because of it | 74.7% | **89.3%** |
-| Dev set, first run (107 cases) | Written from the original prompt's rules; first run, before any tuning | 76.0% | **93.5%** |
-| Dev set, final (107 cases) | After fixing what the runs exposed; optimistic, since fixes were found on these cases | 76.0% | **99.4%** |
-| Held-out, after the router fallback | No longer blind: its failures motivated the fallback | 74.7% | **100%** |
+| The brief's 5 sample messages | The brief | 3 of 15 runs | **15 of 15** |
+| Escalation stress (60) | Fresh agent, brief only | 67.8% | **96.7%** |
+| Robustness (60) | Fresh agent, brief only | 78.3% | **90.6%** |
+| External (120) | A different model, brief only | 68.3% | **92.5%** |
+| Held-out (25) | Fresh agent, brief only | 74.7% | **100%** |
+| Dev (107) | Us, from the original prompt's rules | 78.5% | **98.8%** |
 
-**Split by kind of case** (dev set, final):
+The external, held-out and dev sets were each used to find and fix problems after their first blind run, so their final numbers are optimistic. Their first runs were 86.4%, 89.3% and 93.5%.
+
+**Handoffs** (frozen system):
+
+| Set | Must-escalate missed, original → new | False escalations, original → new |
+|---|---|---|
+| Escalation stress | 26 of 60 → **0** | 0 of 120 → 5 |
+| Robustness | 11 of 27 → **0** | 6 of 153 → **1** |
+| External | 37 of 75 → **3** | 3 of 285 → **0** |
+
+**Speed and cost** (replies that reached the model):
 
 | | Original | New |
 |---|---|---|
-| Must escalate (51 runs) | 3.9% | **100%** |
-| Everything else (270 runs) | 89.6% | **99.3%** |
-| Escalation precision (handoffs that were right) | 90.9% | **100%** |
+| Median latency | 5.2 to 6.9 s | **3.6 to 4.9 s** |
+| Slowest 5% | 9.4 to 13.4 s | **6.8 to 9.0 s** |
+| Prompt size per message | 167k characters | **40k to 48k characters** |
+| Cost per 1,000 replies | $1.78 to $2.03 | **$0.81 to $1.18** |
 
-**Speed and cost** (dev set, final; latency over replies that reached the model):
+What the numbers say, plainly:
 
-| | Original | New |
-|---|---|---|
-| Median latency | 5.3 s | **3.7 s** |
-| Slowest 5% | 9.8 s | **7.2 s** |
-| Prompt size per message | 167k characters | **40k characters** |
-| Cost per 1,000 replies | $1.72 | **$0.86** |
-| Handoffs answered with no model call | 0 | 33 of 321 |
+- **The lead is in handoffs.** The original prompt has no handoff rule; it missed 41% to 49% of the messages that needed a person on the three independent sets, and when it did flag one it kept writing a sales answer. The new system misses almost none, and code writes the one-sentence handoff.
+- **On everything else the two are about even on unseen messages.** On blind cases that should not escalate, the original scored 97.5% and 90.8% and the new system 95.0% and 88.9%, within the noise. An independent audit of the external set reached the same conclusion. The restructuring did not make ordinary answers better on new wording; it made them cheaper, faster, traceable and testable, without making them worse.
+- **The new system's remaining errors on blind sets** were a pre-gate false handoff ("my girlfriend wants to talk to someone who's been through it"), refund-terms questions read as refund requests, and pause signals inside a multi-question message. These were fixed after the freeze; see "After the freeze" below.
+- **It is faster and cheaper on every set.**
 
-What the numbers say:
+Every reply and trace is in [`results/runs/`](results/runs/). Per-set tables are in [`results/runs/final/`](results/runs/final/), with an independent audit of the scoring. Every decision and fix is in [`docs/decisions.md`](docs/decisions.md).
 
-- **Escalation is the biggest difference.** The original prompt has no handoff rule. When a patient asked for a person it often set the flag, then kept writing a sales answer. The new system hands off in one sentence written by code.
-- **On everything else the original prompt was already decent** (about 90%). The new system's first, untuned run was only about 3 points better there. The fixes that followed came from studying failures, which is why the blind held-out number is the one to trust.
-- **The new system's main weakness is new wording.** On the blind set, two messages missed their policy module because no trigger phrase matched ("does blue cross cover any of this?", "need to talk to my wife first"). A small fallback classifier now handles messages no phrase matches. It fixed both, but that result is no longer blind.
-- **It is faster and cheaper,** because each message reads about a quarter of the prompt.
+### After the freeze
 
-Each run is in [`results/runs/`](results/runs/) with every reply and trace. [`results/compare.md`](results/compare.md) has the full table by policy area. Every fix, and why, is in [`docs/decisions.md`](docs/decisions.md).
+Three bugs the blind sets exposed were fixed after their scores were recorded, each as a general rule with tests for its look-alikes:
+
+- The pre-gate handed off "my girlfriend wants to talk to someone who's been through it". Talking to a past patient is no longer read as asking for staff.
+- "If I change my mind after the deposit, can I get it back?" was sometimes read as a refund request. A what-if about refund terms is now named as a normal answer.
+- A pause inside a multi-question message ("does Silver include the hotel? I'll need a few weeks to talk it over with my wife") did not load the pause rules. It now does.
+
+A regression run on all five sets stopped partway when the API credit ran out (held-out finished; the others completed 29% to 69% of their turns). On the 636 turns both versions completed, the results were unchanged within run-to-run noise: 606 passes before, 608 after; false escalations 3 before, 0 after; missed escalations 3 before, 4 after. Each targeted case that ran now passes. These numbers are not blind and are not used in the headline. Runs are in `results/runs/postfreeze/`.
 
 ## Run it
 
@@ -67,18 +79,18 @@ The command that answers messages reads a JSON array of `{ "id", "text" }` and w
 npm run -s reply -- --in messages.json --out replies.json
 ```
 
-Use `-s` (or `--out`) so npm's banner does not end up in the JSON. API errors are retried; a message that still fails is handed to a person and a warning is printed to stderr. A trace for every reply goes to `results/traces.jsonl`. Add `--system baseline` to run the original prompt instead.
+Use `-s` (or `--out`) so npm's banner does not end up in the JSON. Up to 4 messages run at once (`--concurrency N` to change). A trace for every reply goes to `results/traces.jsonl`. API errors are retried; a message that still fails is handed to a person, and stderr ends with a line like `wrote 120 replies; 0 handed off after errors`. Add `--system baseline` to run the original prompt instead.
 
 Tests and the comparison:
 
 ```bash
-npm test                                                      # unit tests, no API calls, no key needed
-npm run -s eval -- --system baseline --out results/baseline.json
-npm run -s eval -- --system new --out results/new.json
-npm run -s compare -- results/baseline.json results/new.json
+npm test                                                                   # unit tests, no API calls, no key needed
+npm run -s eval -- --system baseline --cases tests/heldout2 --out results/b.json
+npm run -s eval -- --system new --cases tests/heldout2 --out results/n.json
+npm run -s compare -- results/b.json results/n.json
 ```
 
-A full eval run is 321 turns per system, about 10 minutes and under a dollar on Haiku. Add `--tag escalation` (or any tag) to run a subset. The model is set with `MODEL=...`.
+Test sets: `tests/cases` (dev), `tests/heldout`, `tests/external`, `tests/escalation-stress`, `tests/heldout2` (robustness). A run of 60 cases takes a few minutes and costs well under a dollar on Haiku. `--tag <tag>` runs a subset. Settings: `MODEL=...`; `ROUTER_FALLBACK=off` turns off the classifier fallback; `ROUTER_MODE=union` runs the classifier on every message (tested and not adopted, see below).
 
 ## How it works
 
@@ -99,27 +111,25 @@ There is a before-and-after diagram in [`docs/workflow.md`](docs/workflow.md).
 
 **What stays loaded on every turn:** the core prompt, [`prompts/core.md`](prompts/core.md), about 1,400 words. It covers identity and voice, answering only what was asked, plain text with links last, grounding every fact in a tool result, what the coordinator cannot do, when a person must take over, and the output fields. Plus the patient's context.
 
-**What loads per message:** the stage module for the patient's pipeline stage, and up to three policy modules from [`skills/`](skills/). There are 30 modules. Each one is the original prompt's text for one policy, copied word for word, so the gains come from structure, not from rewriting their rules. Each module declares the phrases that load it, a priority, and which other modules it overrides. The router is plain code, so its choice is the same every time and is written to the trace. When no phrase matches, a small classifier call picks modules from one-line descriptions; it fails open, adds about a second, and runs on roughly 5 to 15% of messages. Set `ROUTER_FALLBACK=off` to disable it.
+**What loads per message:** the stage module for the patient's pipeline stage, and up to three policy modules from [`skills/`](skills/). There are 30 modules. Each one is the original prompt's text for one policy, copied word for word, so the gains come from structure, not from rewriting their rules. Each module declares the phrases that load it, a priority, and which other modules it overrides. The router is plain code, so its choice is the same every time and is written to the trace. When no phrase matches, a small classifier call picks modules from a one-sentence description of each module's patient intent; it fails open, adds about a second, and runs on roughly 5 to 15% of messages. Running it on every message ("union mode") was tested and rejected: no accuracy gain, about a second slower.
 
 **How conflicts are settled:** in code, before the prompt is built. Where the original prompt said "this overrides that", the module declares it, and the router drops the losing module. Research shows a small model follows "this rule beats that rule" instructions poorly, so the model never has to decide.
 
 **What the model still decides:** the wording of the reply, which tools to call, and judgment-call handoffs, such as "move the $500 I already paid to Hakan".
 
-**What code enforces after the model:** every link and price must come from a tool result this turn. Formatting is fixed in code. A reply that tells the patient to pay from their assessment gets the assessment link added by code. Anything else wrong gets one retry that tells the model which links and prices are allowed. If it is still wrong, a person takes over.
+**What code enforces after the model:** every link and price must come from a tool result this turn. Formatting is fixed in code. A reply that tells the patient to pay from their assessment gets the assessment link added by code. Anything else wrong gets one retry that tells the model which links and prices are allowed. If a hard problem remains (an invented link or price, card digits, a false handoff claim, a banned promise), a person takes over; if only a heuristic check still fails, the reply is sent.
 
 ## Escalation
 
-`escalate: true` means a person takes over. It happens three ways, and the reply is always one sentence written by code, so it never answers the question or claims something was done.
+`escalate: true` means a person takes over. It is decided in three places, and the reply is always one sentence written by code, so it never answers the question or claims something was done.
 
-| Source | When | Example |
+| Source | Escalates when | Does not escalate (tested look-alikes) |
 |---|---|---|
-| Pre-gate (code) | The patient asks for a person, shares card digits, or asks us to charge a card | "I demand to talk to a human" |
-| Model | Something no tool or rule can do: move or refund paid money, contact a clinic, hold a date, a second ask for clinic contact details | "Call Heva and hold December 8 for me" |
-| Validator | The reply still breaks a check after one retry | an invented price, twice |
+| Pre-gate (code, no model call) | An explicit ask for a person; card numbers, including split across lines; "charge my card" | "Are you a bot?"; "I need to talk to my wife"; "can I talk to someone at the clinic?" (first ask); "can I pay with a debit card?" |
+| Model, from a short fixed list | Move or refund money the patient says they paid; contact a clinic or hold a date; find which dates are open; arrange their hotel, transfer or driver; a call other than the free consultation; a second ask for clinic contact details; a discount demand that will not drop | "Can I move my deposit later?"; "which weekdays can Silver be booked?"; "how does pickup from my own hotel work?"; "is the consultation a phone call?" |
+| Validator | A reply still has an invented link or price, card digits, a false "I'm getting a person" claim, or a banned promise after one retry | Only a heuristic check failing (for example, naming a package without looking it up): the reply is sent |
 
-Card digits are removed before the message reaches the model or any log. The trace records which source escalated and why, so the person taking over sees the reason.
-
-Things that look like handoffs but are not: "are you a bot?", "can I move my deposit later?", "can you call me?" (the free consultation call is offered), and a payment link request.
+The list is narrow and fixed on purpose. Research on support bots found that "escalate if unsure" inflates false handoffs, and model confidence is a poor signal, so each trigger is paired with its answerable look-alike. False escalations are measured on every run (see the Handoffs table above). Card digits are removed before the message reaches the model or any log. The trace records which source escalated and why, so the person taking over sees the reason.
 
 ## The eight problems, answered
 
@@ -153,12 +163,13 @@ Module "carecredit" loads for 2 of 107 cases. Editing it can change only these:
 
 ## How it was tested
 
-- **The test set** is 107 cases written from the original prompt's own rules, its examples of good and bad replies, and the tool data. None of them copy the sample replies in the brief. It includes 17 cases that must escalate, hard cases that must not ("is that humanly possible?"), 13 trap cases where a wrong price is planted in the message, the chat history, or the original prompt's own outdated text, and 38 cases that need no tool at all.
-- **A blind held-out set** of 25 more cases was written by a separate agent from the brief alone. It never saw the system's prompts, modules, code, or results. It is in `tests/heldout/`.
-- **The checks** are code, not a judging model: required facts, forbidden phrases, link placement, escalation, tools called. A rescore command reapplies corrected checks to saved replies without new API calls.
-- **The tool-use labels** follow ToolFailBench (arXiv 2607.04686): did the model skip a tool, ignore its result, or invent a value, and did it call tools it did not need.
-- **Fairness:** the original prompt gets the same model, tools, schema and caching. Infra errors are counted separately, never as failures. Three reps per case, compared case by case.
-- **Limits:** we wrote the test set, so it can share our blind spots. Most cases use the brief's patient (Jordan, after the assessment was sent); first-contact cases are fewer.
+- **Five test sets, 372 cases.** Our dev set (107) was written from the original prompt's rules and its examples of good and bad replies. Four more were written from the brief alone by authors who never saw the system: a held-out set (25), an external set by a different model (120, with a 100-rule coverage map in `tests/external/coverage.md`), an escalation stress set (60, with 19 minimal pairs), and a robustness set (60). None copies the brief's sample replies.
+- **Every check is proven before any run.** Each case outside the dev set has a correct reply that must pass and a wrong one that must fail, run as unit tests, so no case can fail a correct answer.
+- **The checks** are code, not a judging model: escalation, required facts, forbidden content, link placement, follow-up. The tool-use labels follow ToolFailBench (arXiv 2607.04686).
+- **Fairness:** the same model, tools, output format, caching and patient data for both systems. Infra errors are kept out of the scores. Three reps per case, compared case by case, with a standard error.
+- **Independent audits.** A separate session re-scored every saved reply (no mismatches), read every failing reply by hand to separate system errors from over-strict checks, and sampled passing replies for false passes. Its reports are in `results/runs/external/audit.md` and `results/runs/final/audit.md`.
+- **Blind first.** Each blind set was scored before any change was made because of it, and those numbers are reported as the result. Later fixes are disclosed.
+- **Limits:** checks are text rules, so they cannot fully judge tone or whether a handoff answered nothing. Every case uses the brief's patient, as the graded command does. Samples are small (standard errors of 4 to 9 points).
 
 ## Where it breaks at scale, and the fix
 
@@ -177,11 +188,11 @@ At 200,000 active users and a few messages each per day, expect around a million
 
 ## What's next
 
-Each of these runs as an experiment against the current version on the same harness, and is kept only if it wins beyond the noise without making replies slower:
+Each runs as an experiment against the current version on the same harness, and is kept only if it wins beyond the noise without making replies slower:
 
+- Log every fallback-classifier decision in production and turn frequent ones into trigger phrases, so the router covers new wording without the extra call.
 - On the retry path only, let the model consult a stronger model (the API's advisor tool), and measure whether more retries succeed.
-- Let the model load a module itself, as a tool, versus code choosing. Code choosing is the current design, based on published results; the experiment would measure it here.
-- More first-contact test cases, and a judging model for tone, checked against hand labels.
+- A judging model for tone and for "the handoff answered nothing", checked against hand labels.
 
 ## Repository layout
 
