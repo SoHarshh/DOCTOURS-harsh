@@ -129,3 +129,18 @@ describe("isQuestion", () => {
     expect(isQuestion("I want to book")).toBe(false);
   });
 });
+
+describe("pregate final review fixes", () => {
+  it("asking to reach someone at the clinic is a clinic-contact question for the model, not a handoff", () => {
+    for (const t of [
+      "can I talk to someone at the clinic before I pay?",
+      "can I speak with a representative from the clinic?",
+      "could I chat with someone from Heva first?",
+      "can I talk to a person at Dr. Hakan's office?",
+    ]) expect(pregate(t).escalate, t).toBe(false);
+  });
+  it("asking for someone on our side still fires", () => {
+    expect(pregate("can I talk to someone at Doctours?").escalate).toBe(true);
+    expect(pregate("I want to speak to a real person").escalate).toBe(true);
+  });
+});
