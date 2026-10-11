@@ -12,6 +12,7 @@ import { callModel, type ModelDeps } from "./model.js";
 import { validate, autoFix, retryMessage, VALIDATOR_NAMES } from "./validators.js";
 import { handoffReply } from "./escalationReply.js";
 import { ensureActionLink } from "./actionLinks.js";
+import { classifyModules, isAcknowledgement } from "./classifier.js";
 import { callSummaryExtra, loadCallSummaries, type SummaryStore } from "../subagents/callLog.js";
 
 export interface RunOpts {
@@ -25,6 +26,8 @@ export interface RunOpts {
   toolOverrides?: Record<string, unknown>;
   /** Precomputed call summaries; defaults to data/call-summaries.json. */
   callSummaries?: SummaryStore;
+  /** When no module matched, ask a small classifier (default on; env ROUTER_FALLBACK=off turns it off). */
+  routerFallback?: boolean;
 }
 
 let defaultSkills: Skill[] | null = null;
@@ -63,13 +66,28 @@ export async function runMessage(ctx: Context, text: string, opts: RunOpts): Pro
   trace.suppressed = routed.suppressed;
   if (!routed.stageSkill) trace.notes.push(`no stage module for ${ctx.PIPELINE_STATUS}`);
 
+  // 2b. Router fallback: no phrase matched and the message is more than an acknowledgement.
+  let chosen = routed.skills;
+  const fallbackOn = opts.routerFallback ?? process.env.ROUTER_FALLBACK !== "off";
+  const anyPolicy = chosen.some((s) => !s.name.startsWith("stage-"));
+  if (fallbackOn && !anyPolicy && !isAcknowledgement(text)) {
+    const picked = await classifyModules(opts.deps, gate.redactedText, skills);
+    trace.subagents.push("routerFallback");
+    trace.usage = addUsage(trace.usage, picked.usage);
+    if (picked.error) trace.notes.push(`router fallback: ${picked.error}`);
+    const extra = skills.filter((s) => picked.names.includes(s.name));
+    for (const s of extra) trace.routing.push({ skill: s.name, by: "classifier" });
+    chosen = [...chosen, ...extra].sort((a, b) => a.precedence - b.precedence || a.name.localeCompare(b.name));
+    trace.skillsLoaded = chosen.map((s) => s.name);
+  }
+
   // 3. Side task: a call summary prepared ahead of time, added only when the patient asks about a call.
   const extras: string[] = [];
   const callExtra = callSummaryExtra(ctx, text, opts.callSummaries ?? loadCallSummaries());
   if (callExtra) { extras.push(callExtra); trace.subagents.push("callLog"); }
 
   // 4. Assemble: fixed core (cached) + chosen modules + context.
-  const system = assembleSystem(core, routed.skills, ctx, extras);
+  const system = assembleSystem(core, chosen, ctx, extras);
   trace.promptChars = system.reduce((n, b) => n + b.text.length, 0);
 
   // 5. Model call, validators, and at most one retry.

@@ -15,7 +15,7 @@ const SKILLS = [
 
 const opts = (client: any, over: Record<string, unknown> = {}) => ({
   deps: { client, model: "claude-haiku-5-5", effort: "medium" as const, maxRounds: 4 },
-  id: "t", skills: SKILLS, core: "CORE PROMPT", callSummaries: {}, ...over,
+  id: "t", skills: SKILLS, core: "CORE PROMPT", callSummaries: {}, routerFallback: false, ...over,
 });
 const lastUser = (c: any, i: number) => { const m = c.calls[i].messages; return JSON.stringify(m[0].content); };
 
@@ -119,6 +119,26 @@ describe("runMessage", () => {
     expect(reply.response.endsWith("\nhttps://www.doctours.com/assessment/c3d4e5f6-3333-4333-8333-333333333333")).toBe(true);
     expect(trace.validators.autoFixed).toContain("assessmentLink");
     expect(c.calls.length).toBe(1);
+  });
+  it("router fallback: when no module matched, one classifier call picks modules before the main call", async () => {
+    const pick = { model: "claude-haiku-5-5", stop_reason: "end_turn", content: [{ type: "text", text: JSON.stringify({ modules: ["consultation"] }) }], usage: { input_tokens: 200, output_tokens: 10 } };
+    const c = fakeClient([pick, textResponse(baseReply({ response: "Yes, it is free." }))]);
+    const { trace } = await runMessage(buildContext(), "is the phone thing gratis", opts(c, { routerFallback: true }));
+    expect(c.calls.length).toBe(2);
+    expect(c.calls[0].tools).toBeUndefined();
+    expect(c.calls[1].system[1].text).toContain("CONSULTATION POLICY");
+    expect(trace.skillsLoaded).toEqual(["consultation", "stage-pre-clinical-sent"]);
+    expect(trace.routing.some((r) => r.skill === "consultation" && r.by === "classifier")).toBe(true);
+    expect(trace.subagents).toContain("routerFallback");
+    expect(trace.usage.input).toBeGreaterThanOrEqual(300);
+  });
+  it("router fallback is skipped for acknowledgements, matched messages, and when turned off", async () => {
+    for (const [text, on] of [["ok thanks", true], ["What does Dr. Hakan Clinic cost?", true], ["is the phone thing gratis", false]] as const) {
+      const c = fakeClient([textResponse(baseReply({ response: "Sure." }))]);
+      await runMessage(buildContext(), text, opts(c, { routerFallback: on }));
+      expect(c.calls.length, text).toBe(1);
+      expect(c.calls[0].tools, text).toBeDefined();
+    }
   });
   it("records total latency and prompt size", async () => {
     const c = fakeClient([textResponse(baseReply({ response: "Anytime." }))]);
