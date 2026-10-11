@@ -6,9 +6,7 @@ dist/
 .DS_Store
 
 # local only, not part of the deliverable
-CLAUDE.md
 pre-deposit-respond-packet.md
-.superpowers/
 
 # working eval outputs; measured runs are archived under results/runs/
 results/*.json

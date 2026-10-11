@@ -1,10 +1,10 @@
 # Routed Reply System Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> Steps use checkbox (`- [ ]`) syntax for tracking. Tasks run in order; each ends with a commit and push.
 
 **Goal:** Replace the single 800-line concierge prompt with a routed skills pipeline that escalates to a human, emits a trace per reply, and measurably beats the original on a shared test suite.
 
-**Architecture:** Per message: code pre-gate, code router, assembled prompt (core plus matched skills plus context), one Claude call with the 14 fixture tools and structured output, code validators, trace. A baseline runner fills the original monolith prompt with the same tools and output schema so both systems run through one harness.
+**Architecture:** Per message: code pre-gate, code router, assembled prompt (core plus matched skills plus context), one model call with the 14 fixture tools and structured output, code validators, trace. A baseline runner fills the original monolith prompt with the same tools and output schema so both systems run through one harness.
 
 **Tech Stack:** Node 22, TypeScript (ESM, run with `tsx`), `@anthropic-ai/sdk`, `zod`, `vitest`, `dotenv`.
 
@@ -17,8 +17,8 @@
 - Only the 14 tool functions from the packet exist. Same names, same fixture data, `null` for unknown inputs.
 - The packet's expected replies never appear in any prompt, skill, test fixture the model can see, or routing rule. No special-casing of the five sample sentences.
 - Reply `response` is plain text, no markdown. Any URL is the last line.
-- No mention of Claude in any committed file or commit message. Commits use the configured git identity. Push after every task.
-- The packet file `pre-deposit-respond-packet.md` and `CLAUDE.md` stay gitignored. Skill files copy policy text out of the packet; that copy is the deliverable.
+- Commits use the configured git identity. Push after every task.
+- The packet file `pre-deposit-respond-packet.md` stays gitignored. Skill files copy policy text out of the packet; that copy is the deliverable.
 - Current date in prompts is the packet's fixed value: `September 27, 2026 at 07:37 PM UTC`.
 
 ## Review Focus
@@ -3125,4 +3125,4 @@ These override the task bodies above where they differ. See `docs/design.md` and
 - **Task 16 (checker):** add `classifyToolUse(case, reply, trace)` returning the ToolFailBench label. Case schema gains `toolRequired?: boolean` and `trap?: { value: string }`.
 - **Task 17 (cases):** add trap and control cases from `research_notes/.../addendum_toolfailbench.md`.
 - **Task 18 (harness):** default `--reps 3`; compare reports p50 and p95 latency, Clean Tool-Use Rate and each failure rate, retry rate and first-retry fix rate, and paired per-case wins and losses.
-- **Execution:** native, task by task, commit and push after each.
+- **Execution:** task by task, commit and push after each.
