@@ -207,6 +207,15 @@ describe("routing", () => {
   it("call requests still load the consultation module", () => {
     for (const t of ["could someone call me back tomorrow?", "can I get a call with the surgeon?", "is the consultation a phone call?"]) expect(names(t), t).toContain("consultation");
   });
+  it("rules the module cut first left out now sit where their messages route", () => {
+    // packet 884: after a failed payment method, acknowledge it and offer only the next option
+    expect(byName.get("payment-and-deposit")?.body).toContain("Acknowledge what failed and move to the next option only.");
+    // packet 997: no invented clinic labels or nicknames
+    expect(byName.get("clinic-and-package-facts")?.body).toContain("Do not fabricate labels, nicknames, or brand names for clinics.");
+    for (const t of ["PayPal didn't work for me, what else can I use?", "my bank declined it", "the transfer did not go through", "Klarna turned me down"]) {
+      expect(names(t), t).toContain("payment-and-deposit");
+    }
+  });
   it("a deposit paid to a clinic directly loads deposit eligibility", () => {
     for (const t of [
       "Can the deposit I put down directly with Heva be moved into Doctours?",

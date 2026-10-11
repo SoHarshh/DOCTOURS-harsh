@@ -81,6 +81,9 @@ describe("core prompt", () => {
   it("does not copy external test sentences into the prompt", () => {
     for (const t of ["dates are still free", "Move my deposit to Gold now", "transport from my own hotel?", "a separate callback for me"]) expect(core, t).not.toContain(t);
   });
+  it("treats an automated hold notice in the history as handled", () => {
+    expect(section("# VOICE AND FORMAT")).toMatch(/automated hold notice[^.]*already handled; do not repeat it or apologize at length/i);
+  });
   it("replies in English even when asked for another language", () => {
     expect(section("# WHAT YOU DO EACH TURN")).toMatch(/Always reply in English, even when the patient writes in or asks for another language/);
   });

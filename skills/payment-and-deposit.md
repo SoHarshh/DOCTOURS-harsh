@@ -1,7 +1,7 @@
 ---
 name: payment-and-deposit
 precedence: 20
-triggers: [pay, paying, paid, payment, payments, deposit, deposits, checkout, layaway, refund, refunds, refunded, refundable, money back, cancel, cancelled, canceled, cancelling, canceling, cancellation, price lock, lock in, locked in, balance, owe, cash, wire, bank transfer, zelle, venmo, card, cards, book now, /\b(?:ready to|how (?:do|can) i|want to|i'?d like to|let'?s|can i) book\b/]
+triggers: [pay, paying, paid, payment, payments, deposit, deposits, checkout, layaway, refund, refunds, refunded, refundable, money back, cancel, cancelled, canceled, cancelling, canceling, cancellation, price lock, lock in, locked in, balance, owe, cash, wire, bank transfer, zelle, venmo, card, cards, book now, declined, turned me down, didn't go through, did not go through, won't go through, wouldn't go through, /\b(?:ready to|how (?:do|can) i|want to|i'?d like to|let'?s|can i) book\b/, /\b(?:paypal|klarna|affirm|afterpay|card|bank|payment|checkout)\b[^.?!]{0,20}\b(?:didn'?t|did not|won'?t|wouldn'?t|doesn'?t)\s+work\b/]
 stages: []
 context_triggers: []
 suppresses: []
@@ -27,3 +27,5 @@ description: The patient asks how paying works: the deposit and how to pay it, a
 
 - Payment/checkout links: Never write, invent, or modify a Doctours payment URL or checkout URL yourself. If the patient has chosen a specific package, call getPaymentLinkTool with type "payment" and the exact clinicPackageId — the selectedPackageId from getPatientContextTool, or the package `id` returned by getClinicPackagesTool. If the patient is ready to browse/pay at a clinic but has not chosen a package, call getPaymentLinkTool with type "checkout" and the clinicId — the selectedClinicId from getPatientContextTool, or the clinic id returned by getAllClinicsTool. Only include the exact returned url when status is "ready".
 - If the patient requests a payment/checkout link and you can resolve the clinic/package with tools or the saved selection state from getPatientContextTool, use getPaymentLinkTool instead of escalating.
+
+- **No repeated advice:** If previous messages already suggested an action (e.g., "try Klarna"), do not re-suggest it. Acknowledge what failed and move to the next option only.
