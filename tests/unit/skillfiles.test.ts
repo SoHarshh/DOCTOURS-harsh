@@ -216,6 +216,27 @@ describe("routing", () => {
       expect(names(t), t).toContain("payment-and-deposit");
     }
   });
+  it("rules a module's intents need are in that module, not only in one that may not load with it", () => {
+    // [module that now carries it, packet line, distinctive text]
+    const copies: [string, number, string][] = [
+      ["financing-geography", 1445, "The Klarna account does NOT have to be in the patient's own name"],
+      ["financing-geography", 1440, "The deposit is paid in full at checkout."],
+      ["financing-geography", 1451, "Layaway is available regardless of home country."],
+      ["financing-geography", 932, "Never compute or state financing schedules"],
+      ["promo", 923, "Claimed discount: BAD"],
+      ["off-channel-requests", 980, "**Can they message the clinic themselves:**"],
+      ["off-channel-requests", 1436, "a request to verify specific open dates is routed to a person"],
+      ["policy-grounding", 1438, "**Date confirmation flow:**"],
+      ["travel", 978, "**Why we need the passport:**"],
+      ["travel", 935, "Never claim which airports an airport transfer covers"],
+      ["why-doctours", 998, "Do not fabricate Doctours' track record"],
+      ["why-doctours", 817, "do not use them as Doctours differentiators"],
+    ];
+    for (const [mod, line, text] of copies) expect(byName.get(mod)?.body, `${mod} should carry packet ${line}`).toContain(text);
+  });
+  it("a question about how many nights to plan loads travel's stay-length rule", () => {
+    for (const t of ["how many nights should I plan for?", "how many days do I need to be there?"]) expect(names(t), t).toContain("travel");
+  });
   it("a deposit paid to a clinic directly loads deposit eligibility", () => {
     for (const t of [
       "Can the deposit I put down directly with Heva be moved into Doctours?",
