@@ -38,3 +38,16 @@ describe("ensureActionLink", () => {
     expect(r.added).toBe(false);
   });
 });
+
+describe("review minors", () => {
+  it("does not add the link when the assessment is described rather than acted on", () => {
+    for (const t of ["The photos from your assessment look fine.", "The graft range from your assessment is 2,500 to 3,200."]) {
+      expect(ensureActionLink(reply(t), new ToolLog()).added, t).toBe(false);
+    }
+  });
+  it("still adds it for instructions to open, use or book from the assessment", () => {
+    for (const t of ["Open your assessment and pick Heva.", "You can book Silver from your assessment."]) {
+      expect(ensureActionLink(reply(t), new ToolLog()).added, t).toBe(true);
+    }
+  });
+});

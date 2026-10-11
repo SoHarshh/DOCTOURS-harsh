@@ -9,7 +9,7 @@ import { executeTool } from "../tools/execute.js";
  * No retry, no extra model call.
  */
 
-const ACT_ON_ASSESSMENT = /\b(?:pay|paying|book|booking|open|from|use|check|review)\b[^.?!\n]{0,40}\byour assessment\b/i;
+const ACT_ON_ASSESSMENT = /\b(?:pay|paying|book|booking)\b[^.?!\n]{0,40}\b(?:from|in|through|on|via) your assessment\b|\b(?:open|use|check|review)\s+your assessment\b/i;
 
 export function ensureActionLink(reply: Reply, log: ToolLog, toolOverrides: Record<string, unknown> = {}): { reply: Reply; added: boolean } {
   if (reply.escalate || !ACT_ON_ASSESSMENT.test(reply.response)) return { reply, added: false };
