@@ -184,6 +184,26 @@ describe("toolRequired", () => {
   });
 });
 
+describe("toolRequired with package names the patient wrote", () => {
+  const patient = "The packages just say Silver and Gold; neither says Afro. Does that mean Heva is not for my 4C curls?";
+  it("does not fire when the reply only repeats package names the patient wrote", () => {
+    const r = reply({ response: "Silver and Gold only describe what each stay includes. Afro hair is Heva's specialty either way." });
+    expect(names(r, new ToolLog(), patient)).not.toContain("toolRequired");
+  });
+  it("matches the patient's names whatever their case", () => {
+    const r = reply({ response: "The Gold package and the Silver package are both at Heva." });
+    expect(names(r, new ToolLog(), "is gold or silver better?")).not.toContain("toolRequired");
+  });
+  it("still fires for a package name the patient did not write", () => {
+    const r = reply({ response: "Silver and Gold are at Heva; Sapphire is at Dr. Hakan." });
+    const found = validate(r, new ToolLog(), ctx, patient).filter((v) => v.name === "toolRequired");
+    expect(found.map((v) => v.detail)).toEqual([expect.stringContaining("Sapphire")]);
+  });
+  it("still fires for a price, even when the package names are the patient's", () => {
+    expect(names(reply({ response: "Silver is $3,000." }), new ToolLog(), patient)).toContain("toolRequired");
+  });
+});
+
 describe("autoFix", () => {
   it("strips markdown and moves URLs to the end", () => {
     const { reply: r, fixed } = autoFix(reply({ response: "**Yes.** Book at https://www.doctours.com/consultation today.\n- thanks" }));

@@ -28,6 +28,13 @@ const MONEY_SRC = String.raw`(?:\$|usd\s?|€|£)\s?(\d[\d,]*(?:\.\d+)?)|(\d[\d,
 const PACKAGE_NAME_RE = /\b(Silver|Gold|Sapphire|Diamond|VIP|Platinum|Premier)\b/;
 /** "the gold package": a lowercase tier name counts only next to a word that makes it a package ("silver lining" does not). */
 const PACKAGE_WORD_RE = /\b(silver|gold|sapphire|diamond|vip|platinum|premier)\s+(?:package|tier|option|plan)\b/i;
+/** A tier name in any case, for matching what the patient wrote. */
+const TIER_RE = /\b(silver|gold|sapphire|diamond|vip|platinum|premier)\b/gi;
+/** Every package name in the reply, in order of appearance. */
+const packageNamesIn = (s: string) => [
+  ...[...s.matchAll(new RegExp(PACKAGE_NAME_RE, "g"))].map((m) => ({ at: m.index, name: m[1] })),
+  ...[...s.matchAll(new RegExp(PACKAGE_WORD_RE, "gi"))].map((m) => ({ at: m.index, name: m[1] })),
+].sort((a, b) => a.at - b.at).map((m) => m.name);
 /** The timing phrase is about the assessment itself, not something mentioned after it. */
 const ASSESSMENT_TIMING_RE = /\bassessment\b[^.?!,]{0,30}\b(?:ready|back|done|complete|completed|finished|arrive|arrives|takes?|should|will be|usually|typically|get|receive)\b|\b(?:ready|back|done|complete|finished)\b[^.?!,]{0,30}\bassessment\b/i;
 
@@ -157,11 +164,13 @@ export function validate(reply: Reply, log: ToolLog, _ctx: Context, patientText?
   if (SENT_CLAIM_RE.test(text) && urlsIn(text).length === 0) add("claimsVsReceipts", "refers to a link but the reply contains none");
 
   if (!log.called("getClinicPackages")) {
+    // Prices and package names the patient wrote themselves are not invented by the model.
     const patientNums = new Set(patientText ? numbersIn(patientText) : []);
+    const patientPkgs = new Set([...(patientText ?? "").matchAll(TIER_RE)].map((m) => m[1].toLowerCase()));
     const prices = moneyIn(text).filter((n) => !POLICY_PRICES.includes(n) && !patientNums.has(n));
-    const pkg = text.match(PACKAGE_NAME_RE) ?? text.match(PACKAGE_WORD_RE);
+    const pkg = packageNamesIn(text).find((p) => !patientPkgs.has(p.toLowerCase()));
     if (prices.length) add("toolRequired", `states a price (${prices[0]}) without calling getClinicPackages this turn`);
-    else if (pkg) add("toolRequired", `names a package (${pkg[1]}) without calling getClinicPackages this turn`);
+    else if (pkg) add("toolRequired", `names a package (${pkg}) without calling getClinicPackages this turn`);
   }
 
   return v;
