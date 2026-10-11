@@ -73,3 +73,9 @@ describe("handoffReply", () => {
     expect(handoffReply("model", "x").response).not.toBe("changed");
   });
 });
+
+describe("review minors", () => {
+  it("strips URLs from a model-written reason", () => {
+    expect(handoffReply("model", "asked about https://example.com/x for a refund").escalationReason).not.toMatch(/https?:/);
+  });
+});

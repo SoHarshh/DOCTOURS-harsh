@@ -17,7 +17,7 @@ const MAX_REASON = 120;
 
 /** Short, single-line, and with any digit runs masked so a card number can never reach the output. */
 function cleanReason(reason: string, category: HandoffCategory): string {
-  const r = reason.replace(/\d(?:[\d -]*\d)?/g, "#").replace(/\s+/g, " ").trim().slice(0, MAX_REASON).trim();
+  const r = reason.replace(/https?:\/\/\S+/g, "").replace(/\d(?:[\d -]*\d)?/g, "#").replace(/\s+/g, " ").trim().slice(0, MAX_REASON).trim();
   return r || category;
 }
 
