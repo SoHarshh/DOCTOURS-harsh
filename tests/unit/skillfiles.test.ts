@@ -1,0 +1,172 @@
+import { describe, it, expect } from "vitest";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import { loadSkills, type Skill } from "../../src/pipeline/skills.js";
+import { route, MAX_MODULES } from "../../src/pipeline/router.js";
+import { buildContext, type Context } from "../../src/context/buildContext.js";
+import { ROOT, SKILLS_DIR } from "../../src/paths.js";
+
+const all = loadSkills(SKILLS_DIR);
+const byName = new Map(all.map((s) => [s.name, s]));
+const names = (text: string, over: Partial<Context> = {}) => route(buildContext(over), text, all).skills.map((s) => s.name);
+const nonStage = (list: string[]) => list.filter((n) => !n.startsWith("stage-"));
+const OUTSTANDING = "area unknown; name unknown; photos missing. Asks so far -- area 0, name 0, photos 0 (budget 1 each).";
+const STAGES = ["LEAD", "PREP_PRE_CLINICAL", "PRE_CLINICAL_SENT", "MEETING_BOOKED", "MEETING_COMPLETED", "MEETING_MISSED", "WAITING"];
+
+describe("skill files", () => {
+  it("all parse, names unique and match file names, bodies non-empty", () => {
+    expect(all.length).toBe(30);
+    expect(new Set(all.map((s) => s.name)).size).toBe(all.length);
+    for (const s of all) {
+      expect(s.file, s.name).toBe(`${s.name}.md`);
+      expect(s.body.length, s.name).toBeGreaterThan(40);
+    }
+  });
+  it("no expected-reply text in any module", () => {
+    for (const s of all) expect(s.body, s.name).not.toMatch(/15 to 20 minutes|getting a person for you|I can't charge a card|Sapphire, at \$|Silver is \$3,000 USD/);
+  });
+  it("precedence bands: hard rules 20, guidance 30, stage 40", () => {
+    for (const s of all) expect([20, 30, 40], s.name).toContain(s.precedence);
+    for (const s of all.filter((x) => x.name.startsWith("stage-"))) {
+      expect(s.precedence, s.name).toBe(40);
+      expect(s.triggers, s.name).toEqual([]);
+    }
+  });
+  it("every suppresses entry names a real non-stage module", () => {
+    for (const s of all) for (const x of s.suppresses) {
+      expect(byName.has(x), `${s.name} suppresses ${x}`).toBe(true);
+      expect(x.startsWith("stage-"), `${s.name} suppresses ${x}`).toBe(false);
+    }
+  });
+  it("conflicts the original settled in prose are declared as suppressions", () => {
+    expect(byName.get("time-bound-pause")?.suppresses).toEqual(["collection"]);
+    expect(byName.get("image-delay")?.suppresses).toEqual(["collection", "time-bound-pause"]);
+  });
+  it("no phrase trigger is already covered by another phrase in the same module", () => {
+    // keeps hit counts honest: "payment" and "payment link" would score one mention twice
+    const ctx = buildContext();
+    for (const s of all) {
+      const phrases = s.triggers.filter((t): t is string => typeof t === "string");
+      for (const a of phrases) {
+        const probe: Skill = { ...s, name: "probe", triggers: [a], contextTriggers: [], stages: [], suppresses: [] };
+        for (const b of phrases) {
+          if (a === b) continue;
+          expect(route(ctx, b, [probe]).skills.length, `${s.name}: "${a}" already matches "${b}"`).toBe(0);
+        }
+      }
+    }
+  });
+  it.skipIf(!existsSync(join(ROOT, "pre-deposit-respond-packet.md")))("module bodies are verbatim packet lines (fertility excepted)", () => {
+    const packet = new Set(readFileSync(join(ROOT, "pre-deposit-respond-packet.md"), "utf8").split("\n"));
+    for (const s of all.filter((x) => x.name !== "fertility")) {
+      for (const line of s.body.split("\n")) if (line.trim()) expect(packet.has(line), `${s.name}: ${line.slice(0, 60)}`).toBe(true);
+    }
+  });
+});
+
+describe("stage modules", () => {
+  it("every stage has exactly one stage module", () => {
+    for (const st of STAGES) {
+      const r = route(buildContext({ PIPELINE_STATUS: st }), "hi", all);
+      expect(r.stageSkill, st).not.toBeNull();
+      expect(r.skills.filter((s) => s.name.startsWith("stage-")).length, st).toBe(1);
+    }
+  });
+});
+
+describe("routing", () => {
+  it("routes the packet-shaped questions", () => {
+    const a = names("I'm leaning toward Heva. What packages do they have, and can I pay from the assessment? I have 4C curls — does Heva do afro hair?");
+    expect(a).toEqual(expect.arrayContaining(["stage-pre-clinical-sent", "clinic-and-package-facts", "payment-and-deposit", "assessment"]));
+    expect(names("What does Dr. Hakan Clinic cost?")).toEqual(["clinic-and-package-facts", "stage-pre-clinical-sent"]);
+    expect(names("Is the consultation free?")).toEqual(["consultation", "stage-pre-clinical-sent"]);
+  });
+  it("each module loads for a message about its policy", () => {
+    const cases: [string, string, Partial<Context>?][] = [
+      ["financing-geography", "can I pay in monthly installments?"],
+      ["health-insurance", "will my insurance cover this?"],
+      ["carecredit", "do you take carecredit?"],
+      ["carecredit", "Do you offer financing thru Cherry?"],
+      ["clinic-website", "what's Heva's website?"],
+      ["payment-and-deposit", "how do I pay the deposit?"],
+      ["promo", "are there any discounts right now?"],
+      ["deposit-eligibility", "I already paid a deposit directly to the clinic"],
+      ["clinic-and-package-facts", "does Heva operate on Sundays?"],
+      ["clinic-status-tiers", "do you have any clinics in Mexico?"],
+      ["assessment", "when will my assessment be ready?"],
+      ["image-delay", "I have a sew-in right now"],
+      ["time-bound-pause", "I need some time to save up first"],
+      ["consultation", "can I reschedule my consultation?"],
+      ["off-channel-requests", "can you email me a pdf of the plan?"],
+      ["off-channel-requests", "Can you call Heva and hold Dec 8 for me?"],
+      ["policy-grounding", "how far is the airport from the clinic?"],
+      ["creator-partnership", "I'm an influencer with 40k followers, want to collab?"],
+      ["fertility", "do you do IVF?"],
+      ["collection", "can I text you the photos instead?"],
+      ["collection", "hey", { PIPELINE_STATUS: "LEAD", COLLECTION_STATUS: OUTSTANDING }],
+      ["reversibility", "what if I change my mind after paying?"],
+      ["direct-clinic-quote", "Heva quoted me 2600 directly"],
+      ["travel", "I don't have a passport yet"],
+      ["preferences-and-dates", "I'm thinking about going in March"],
+      ["why-doctours", "why should I book through Doctours instead of the clinic?"],
+      ["recovery", "can I wear a hat after the surgery?"],
+    ];
+    for (const [mod, text, over] of cases) expect(names(text, over), `${mod}: ${text}`).toContain(mod);
+    const covered = new Set(cases.map((c) => c[0]));
+    for (const s of all.filter((x) => !x.name.startsWith("stage-"))) expect(covered.has(s.name), `no routing case for ${s.name}`).toBe(true);
+  });
+  it("short acknowledgements load only the stage module", () => {
+    for (const t of ["ok thanks", "thanks!", "thank you", "hi", "hello", "yes", "no", "got it", "done", "perfect", "sounds good", "ok cool", "great", "awesome"]) {
+      expect(names(t), t).toEqual(["stage-pre-clinical-sent"]);
+    }
+  });
+  it("look-alike words do not load the wrong module", () => {
+    expect(names("do you offer financing?")).not.toContain("promo");
+    expect(names("how much coverage will I get on my crown?")).not.toContain("health-insurance");
+    expect(names("will my hair fall out after?")).not.toContain("preferences-and-dates");
+    expect(names("may I ask something?")).not.toContain("preferences-and-dates");
+    expect(names("I'll pay the deposit when I can")).not.toContain("image-delay");
+    expect(names("I saw your ad on instagram")).not.toContain("creator-partnership");
+    expect(names("can you send me the payment link?")).not.toContain("clinic-website");
+    expect(names("I'm interested in Heva")).not.toContain("policy-grounding");
+    expect(names("how much is the package?")).not.toContain("recovery");
+  });
+  it("fertility loads without hair-transplant facts", () => {
+    const r = names("do you do IVF?");
+    expect(r).toContain("fertility");
+    expect(r).not.toContain("clinic-and-package-facts");
+  });
+  it("collection loads only when something is outstanding", () => {
+    expect(names("hi")).not.toContain("collection");
+    expect(names("hi", { PIPELINE_STATUS: "LEAD", COLLECTION_STATUS: OUTSTANDING })).toContain("collection");
+  });
+  it("precedence puts hard rules before guidance before stage", () => {
+    const r = names("I'm torn between Silver and Gold, what's the price?");
+    expect(r.indexOf("clinic-and-package-facts")).toBeLessThan(r.indexOf("reversibility"));
+    expect(r.indexOf("reversibility")).toBeLessThan(r.indexOf("stage-pre-clinical-sent"));
+  });
+  it("a message touching many policies still loads at most the cap plus the stage", () => {
+    const r = names("Can I use CareCredit or insurance, do you have clinics in Mexico, I need a passport, and can I wear a hat after?");
+    expect(nonStage(r).length).toBe(MAX_MODULES);
+    expect(r).toContain("stage-pre-clinical-sent");
+  });
+});
+
+describe("conflicts settled in code", () => {
+  const lead = { PIPELINE_STATUS: "LEAD", COLLECTION_STATUS: OUTSTANDING };
+  it("a time-bound pause drops the collection module", () => {
+    const r = route(buildContext(lead), "I need some time to save up first", all);
+    expect(r.skills.map((s) => s.name)).toEqual(["time-bound-pause", "stage-lead"]);
+    expect(r.suppressed).toEqual([{ winner: "time-bound-pause", suppressed: "collection" }]);
+  });
+  it("a hair-state photo delay drops collection and the generic pause", () => {
+    const r = route(buildContext(lead), "I have braids in right now, I need some time before photos", all);
+    expect(r.skills.map((s) => s.name)).toContain("image-delay");
+    expect(r.skills.map((s) => s.name)).not.toContain("collection");
+    expect(r.skills.map((s) => s.name)).not.toContain("time-bound-pause");
+    expect(r.suppressed).toEqual([
+      { winner: "image-delay", suppressed: "collection" },
+      { winner: "image-delay", suppressed: "time-bound-pause" },
+    ]);
+  });
+});

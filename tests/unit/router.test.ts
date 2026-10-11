@@ -106,6 +106,13 @@ describe("route suppression", () => {
     expect(names(r)).toEqual(["pause", "stage-lead"]);
     expect(r.suppressed).toEqual([]);
   });
+  it("a module that is itself suppressed cannot suppress others, whatever the name order", () => {
+    const mk = (name: string, sup: string) => parseSkill(`${name}.md`, `---\nname: ${name}\nprecedence: 20\ntriggers: [hello]\nsuppresses: [${sup}]\n---\nbody`);
+    const coll = parseSkill("c.md", "---\nname: coll\nprecedence: 30\ntriggers: [hello]\n---\nbody");
+    const r = route(buildContext({ PIPELINE_STATUS: "LEAD" }), "hello", [mk("a-pause", "coll"), mk("z-delay", "a-pause, coll"), coll]);
+    expect(names(r)).toEqual(["z-delay"]);
+    expect(r.suppressed).toEqual([{ winner: "z-delay", suppressed: "a-pause" }, { winner: "z-delay", suppressed: "coll" }]);
+  });
   it("never suppresses the stage module", () => {
     const greedy = parseSkill("g.md", "---\nname: greedy\nprecedence: 1\ntriggers: [hello]\nsuppresses: [stage-lead]\n---\nbody");
     const r = route(buildContext({ PIPELINE_STATUS: "LEAD" }), "hello", [...all, greedy]);

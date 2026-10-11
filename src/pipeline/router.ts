@@ -78,17 +78,22 @@ export function route(ctx: Context, text: string, all: Skill[]): RouteResult {
     }
   }
 
-  // Conflicts: a winner drops the modules it suppresses, when both matched. Winners are visited
-  // in precedence order and a module already dropped cannot drop others.
+  // Conflicts: a winner drops the modules it suppresses, when both matched. Only a module that no
+  // surviving module suppresses may act as a winner, so the outcome never depends on name order.
   const suppressed: RouteResult["suppressed"] = [];
   const dropped = new Set<string>();
-  const present = new Set(candidates.map((c) => c.skill.name));
-  for (const { skill: w } of [...candidates].sort((a, b) => byPrecedence(a.skill, b.skill))) {
-    if (dropped.has(w.name)) continue;
-    for (const loser of w.suppresses) {
-      if (present.has(loser) && !dropped.has(loser)) {
-        dropped.add(loser);
-        suppressed.push({ winner: w.name, suppressed: loser });
+  const ordered = [...candidates].map((c) => c.skill).sort(byPrecedence);
+  const alive = (n: string) => !dropped.has(n) && ordered.some((s) => s.name === n);
+  for (let changed = true; changed; ) {
+    changed = false;
+    for (const w of ordered) {
+      if (!alive(w.name) || ordered.some((o) => alive(o.name) && o.suppresses.includes(w.name))) continue;
+      for (const loser of w.suppresses) {
+        if (alive(loser)) {
+          dropped.add(loser);
+          suppressed.push({ winner: w.name, suppressed: loser });
+          changed = true;
+        }
       }
     }
   }

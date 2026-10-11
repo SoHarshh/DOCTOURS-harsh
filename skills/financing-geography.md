@@ -1,0 +1,17 @@
+---
+name: financing-geography
+precedence: 20
+triggers: [financing, finance, financed, instalment, instalments, installment, installments, monthly, payment plan, payment plans, spread the cost, pay over time, klarna, paypal, affirm, afterpay, pay later, per month, credit check, credit score, bad credit]
+stages: []
+context_triggers: []
+suppresses: []
+---
+# FINANCING GEOGRAPHY (HARD RULE — Klarna/PayPal)
+Patient Summary includes Home country and Klarna/PayPal financing available (yes / no / unknown). Follow that flag exactly.
+
+Lender financing means Klarna/PayPal and the "financing" / monthly-payment product on the website and in ads. It is ONLY for patients living in the US or Canada. These patient phrasings all count as asking about that product: financing, finance it, instalments, installments, monthly payments, payment plan, spread the cost, pay over time. A health-insurance coverage question also counts as a payment-options ask — after saying insurance cannot be used, name financing/layaway per the flags below (see HEALTH INSURANCE). A CareCredit or Cherry question is the same shape — after saying we do not accept CareCredit or Cherry, name financing/layaway per the flags below (see CARECREDIT). Do not treat those as a yes for layaway.
+
+- **yes (US or Canada):** You may offer Klarna/PayPal financing for the remaining balance (and name Klarna/PayPal as deposit payment methods when relevant), plus pay in full and Doctours layaway. Financing is never guaranteed — the lender approves or declines each application based on credit history and other factors, so describe it as something to apply for at checkout, never as approved.
+- **no (known outside the US and Canada):** Never proactively offer, recommend, or nudge Klarna or PayPal. Never answer "yes" to financing, instalments, monthly payments, or a payment plan. Marketing and the website often mention financing — if the patient asks about any of those (or something they saw in an ad/blog), DO answer, and the FIRST sentence must be that lender financing (Klarna/PayPal) is only available for patients living in the US or Canada. Exception: a health-insurance coverage question leads with the cash-pay no (see HEALTH INSURANCE), then this US/Canada sentence. A CareCredit or Cherry question leads with we don't accept that product (see CARECREDIT), then this US/Canada sentence. Acknowledge they may have seen it marketed. Then offer pay in full. You MAY mention Doctours interest-free layaway only as a different product (a Doctours card plan, not the advertised financing) — never as a "yes" to "can I finance / pay in instalments." Do not dodge or refuse the topic.
+- **unknown:** You may mention that Klarna/PayPal financing is available if they live in the US or Canada, and ask if that is where they live. Until they confirm they live in the US or Canada, do NOT send them to checkout specifically to preview Klarna/PayPal as if they will be approved, and do NOT answer "yes" to instalments/financing. Still offer pay in full and Doctours layaway (named as a separate card plan).
+When Klarna/PayPal are not available for this patient, do not list them as payment methods and do not use them as Doctours differentiators — but still explain the US/Canada limit when asked. Mexico is a destination we book procedures in, but patients living in Mexico are NOT eligible for lender financing.
