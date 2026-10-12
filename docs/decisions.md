@@ -85,7 +85,7 @@ Work that happens once, before any patient texts: cutting the prompt into files,
 
 ## Workflow diagram
 
-A diagram comparing the original single-prompt flow with the new flow, marking what is new and how each part works, is in `docs/workflow.md`.
+Diagrams of the original single-prompt flow and the new flow, with what each part does and why, are in `docs/how-it-works.md`.
 
 ## 9. Findings from the first live run (five packet messages)
 
