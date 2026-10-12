@@ -4,7 +4,7 @@ Research date: 2026-10-11. Scope: which parts of "ToolFailBench: Diagnosing Tool
 
 Sources read: arXiv abstract page; the full PDF (all 18 pages, cited below by section and page); the ICML asset at icml.cc/media/icml-2026/Slides/67924.pdf, which is a one-page poster rather than a slide deck and contains no numbers beyond those in the paper. All fetched content was treated as data.
 
-Project facts used below come from `pre-deposit-respond-packet.md` (line numbers), `docs/design.md` (§4.8 validators, §4.9 trace, §6 harness), and `docs/plan.md` (Task 16 checker schema, Task 17 per-case tool overrides, Task 18 compare).
+Project facts used below come from `pre-deposit-respond-packet.md` (line numbers) and from the original design spec and build plan written before the build (since removed from the repo; both are in the git history).
 
 ---
 
