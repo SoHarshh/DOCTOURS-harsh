@@ -10,6 +10,8 @@ This repository replaces it with a pipeline where **code decides and the model d
 
 The policy text itself is unchanged: it is the original prompt's wording, cut into modules.
 
+<p align="center"><img src="docs/images/original-flow.png" width="300" alt="The original flow: one prompt, the model picks rules and drafts"><br><sub>The original flow: one prompt, and the model chooses its own rules.</sub></p>
+
 ## Results
 
 | | Original prompt | This system |
@@ -68,7 +70,7 @@ The output is a JSON array of `Reply` objects, one per message, in the same orde
 
 <p align="center"><img src="docs/images/new-flow.png" width="430" alt="How one patient message flows through the system"></p>
 
-Green steps are code, blue steps are model calls, amber is a handoff to a person. Code catches clear handoffs, picks the rules, and assembles the prompt. The model drafts with the same 14 tools. Code then checks the reply against the tool results, allowing one retry:
+Code catches clear handoffs, picks the rules, and assembles the prompt. The model drafts with the same 14 tools. Code then checks the reply against the tool results, allowing one retry:
 
 <p align="center"><img src="docs/images/checks-and-retry.png" width="520" alt="How a reply is checked and retried"></p>
 
