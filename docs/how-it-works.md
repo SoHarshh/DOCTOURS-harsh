@@ -22,7 +22,7 @@ Both systems use Haiku 5.5, the same 14 tools and fixture data, the same patient
 
 Each message is an independent turn on the same fixed history: Jordan Hale has received an assessment recommending Heva and Dr. Hakan. The tools provide clinic facts, prices, patient details and links; they are assignment fixtures, not live clinic integrations.
 
-Policy modules preserve the original wording; five lines that contradicted the new handoff requirement were removed (listed in the decision log). A separate fertility stub demonstrates how another care line could be added.
+Policy modules preserve the original wording, with five conflicting lines deliberately removed. A separate fertility stub demonstrates how another care line could be added.
 
 ## 3. Original flow
 
@@ -226,7 +226,7 @@ Later fixes in **f5e2652** raised stress to 100% and robustness to 91.1%. Those 
 | Stage | What changed and why |
 | --- | --- |
 | Original | One prompt handled all rule selection and drafting |
-| v1 | Added routing, modules, checks, bounded retry, code-written handoffs and traces to make behavior testable; moved inconsistent assessment-link inclusion into code after the first live run |
+| v1 | Added routing, modules, checks, bounded retry, code-written handoffs and traces to make behavior testable; moved the assessment link into code |
 | v2 | Fixed routing misses, false validator failures and caching |
 | v3 | Added fallback classification after blind held-out messages exposed gaps in phrase matching |
 | Generalization | Expanded escalation coverage with look-alikes, separated hard and soft failures, and improved module descriptions; rejected always-on classification because it added latency without enough benefit |

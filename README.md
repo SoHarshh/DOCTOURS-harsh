@@ -68,42 +68,15 @@ The output is a JSON array of `Reply` objects, one per message, in the same orde
 
 <p align="center"><img src="docs/images/new-flow.png" width="430" alt="How one patient message flows through the system"></p>
 
-Green steps are code, blue steps are model calls, and amber is a handoff to a person.
-
-1. **Pre-gate (code).** Explicit requests for a person, card numbers, and "charge my card" are handed off with no model call.
-2. **Router (code).** The router loads the patient's stage module plus up to 3 of 30 policy modules, chosen by trigger phrases. It also settles conflicts between rules. If no phrase matched and the message is more than an acknowledgement, one small classifier call picks modules from their descriptions.
-3. **Prompt.** The core prompt, the chosen modules and the patient context are sent as three cached blocks.
-4. **Model.** The model has the same 14 tools as the original and returns a structured `Reply`.
-5. **Checks (code).** Links and prices must come from this turn's tool results. The reply must be plain text with the link last, contain no card digits, and claim no action that did not happen. A failing reply gets one retry, with feedback listing the allowed values:
+Green steps are code, blue steps are model calls, amber is a handoff to a person. Code catches clear handoffs, picks the rules, and assembles the prompt. The model drafts with the same 14 tools. Code then checks the reply against the tool results, allowing one retry:
 
 <p align="center"><img src="docs/images/checks-and-retry.png" width="520" alt="How a reply is checked and retried"></p>
 
-6. **Handoff (code).** Whenever a person must take over, code writes the one-sentence reply. It never answers the question or claims something was done.
-7. **Trace.** Every reply records which modules loaded and why, the tools called, the checks, and where any escalation came from.
+- **Why this structure.** A small model follows fewer rules as their number grows, and it handles conflicting rules poorly. So decisions that can be tested move into code, and the model sees only the rules a message needs.
+- **What stays loaded on every turn.** The core prompt ([`prompts/core.md`](prompts/core.md)) and the patient context. The rest is the patient's stage module plus at most 3 of the 30 policy modules in [`skills/`](skills/).
+- **How escalation works.** Escalation can come from three places: the pre-gate (asks for a person, card details), the model (a short fixed list in the core prompt), or the checks (a hard failure after the retry). In every case code writes the one-sentence handoff.
 
-The full walkthrough, with the reasons behind each step, is in [`docs/how-it-works.md`](docs/how-it-works.md).
-
-## Design in brief
-
-- **Why this structure.** A small model follows fewer of its rules as the rule count grows, and it is poor at choosing between rules that conflict. So every decision that can be logged and tested moves into code, and the model sees only the rules a message needs. That answers the brief's eight problems:
-  - smaller context per message
-  - a trace for every reply
-  - a new care line is just new modules (see the [`skills/fertility.md`](skills/fertility.md) stub)
-  - side tasks are done ahead of time
-  - lower cost
-  - an edit reaches only the messages that load that module
-  - conflicts are settled in code and recorded
-  - tests per module
-- **What stays loaded on every turn.**
-  - The core prompt ([`prompts/core.md`](prompts/core.md), about 1,400 words): identity and voice, grounding, what the coordinator cannot do, when to hand off, and the output fields.
-  - The patient context.
-  - Everything else is the stage module plus at most 3 policy modules ([`skills/`](skills/)).
-- **How escalation works.** Escalation is decided in three places:
-  1. The pre-gate catches explicit asks for a person and card details.
-  2. The model escalates from a short fixed list: moving paid money, contacting a clinic or holding a date, checking open dates, arranging hotel or transport, a call other than the free consultation, a repeated ask for clinic contacts, and a discount demand that won't drop.
-  3. The checks escalate a reply that still has an invented link or price, card digits, or a false claim after the retry.
-
-  In every case code writes the handoff sentence. Each trigger is tested against an answerable look-alike, for example "move my deposit" against "can I move it later?".
+Every step, the full escalation list, and the reasons behind each choice are in [`docs/how-it-works.md`](docs/how-it-works.md).
 
 ## More detail
 
